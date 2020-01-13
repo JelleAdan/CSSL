@@ -1,9 +1,9 @@
-﻿using CSSL.Examples.ServerpoolsDispatcher;
+﻿using CSSL.Examples.DataCenter;
 using CSSL.Modeling;
 using CSSL.Utilities.Distributions;
 using System;
 
-namespace SingleQueueDispatcherMultipleServerpools
+namespace DataCenter
 {
     class Program
     {
