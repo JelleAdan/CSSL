@@ -23,7 +23,7 @@ namespace CSSL.Modeling
             MyExecutive = executive;
             MyModel = new Model(name + "_Model", MyExecutive);
             MyExperiment = new Experiment(name + "_Experiment");
-            replicationExecutionProcess = new ReplicationExecutionProcess();
+            replicationExecutionProcess = new ReplicationExecutionProcess(MyExperiment);
         }
 
         public Executive MyExecutive { get; }
@@ -38,10 +38,39 @@ namespace CSSL.Modeling
         {
             replicationExecutionProcess.TryInitialize();
         }
+
+        public void Run()
+        {
+            replicationExecutionProcess.TryRun();
+        }
+
+        public void End()
+        {
+            replicationExecutionProcess.TryEnd();
+        }
     }
 
     public class ReplicationExecutionProcess : IterativeProcess<Executive>
     {
+        private Experiment experiment;
+
+        public ReplicationExecutionProcess(Experiment experiment)
+        {
+            this.experiment = experiment;
+        }
+
+        protected sealed override void DoInitialize()
+        {
+            base.DoInitialize();
+
+
+        }
+
+        protected sealed override void DoRun()
+        {
+            base.DoRun();
+        }
+
         public void RunNext()
         {
         }

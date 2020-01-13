@@ -62,25 +62,5 @@ namespace CSSL.Modeling
         ///  First checks if state transition is allowed, if allowed it proceeds, otherwise it throws an error.
         /// </summary>
         void TryEnd();
-
-        /// <summary>
-        /// Method that contains the logic to initialize the process. 
-        /// </summary>
-        //void DoInitialize();
-
-        /// <summary>
-        /// Method that contains the logic to run the process. 
-        /// </summary>
-        //void DoRun();
-
-        /// <summary>
-        /// Method that contains the logic to run the next step in the process.
-        /// </summary>
-        //void DoRunNext();
-
-        /// <summary>
-        /// Method that contains the logic to end the process. 
-        /// </summary>
-        //void DoEnd();
     }
 }

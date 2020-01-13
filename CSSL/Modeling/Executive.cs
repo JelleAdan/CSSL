@@ -48,22 +48,22 @@ namespace CSSL.Modeling
                 Calendar = calendar;
             }
 
-            protected override void DoInitialize()
+            protected sealed override void DoInitialize()
             {
                 base.DoInitialize();
             }
 
-            public override void DoRun()
+            protected sealed override void DoRun()
             {
                 base.DoRun();
             }
 
-            public override void DoRunNext()
+            protected sealed override void DoRunNext()
             {
                 base.DoRunNext();
             }
 
-            public override void DoEnd()
+            protected sealed override void DoEnd()
             {
                 base.DoEnd();
             }
