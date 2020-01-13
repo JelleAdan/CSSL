@@ -37,7 +37,7 @@ namespace CSSL.Modeling
         /// <summary>
         /// Flag to indicate if the process has another step to run.
         /// </summary>
-        bool HasNext { get; }
+        //bool HasNext { get; }
 
         /// <summary>
         /// Method to initialize the process. 
@@ -71,16 +71,16 @@ namespace CSSL.Modeling
         /// <summary>
         /// Method that contains the logic to run the process. 
         /// </summary>
-        void DoRun();
+        //void DoRun();
 
         /// <summary>
         /// Method that contains the logic to run the next step in the process.
         /// </summary>
-        void DoRunNext();
+        //void DoRunNext();
 
         /// <summary>
         /// Method that contains the logic to end the process. 
         /// </summary>
-        void DoEnd();
+        //void DoEnd();
     }
 }

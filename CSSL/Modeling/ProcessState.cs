@@ -27,17 +27,17 @@ namespace CSSL.Modeling
             throw new Exception($"\nTried to initialize {process.Name} from an illegal state: {process.CurrentState.Name}");
         }
 
-        public virtual void TryRun()
+        public virtual bool TryRun()
         {
             throw new Exception($"\nTried to run {process.Name} from an illegal state: {process.CurrentState.Name}");
         }
 
-        public virtual void TryRunNext()
+        public virtual bool TryRunNext()
         {
             throw new Exception($"\nTried to run next step in {process.Name} from an illegal state: {process.CurrentState.Name}");
         }
 
-        public virtual void TryEnd()
+        public virtual bool TryEnd()
         {
             throw new Exception($"\nTried to end {process.Name} from an illegal state: {process.CurrentState.Name}");
         }
@@ -58,12 +58,11 @@ namespace CSSL.Modeling
         public override bool TryInitialize()
         {
             return true;
-            process.DoInitialize();
         }
 
-        public override void TryEnd()
+        public override bool TryEnd()
         {
-            process.DoEnd();
+            return true;
         }
     }
 
@@ -79,19 +78,19 @@ namespace CSSL.Modeling
 
         public override string Name => "InitializedState";
 
-        public override void TryRun()
+        public override bool TryRun()
         {
-            process.DoRun();
+            return true;
         }
 
-        public override void TryRunNext()
+        public override bool TryRunNext()
         {
-            process.DoRunNext();
+            return true;
         }
 
-        public override void TryEnd()
+        public override bool TryEnd()
         {
-            process.DoEnd();
+            return true;
         }
     }
 
@@ -107,19 +106,19 @@ namespace CSSL.Modeling
 
         public override string Name => "RunningState";
 
-        public override void TryRun()
+        public override bool TryRun()
         {
-            process.DoRun();
+            return true;
         }
 
-        public override void TryRunNext()
+        public override bool TryRunNext()
         {
-            process.DoRunNext();
+            return true;
         }
 
-        public override void TryEnd()
+        public override bool TryEnd()
         {
-            process.DoEnd();
+            return true;
         }
     }
 

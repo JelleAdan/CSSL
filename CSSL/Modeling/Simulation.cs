@@ -23,13 +23,14 @@ namespace CSSL.Modeling
             MyExecutive = executive;
             MyModel = new Model(name + "_Model", MyExecutive);
             MyExperiment = new Experiment(name + "_Experiment");
+            replicationExecutionProcess = new ReplicationExecutionProcess();
         }
 
         public Executive MyExecutive { get; }
 
-        public Experiment MyExperiment { get; }
-
         public Model MyModel { get; private set; }
+
+        public Experiment MyExperiment { get; }
 
         private ReplicationExecutionProcess replicationExecutionProcess { get; }
 
@@ -39,19 +40,10 @@ namespace CSSL.Modeling
         }
     }
 
-    public class ReplicationExecutionProcess : IterativeProcess<Experiment>
+    public class ReplicationExecutionProcess : IterativeProcess<Executive>
     {
-        private List<Experiment> Experiments;
-
-        public ReplicationExecutionProcess(List<Experiment> experiments)
-        {
-            Experiments = experiments;
-        }
-
         public void RunNext()
         {
-            int counter = 0;
-            var next = Experiments[counter];
         }
     }
 }
