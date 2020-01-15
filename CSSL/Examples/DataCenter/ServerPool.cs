@@ -14,6 +14,11 @@ namespace CSSL.Examples.DataCenter
         {
         }
 
-        private int jobCount;
+        public int JobCount { get; private set; }
+
+        public void HandleDeparture(CSSLEvent e)
+        {
+
+        }
     }
 }

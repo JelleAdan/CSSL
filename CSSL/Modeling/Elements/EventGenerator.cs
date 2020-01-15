@@ -9,11 +9,11 @@ namespace CSSL.Modeling.Elements
 {
     public class EventGenerator : SchedulingElement, IEventGenerator
     {
-        private Distribution interEventTime;
+        private Distribution interEventTimeDistribution;
 
-        public EventGenerator(ModelElement parent, string name, Distribution interEventTime) : base(parent, name)
+        public EventGenerator(ModelElement parent, string name, Distribution interEventTimeDistribution) : base(parent, name)
         {
-            this.interEventTime = interEventTime;
+            this.interEventTimeDistribution = interEventTimeDistribution;
         }
 
         public bool IsOn { get; private set; }
@@ -30,7 +30,7 @@ namespace CSSL.Modeling.Elements
 
         public double NextEventTime()
         {
-            return time = GetTime() + interEventTime.Next();
+            return GetTime() + interEventTimeDistribution.Next();
         }
     }
 }

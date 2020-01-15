@@ -11,11 +11,12 @@ namespace CSSL.Examples.DataCenter
 {
     public class JobGenerator : EventGenerator
     {
-        public JobGenerator(ModelElement parent, string name, Distribution interEventTime) : base(parent, name, interEventTime)
+        public JobGenerator(ModelElement parent, string name, Distribution interEventTimeDistribution, Dispatcher dispatcher) : base(parent, name, interEventTimeDistribution)
         {
+            this.dispatcher = dispatcher;
         }
 
-        private Distribution interEventTime;
+        private Dispatcher dispatcher;
 
         public void HandleGeneration(CSSLEvent e)
         {
@@ -25,7 +26,8 @@ namespace CSSL.Examples.DataCenter
             // Instantiate a job
             Job job = new Job(GetTime());
 
-            // Send to queue
+            // Send to dispatcher
+            dispatcher.HandleArrival(job);
         }
     }
 }
