@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CSSL.Modeling;
+using CSSL.Modeling.Elements;
 
 namespace CSSL.Calendar
 {

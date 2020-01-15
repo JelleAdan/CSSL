@@ -12,12 +12,18 @@ namespace CSSL.Modeling.CSSLQueue
     {
         public CSSLQueue(ModelElement parent, string name) : base(parent, name)
         {
+            Items = new List<CSSLQueueObject>();
         }
 
         /// <summary>
         /// List of items in the queue.
         /// </summary>
         protected List<CSSLQueueObject> Items;
+
+        /// <summary>
+        /// Returns the current length of the queue.
+        /// </summary>
+        public int Length { get => Items.Count; }
 
         /// <summary>
         /// Adds an item to the end of the queue.

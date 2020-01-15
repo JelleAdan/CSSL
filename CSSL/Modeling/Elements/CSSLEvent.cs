@@ -11,13 +11,13 @@ namespace CSSL.Modeling.Elements
     {
         public delegate void CSSLEventAction(CSSLEvent csslevent);
 
-        private double time { get; }
+        public double Time { get; }
 
         private CSSLEventAction action { get; }
 
         public CSSLEvent(double time, CSSLEventAction action)
         {
-            this.time = time;
+            Time = time;
             this.action = action;
         }
 
@@ -28,12 +28,12 @@ namespace CSSL.Modeling.Elements
 
         public int CompareTo(CSSLEvent other)
         {
-            if (time < other.time)
+            if (Time < other.Time)
             {
                 return -1;
             }
 
-            if (time > other.time)
+            if (Time > other.Time)
             {
                 return 1;
             }

@@ -13,8 +13,17 @@ namespace CSSL.Examples.DataCenter
     {
         public Dispatcher(ModelElement parent, string name) : base(parent, name)
         {
+            queue = new Queue<CSSLQueueObject>();
         }
 
         private Queue<CSSLQueueObject> queue;
+
+        public void HandleArrival(CSSLEvent e)
+        {
+            if(queue.Length == 0)
+            {
+
+            }
+        }
     }
 }

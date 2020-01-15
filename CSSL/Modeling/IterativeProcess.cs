@@ -12,13 +12,13 @@ namespace CSSL.Modeling
 
         public ProcessState CurrentState { get; private set; }
 
-        public bool IsCreated => CurrentState.Name == "CreatedState";
+        public bool IsCreated => CurrentState.GetType().Name == "CreatedState";
 
-        public bool IsInitialized => CurrentState.Name == "InitializedState";
+        public bool IsInitialized => CurrentState.GetType().Name == "InitializedState";
 
-        public bool IsRunning => CurrentState.Name == "RunningState";
+        public bool IsRunning => CurrentState.GetType().Name == "RunningState";
 
-        public bool IsEnded => CurrentState.Name == "EndedState";
+        public bool IsEnded => CurrentState.GetType().Name == "EndedState";
 
         private CreatedState createdState;
 

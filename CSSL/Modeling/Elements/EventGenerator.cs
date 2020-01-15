@@ -28,10 +28,9 @@ namespace CSSL.Modeling.Elements
             IsOn = true;
         }
 
-        public void Generate()
+        public double NextEventTime()
         {
-            double time = GetTime() + interEventTime.Next();
-            //ScheduleEvent(time, );
+            return time = GetTime() + interEventTime.Next();
         }
     }
 }
