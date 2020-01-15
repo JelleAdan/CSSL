@@ -23,7 +23,7 @@ namespace CSSL.Modeling.CSSLQueue
         /// <summary>
         /// Returns the current length of the queue.
         /// </summary>
-        public int Length { get => Items.Count; }
+        public int Length => Items.Count;
 
         /// <summary>
         /// Adds an item to the end of the queue.
