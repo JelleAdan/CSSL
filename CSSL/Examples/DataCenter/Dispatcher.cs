@@ -55,13 +55,21 @@ namespace CSSL.Examples.DataCenter
                 double serviceTime1 = serviceTime * rnd.NextDouble();
                 double serviceTime2 = serviceTime - serviceTime1;
 
-                Serverpool serverPool = ChooseServerpool();
+                Serverpool serverPool1 = ChooseServerpool();
+                Serverpool serverPool2 = ChooseServerpool();
 
-                ScheduleEvent(GetTime() + serviceTime1, serverPool.)
+                ScheduleEvent(GetTime() + serviceTime1, serverPool1.HandleDeparture);
+                ScheduleEvent(GetTime() + serviceTime2, serverPool2.HandleDeparture);
             }
             else
             {
+                Serverpool serverPool = ChooseServerpool();
 
+                ScheduleEvent(GetTime() + serviceTime, serverPool.HandleDeparture);
+
+                serverPool.HandleArrival(job);
+
+                job.DepartureTime
             }
 
             if (queue.Length > 0)
@@ -92,6 +100,11 @@ namespace CSSL.Examples.DataCenter
             }
 
             return selection.OrderBy(x => x.JobCount).First();
+        }
+
+        public void SendToServerpool(Serverpool serverPool)
+        {
+
         }
     }
 }

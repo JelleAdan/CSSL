@@ -13,6 +13,6 @@ namespace CSSL.Examples.DataCenter
         {
         }
 
-        public double departureTime { get; set; }
+        public double DepartureTime { get; set; }
     }
 }
