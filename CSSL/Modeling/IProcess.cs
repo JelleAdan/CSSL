@@ -49,7 +49,7 @@ namespace CSSL.Modeling
         /// Method to run all steps in the process. 
         /// First checks if state transition is allowed, if allowed it proceeds, otherwise it throws an error.
         /// </summary>
-        void TryRun();
+        void TryRunAll();
 
         /// <summary>
         /// Method to run the next step in the process. 

@@ -42,7 +42,7 @@ namespace CSSL.Modeling
             CurrentState = createdState;
         }
 
-        protected bool HasNext => throw new NotImplementedException();
+        protected virtual bool HasNext => throw new NotImplementedException();
 
         public void TryInitialize()
         {
@@ -52,11 +52,11 @@ namespace CSSL.Modeling
             }
         }
 
-        public void TryRun()
+        public void TryRunAll()
         {
-            if (CurrentState.TryRun())
+            if (CurrentState.TryRunAll())
             {
-                DoRun();
+                DoRunAll();
             }
         }
 
@@ -81,19 +81,44 @@ namespace CSSL.Modeling
             SetState(initializedState);
         }
 
-        protected virtual void DoRun()
+        protected void DoRunAll()
         {
+            if (!IsInitialized)
+            {
+                TryInitialize();
+            }
             SetState(runningState);
+            while (HasNext)
+            {
+                RunIteration();
+            }
+            TryEnd();
         }
 
-        protected virtual void DoRunNext()
+        protected void DoRunNext()
         {
+            if (!IsInitialized)
+            {
+                TryInitialize();
+            }
             SetState(runningState);
+            if (HasNext)
+            {
+                RunIteration();
+            }
+            else
+            {
+                TryEnd();
+            }
         }
 
         protected virtual void DoEnd()
         {
             SetState(endedState);
         }
+
+        protected virtual T NextIteration() { throw new NotImplementedException(); }
+
+        protected virtual void RunIteration() { throw new NotImplementedException(); }
     }
 }

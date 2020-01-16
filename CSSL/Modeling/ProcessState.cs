@@ -21,7 +21,7 @@ namespace CSSL.Modeling
             throw new Exception($"\nTried to initialize {process.GetType().Name} from an illegal state: {process.CurrentState.GetType().Name}");
         }
 
-        public virtual bool TryRun()
+        public virtual bool TryRunAll()
         {
             throw new Exception($"\nTried to run {process.GetType().Name} from an illegal state: {process.CurrentState.GetType().Name}");
         }
@@ -54,7 +54,7 @@ namespace CSSL.Modeling
         {
         }
 
-        public override bool TryRun() { return true; }
+        public override bool TryRunAll() { return true; }
 
         public override bool TryRunNext() { return true; }
 
@@ -67,7 +67,7 @@ namespace CSSL.Modeling
         {
         }
 
-        public override bool TryRun() { return true; }
+        public override bool TryRunAll() { return true; }
 
         public override bool TryRunNext() { return true; }
 

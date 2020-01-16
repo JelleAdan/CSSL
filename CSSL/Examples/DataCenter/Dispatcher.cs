@@ -49,7 +49,7 @@ namespace CSSL.Examples.DataCenter
 
         public void Dispatch(CSSLEvent e)
         {
-            Job job = (Job)queue.DequeueFirst();
+            Job job = queue.DequeueFirst();
 
             job.ServiceTime = serviceTimeDistribution.Next();
 

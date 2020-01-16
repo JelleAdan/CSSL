@@ -74,8 +74,24 @@ namespace CSSL.Modeling
         /// <summary>
         /// The current number of finished replications for this experiment.
         /// </summary>
-        private int currentReplication;
+        private int currentReplicationNumber;
 
+        /// <summary>
+        /// Resets the current replication number to zero. 
+        /// </summary>
+        public void ResetCurrentReplicationNumber()
+        {
+            currentReplicationNumber = 0;
+        }
 
+        public bool HasMoreReplications => currentReplicationNumber < numberOfReplications;
+
+        /// <summary>
+        /// Increments the current replication number by one.
+        /// </summary>
+        public int IncrementCurrentReplicationNumber()
+        {
+            return ++currentReplicationNumber;
+        }
     }
 }

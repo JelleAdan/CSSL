@@ -53,9 +53,9 @@ namespace CSSL.Modeling
                 base.DoInitialize();
             }
 
-            protected sealed override void DoRun()
+            protected sealed override void DoRunAll()
             {
-                base.DoRun();
+                base.DoRunAll();
             }
 
             protected sealed override void DoRunNext()
