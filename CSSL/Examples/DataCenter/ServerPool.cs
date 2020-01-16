@@ -18,7 +18,7 @@ namespace CSSL.Examples.DataCenter
 
         private ServerPoolQueue queue { get; set; }
 
-        public int JobCount { get; private set; }
+        public int JobCount => queue.Length;
 
         public void HandleDeparture(CSSLEvent e)
         {

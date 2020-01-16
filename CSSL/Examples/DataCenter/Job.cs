@@ -14,5 +14,7 @@ namespace CSSL.Examples.DataCenter
         }
 
         public double DepartureTime { get; set; }
+
+        public double ServiceTime { get; set; }
     }
 }

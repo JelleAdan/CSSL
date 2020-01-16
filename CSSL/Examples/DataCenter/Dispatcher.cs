@@ -12,18 +12,18 @@ namespace CSSL.Examples.DataCenter
 {
     public class Dispatcher : SchedulingElement
     {
-        public Dispatcher(ModelElement parent, string name, Distribution serviceTimeDistribution, double serviceTimeThreshold, List<Serverpool> serverPools, int nrServerPools, double epsilon) : base(parent, name)
+        public Dispatcher(ModelElement parent, string name, Distribution serviceTimeDistribution, double serviceTimeThreshold, List<Serverpool> serverPools, int nrServerPools, double dispatchTime) : base(parent, name)
         {
-            queue = new CSSLQueue<CSSLQueueObject>(parent, name + "_Queue");
+            queue = new CSSLQueue<Job>(parent, name + "_Queue");
             this.serviceTimeDistribution = serviceTimeDistribution;
             this.serviceTimeThreshold = serviceTimeThreshold;
             rnd = new Random();
             this.serverPools = serverPools;
             this.nrServerPools = nrServerPools;
-            this.epsilon = epsilon;
+            this.dispatchTime = dispatchTime;
         }
 
-        private CSSLQueue<CSSLQueueObject> queue;
+        private CSSLQueue<Job> queue;
 
         private Distribution serviceTimeDistribution;
 
@@ -35,7 +35,7 @@ namespace CSSL.Examples.DataCenter
 
         private int nrServerPools;
 
-        private double epsilon;
+        private double dispatchTime;
 
         public void HandleArrival(Job job)
         {
@@ -51,34 +51,31 @@ namespace CSSL.Examples.DataCenter
         {
             Job job = (Job)queue.DequeueFirst();
 
-            double serviceTime = serviceTimeDistribution.Next();
+            job.ServiceTime = serviceTimeDistribution.Next();
 
-            if (serviceTime > serviceTimeThreshold)
+            if (job.ServiceTime > serviceTimeThreshold)
             {
-                DispatchTwoJobs(job, serviceTime);
+                Job job2 = SplitJobs(job);
+                SendToServerPool(job);
+                SendToServerPool(job2);
             }
             else
             {
-                DispatchOneJob(job, serviceTime);
+                SendToServerPool(job);
             }
 
             // Schedule next dispatch event, if queue is nonempty
             if (queue.Length > 0)
             {
-                ScheduleEvent(GetTime() + epsilon, Dispatch);
+                ScheduleEvent(GetTime() + dispatchTime, Dispatch);
             }
-            else
-            {
-
-            }
-
         }
 
-        private void DispatchOneJob(Job job, double serviceTime)
+        private void SendToServerPool(Job job)
         {
             Serverpool serverPool = ChooseServerpool();
 
-            double departureTime = GetTime() + serviceTime;
+            double departureTime = GetTime() + job.ServiceTime;
 
             ScheduleEvent(departureTime, serverPool.HandleDeparture);
 
@@ -87,27 +84,20 @@ namespace CSSL.Examples.DataCenter
             serverPool.HandleArrival(job);
         }
 
-        private void DispatchTwoJobs(Job job, double serviceTime)
+        private Job SplitJobs(Job job)
         {
-            double serviceTime1 = serviceTime * rnd.NextDouble();
-            double serviceTime2 = serviceTime - serviceTime1;
+            double serviceTime1 = job.ServiceTime * rnd.NextDouble();
+            double serviceTime2 = job.ServiceTime - serviceTime1;
 
-            Serverpool serverPool1 = ChooseServerpool();
-            Serverpool serverPool2 = ChooseServerpool();
+            Job job2 = new Job(job.CreationTime);
 
-            double departureTime1 = GetTime() + serviceTime1;
-            double departureTime2 = GetTime() + serviceTime2;
+            job.ServiceTime = serviceTime1;
+            job2.ServiceTime = serviceTime2;
 
-            Job job2 = new Job(GetTime());
+            job.DepartureTime = GetTime() + serviceTime1;
+            job2.DepartureTime = GetTime() + serviceTime2;
 
-            job.DepartureTime = departureTime1;
-            job2.DepartureTime = departureTime2;
-
-            ScheduleEvent(GetTime() + serviceTime1, serverPool1.HandleDeparture);
-            ScheduleEvent(GetTime() + serviceTime2, serverPool2.HandleDeparture);
-
-            serverPool1.HandleArrival(job);
-            serverPool2.HandleArrival(job);
+            return job2;
         }
 
         private Serverpool ChooseServerpool()
@@ -128,11 +118,6 @@ namespace CSSL.Examples.DataCenter
             }
 
             return selection.OrderBy(x => x.JobCount).First();
-        }
-
-        public void SendToServerpool(Serverpool serverPool)
-        {
-
         }
     }
 }
