@@ -9,17 +9,19 @@ using System.Threading.Tasks;
 
 namespace CSSL.Observer
 {
-    public abstract class ObserverBase : IObserver<object>
+    public abstract class ModelElementObserverBase<T> : IObserver<T>
     {
         public abstract void OnCompleted();
+
         public abstract void OnError(Exception error);
-        public abstract void OnNext(object value);
+
+        public abstract void OnNext(T value);
 
         private IDisposable cancellation;
 
-        public void Subscribe(ModelElement modelElement)
+        public void Subscribe(IObservable<ModelElement> observable)
         {
-            cancellation = modelElement.Subscribe(this);
+            cancellation = observable.Subscribe(this);
         }
 
         public void Unsubscribe()

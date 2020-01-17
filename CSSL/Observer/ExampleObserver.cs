@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CSSL.Observer
 {
-    public class ExampleObserver : ObserverBase
+    public class ExampleObserver : ModelElementObserverBase
     {
         public override void OnCompleted()
         {

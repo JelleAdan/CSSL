@@ -32,5 +32,10 @@ namespace CSSL.Modeling.Elements
         {
             return GetTime() + interEventTimeDistribution.Next();
         }
+
+        protected override void DoBeforeReplication()
+        {
+            ScheduleEvent(GetExecutive())
+        }
     }
 }

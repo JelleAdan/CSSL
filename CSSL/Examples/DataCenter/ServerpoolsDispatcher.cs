@@ -10,13 +10,11 @@ namespace CSSL.Examples.DataCenter
 {
     public class ServerpoolsDispatcher : ModelElement
     {
+        public JobGenerator JobGenerator { get; private set; }
 
+        public  Dispatcher Dispatcher { get; private set; }
 
-        private JobGenerator jobGenerator;
-
-        private Dispatcher dispatcher;
-
-        private List<Serverpool> serverPools;
+        public List<Serverpool> ServerPools { get; private set; }
 
         public ServerpoolsDispatcher(ModelElement parent, string name) : base(parent, name)
         {
@@ -24,21 +22,21 @@ namespace CSSL.Examples.DataCenter
 
         public void SetJobGenerator(JobGenerator jobGenerator)
         {
-            this.jobGenerator = jobGenerator;
+            JobGenerator = jobGenerator;
         }
 
         public void SetDispatcher(Dispatcher dispatcher)
         {
-            this.dispatcher = dispatcher;
+            Dispatcher = dispatcher;
         }
 
-        public void AddServerpool(Serverpool serverpool)
+        public void AddServerpool(Serverpool serverPool)
         {
-            if (serverPools == null)
+            if (ServerPools == null)
             {
-                serverPools = new List<Serverpool>();
+                ServerPools = new List<Serverpool>();
             }
-            serverPools.Add(serverpool);
+            ServerPools.Add(serverPool);
         }
     }
 }

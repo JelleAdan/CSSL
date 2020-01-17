@@ -91,7 +91,7 @@ namespace CSSL.Modeling
         /// </summary>
         public int IncrementCurrentReplicationNumber()
         {
-            return ++currentReplicationNumber;
+            return currentReplicationNumber++;
         }
     }
 }

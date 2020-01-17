@@ -27,11 +27,16 @@ namespace CSSL.Modeling
             this.calendar = calendar;
         }
 
-        public void Initialize()
+        public void TryInitialize()
         {
             eventExecutionProcess.TryInitialize();
         }
 
+        public void Execute(CSSLEvent e)
+        {
+            Time = e.Time;
+            e.Execute();
+        }
 
         internal void ScheduleEvent(double time, CSSLEventAction action)
         {
@@ -41,31 +46,31 @@ namespace CSSL.Modeling
 
         private class EventExecutionProcess : IterativeProcess<CSSLEvent>
         {
-            private ICalendar Calendar;
+            private Executive executive;
 
-            public EventExecutionProcess(ICalendar calendar) : base()
+            public EventExecutionProcess(Executive executive) : base()
             {
-                Calendar = calendar;
+                this.executive = executive;
             }
+
+            protected override bool HasNext => executive.calendar.HasNext();
 
             protected sealed override void DoInitialize()
             {
                 base.DoInitialize();
+                executive.calendar.CancelAll();
+                executive.Time = 0;
             }
 
-            protected sealed override void DoRunAll()
+            protected sealed override CSSLEvent NextIteration()
             {
-                base.DoRunAll();
+                return executive.calendar.Next();
             }
 
-            protected sealed override void DoRunNext()
+            protected sealed override void RunIteration()
             {
-                base.DoRunNext();
-            }
-
-            protected sealed override void DoEnd()
-            {
-                base.DoEnd();
+                CSSLEvent e = NextIteration();
+                executive.Execute(e);
             }
         }
     }

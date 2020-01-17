@@ -12,18 +12,19 @@ namespace CSSL.Examples.DataCenter
 {
     public class Dispatcher : SchedulingElement
     {
-        public Dispatcher(ModelElement parent, string name, Distribution serviceTimeDistribution, double serviceTimeThreshold, List<Serverpool> serverPools, int nrServerPools, double dispatchTime) : base(parent, name)
+        public Dispatcher(ModelElement parent, string name, Distribution serviceTimeDistribution, double serviceTimeThreshold, List<Serverpool> serverPools, double dispatchTime) : base(parent, name)
         {
             queue = new CSSLQueue<Job>(parent, name + "_Queue");
             this.serviceTimeDistribution = serviceTimeDistribution;
             this.serviceTimeThreshold = serviceTimeThreshold;
             rnd = new Random();
             this.serverPools = serverPools;
-            this.nrServerPools = nrServerPools;
             this.dispatchTime = dispatchTime;
         }
 
         private CSSLQueue<Job> queue;
+
+        public int QueueLength => queue.Length;
 
         private Distribution serviceTimeDistribution;
 
@@ -33,12 +34,14 @@ namespace CSSL.Examples.DataCenter
 
         private List<Serverpool> serverPools;
 
-        private int nrServerPools;
+        private int nrServerPools => serverPools.Count;
 
         private double dispatchTime;
 
         public void HandleArrival(Job job)
         {
+            NotifyObservers(this);
+
             queue.EnqueueLast(job);
 
             if (queue.Length == 1)

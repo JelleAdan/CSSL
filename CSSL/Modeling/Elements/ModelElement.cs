@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CSSL.Modeling.Elements
 {
-    public abstract class ModelElement : IIdentity, IName, IObservable<object>
+    public abstract class ModelElement : IIdentity, IName, IObservable<ModelElement>
     {
         /// <summary>
         /// Incremented to store the total number of created model elements.
@@ -50,6 +50,7 @@ namespace CSSL.Modeling.Elements
             Name = name;
             Id = modelElementCounter++;
             modelElements = new List<ModelElement>();
+            observers = new List<IObserver<ModelElement>>();
         }
 
         /// <summary>
@@ -75,19 +76,13 @@ namespace CSSL.Modeling.Elements
         /// Retrieves the executive.
         /// </summary>
         /// <returns></returns>
-        protected Executive GetExecutive()
-        {
-            return myModel.Executive;
-        }
+        protected Executive GetExecutive() => myModel.Executive;
 
         /// <summary>
         /// Retrieves the current simulation time.
         /// </summary>
         /// <returns></returns>
-        protected double GetTime()
-        {
-            return GetExecutive().Time;
-        }
+        public double GetTime() => GetExecutive().Time;
 
         /// <summary>
         /// 
@@ -128,27 +123,77 @@ namespace CSSL.Modeling.Elements
         }
 
         /// <summary>
-        /// This method should be overridden by derived classes that need to perform initialization actions. It is called once before each replication. 
+        /// This method contains logic to be performed prior to an experiment. 
+        /// It is called once before the first replication. This method ensures that each contained model element has its StrictlyDoBeforeExperiment method called.
+        /// It also calls the DoBeforeExperiment method which contains optional logic. 
         /// </summary>
-        protected virtual void Initialize()
+        public void StrictlyDoBeforeExperiment()
+        {
+            DoBeforeExperiment();
+
+            if (!modelElements.Any())
+            {
+                foreach (ModelElement modelElement in modelElements)
+                {
+                    modelElement.StrictlyDoBeforeExperiment();
+                    modelElement.DoBeforeExperiment();
+                }
+            }
+        }
+
+        /// <summary>
+        /// This method should be overridden by derived classes that need logic to be performed prior to an experiment. 
+        /// </summary>
+        protected virtual void DoBeforeExperiment()
         {
         }
 
-        private List<IObserver<object>> observers;
+        /// <summary>
+        /// This method contains logic to be performed prior to a replication. 
+        /// It is called once before every replication. This method ensures that each contained model element has its StrictlyDoBeforeReplication method called.
+        /// It also calls the DoBeforeReplication method which contains optional logic.
+        /// </summary>
+        public void StrictlyDoBeforeReplication()
+        {
+            DoBeforeReplication();
 
-        public IDisposable Subscribe(IObserver<object> observer)
+            if (!modelElements.Any())
+            {
+                foreach (ModelElement modelElement in modelElements)
+                {
+                    modelElement.StrictlyDoBeforeReplication();
+                    modelElement.DoBeforeReplication();
+                }
+            }
+        }
+
+        /// <summary>
+        /// This method should be overridden by derived classes that need logic to be performed prior to a replication. 
+        /// </summary>
+        protected virtual void DoBeforeReplication()
+        {
+        }
+
+        //public IDisposable Subscribe(IObserver<ModelElement> observer)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        private List<IObserver<ModelElement>> observers;
+
+        public IDisposable Subscribe(IObserver<ModelElement> observer)
         {
             // Check whether observer is already registered. If not, add it.
             if (!observers.Contains(observer))
             {
                 observers.Add(observer);
             }
-            return new Unsubscriber<IObserver<object>>(observers, observer);
+            return new Unsubscriber<IObserver<ModelElement>>(observers, observer);
         }
 
-        private void NotifyObservers(object info)
+        protected void NotifyObservers(ModelElement info)
         {
-            foreach (IObserver<object> observer in observers)
+            foreach (IObserver<ModelElement> observer in observers)
             {
                 observer.OnNext(info);
             }

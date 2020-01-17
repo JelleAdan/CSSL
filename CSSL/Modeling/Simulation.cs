@@ -34,7 +34,7 @@ namespace CSSL.Modeling
 
         private ReplicationExecutionProcess replicationExecutionProcess { get; }
 
-        public void Initialize()
+        public void TryInitialize()
         {
             replicationExecutionProcess.TryInitialize();
         }
@@ -57,29 +57,32 @@ namespace CSSL.Modeling
 
     public class ReplicationExecutionProcess : IterativeProcess<int>
     {
-        private Experiment experiment;
+        private Simulation simulation;
 
-        public ReplicationExecutionProcess(Experiment experiment)
+        public ReplicationExecutionProcess(Simulation simulation)
         {
-            this.experiment = experiment;
+            this.simulation = simulation;
         }
 
-        protected override bool HasNext => experiment.HasMoreReplications;
+        protected override bool HasNext => simulation.MyExperiment.HasMoreReplications;
 
         protected sealed override void DoInitialize()
         {
             base.DoInitialize();
-            experiment.ResetCurrentReplicationNumber();
+            simulation.MyExperiment.ResetCurrentReplicationNumber();
+            simulation.MyModel.StrictlyDoBeforeExperiment();
         }
 
         protected sealed override int NextIteration()
         {
-            return experiment.IncrementCurrentReplicationNumber();
+            return simulation.MyExperiment.IncrementCurrentReplicationNumber();
         }
 
         protected sealed override void RunIteration()
         {
-            
+            NextIteration();
+            simulation.MyExecutive.TryInitialize();
+            simulation.MyModel.StrictlyDoBeforeReplication();
 
         }
     }
