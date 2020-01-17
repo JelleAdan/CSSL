@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CSSL.Examples.DataCenter
+namespace CSSL.Examples.DataCenterSimulation
 {
     public class Job : CSSLQueueObject
     {

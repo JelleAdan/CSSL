@@ -29,7 +29,7 @@ namespace CSSL.Modeling.Elements
             ConstructorCalls(name);
             this.parent = parent ?? throw new ArgumentNullException($"Tried to construct ModelElement with name \"{name}\" but the parent ModelElement is null.");
             parent.AddModelElement(this);
-            myModel = parent.GetModel();
+            myModel = parent.GetModel;
         }
 
         /// <summary>
@@ -62,10 +62,7 @@ namespace CSSL.Modeling.Elements
         /// Retrieves the main model. The highest container for all model elements.
         /// </summary>
         /// <returns></returns>
-        protected virtual Model GetModel()
-        {
-            return parent.GetModel();
-        }
+        protected virtual Model GetModel => parent.GetModel;
 
         /// <summary>
         /// A reference to the overall model.
@@ -76,13 +73,13 @@ namespace CSSL.Modeling.Elements
         /// Retrieves the executive.
         /// </summary>
         /// <returns></returns>
-        protected Executive GetExecutive() => myModel.Executive;
+        protected Executive GetExecutive => myModel.MySimulation.MyExecutive;
 
         /// <summary>
         /// Retrieves the current simulation time.
         /// </summary>
         /// <returns></returns>
-        public double GetTime() => GetExecutive().Time;
+        public double GetTime => GetExecutive.Time;
 
         /// <summary>
         /// 
@@ -118,9 +115,15 @@ namespace CSSL.Modeling.Elements
             {
                 oldParent.RemoveModelElement(this);
                 newParent.AddModelElement(this);
-                myModel = newParent.GetModel();
+                myModel = newParent.GetModel;
             }
         }
+
+
+        /// <summary>
+        /// The observer state of the model element.
+        /// </summary>
+        public ModelElementObserverState ObserverState { get; private set; }
 
         /// <summary>
         /// This method contains logic to be performed prior to an experiment. 
@@ -138,6 +141,7 @@ namespace CSSL.Modeling.Elements
                     modelElement.StrictlyDoBeforeExperiment();
                     modelElement.DoBeforeExperiment();
                 }
+
             }
         }
 
@@ -155,6 +159,11 @@ namespace CSSL.Modeling.Elements
         /// </summary>
         public void StrictlyDoBeforeReplication()
         {
+            if (LengthOfWarmUp > 0)
+            {
+                GetExecutive.ScheduleEvent(GetExecutive.Time, HandleWarmUp);
+            }
+
             DoBeforeReplication();
 
             if (!modelElements.Any())
@@ -168,54 +177,48 @@ namespace CSSL.Modeling.Elements
         }
 
         /// <summary>
-        /// This method should be overridden by derived classes that need logic to be performed prior to a replication. 
+        /// This method should be overridden by derived classes that need additional logic to be performed prior to a replication. 
         /// </summary>
         protected virtual void DoBeforeReplication()
         {
         }
 
-        //public IDisposable Subscribe(IObserver<ModelElement> observer)
-        //{
-        //    throw new NotImplementedException();
-        //}
+        /// <summary>
+        /// The warm-up length of the model element, the default warm-up length is zero.
+        /// A warm-up length of zero implies that the model element allowes its parent to call its warm-up action. 
+        /// </summary>
+        public virtual double LengthOfWarmUp { get; set; }
 
-        private List<IObserver<ModelElement>> observers;
+        private void HandleWarmUp(CSSLEvent e)
+        {
+            ObserverState = ModelElementObserverState.WARMUP;
 
-        public IDisposable Subscribe(IObserver<ModelElement> observer)
+            NotifyObservers(this);
+
+            // Trigger the warm-up action in all children that allow.
+            foreach (ModelElement modelElement in modelElements.Where(x => x.LengthOfWarmUp > 0))
+            {
+                modelElement.HandleWarmUp(e);
+            }
+        }
+
+        private List<ModelElementObserverBase> observers;
+
+        public IDisposable Subscribe(ModelElementObserverBase observer)
         {
             // Check whether observer is already registered. If not, add it.
             if (!observers.Contains(observer))
             {
                 observers.Add(observer);
             }
-            return new Unsubscriber<IObserver<ModelElement>>(observers, observer);
+            return new Unsubscriber<ModelElementObserverBase>(observers, observer);
         }
 
         protected void NotifyObservers(ModelElement info)
         {
-            foreach (IObserver<ModelElement> observer in observers)
+            foreach (ModelElementObserverBase observer in observers)
             {
                 observer.OnNext(info);
-            }
-        }
-
-        private class Unsubscriber<IObserver> : IDisposable
-        {
-            private List<IObserver> observers;
-            private IObserver observer;
-
-            internal Unsubscriber(List<IObserver> observers, IObserver observer)
-            {
-                this.observers = observers;
-                this.observer = observer;
-            }
-
-            public void Dispose()
-            {
-                if (observers.Contains(observer))
-                {
-                    observers.Remove(observer);
-                }
             }
         }
     }

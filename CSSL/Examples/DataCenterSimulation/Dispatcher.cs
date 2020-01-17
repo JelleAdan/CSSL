@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CSSL.Examples.DataCenter
+namespace CSSL.Examples.DataCenterSimulation
 {
     public class Dispatcher : SchedulingElement
     {
@@ -46,11 +46,11 @@ namespace CSSL.Examples.DataCenter
 
             if (queue.Length == 1)
             {
-                ScheduleEvent(GetTime(), Dispatch);
+                ScheduleEvent(GetTime, Dispatch);
             }
         }
 
-        public void Dispatch(CSSLEvent e)
+        private void Dispatch(CSSLEvent e)
         {
             Job job = queue.DequeueFirst();
 
@@ -70,7 +70,7 @@ namespace CSSL.Examples.DataCenter
             // Schedule next dispatch event, if queue is nonempty
             if (queue.Length > 0)
             {
-                ScheduleEvent(GetTime() + dispatchTime, Dispatch);
+                ScheduleEvent(GetTime + dispatchTime, Dispatch);
             }
         }
 
@@ -78,7 +78,7 @@ namespace CSSL.Examples.DataCenter
         {
             Serverpool serverPool = ChooseServerpool();
 
-            double departureTime = GetTime() + job.ServiceTime;
+            double departureTime = GetTime + job.ServiceTime;
 
             ScheduleEvent(departureTime, serverPool.HandleDeparture);
 

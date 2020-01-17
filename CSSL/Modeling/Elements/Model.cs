@@ -8,12 +8,14 @@ namespace CSSL.Modeling.Elements
 {
     public class Model : ModelElement
     {
-        public Model(string name, Executive executive) : base(name)
+        public Model(string name, Simulation simulation) : base(name)
         {
-            Executive = executive;
+            MySimulation = simulation;
         }
 
-        public Executive Executive { get; }
+        public Simulation MySimulation { get; }
+
+        public override double LengthOfWarmUp => MySimulation.MyExperiment.LengthOfWarmUp;
 
         protected sealed override Model GetModel()
         {

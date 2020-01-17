@@ -14,21 +14,21 @@ namespace CSSL.Modeling
         public Simulation(string name)
         {
             MyExecutive = new Executive();
-            MyModel = new Model(name + "_Model", MyExecutive);
+            MyModel = new Model(name + "_Model", MyExecutive, this);
             MyExperiment = new Experiment(name + "_Experiment");
         }
 
         public Simulation(string name, Executive executive)
         {
             MyExecutive = executive;
-            MyModel = new Model(name + "_Model", MyExecutive);
+            MyModel = new Model(name + "_Model", MyExecutive, this);
             MyExperiment = new Experiment(name + "_Experiment");
-            replicationExecutionProcess = new ReplicationExecutionProcess(MyExperiment);
+            replicationExecutionProcess = new ReplicationExecutionProcess(this);
         }
 
         public Executive MyExecutive { get; }
 
-        public Model MyModel { get; private set; }
+        public Model MyModel { get; }
 
         public Experiment MyExperiment { get; }
 

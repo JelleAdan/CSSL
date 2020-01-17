@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CSSL.Examples.DataCenter
+namespace CSSL.Examples.DataCenterSimulation
 {
-    public class ServerpoolsDispatcher : ModelElement
+    public class DataCenter : ModelElement
     {
         public JobGenerator JobGenerator { get; private set; }
 
@@ -16,7 +16,7 @@ namespace CSSL.Examples.DataCenter
 
         public List<Serverpool> ServerPools { get; private set; }
 
-        public ServerpoolsDispatcher(ModelElement parent, string name) : base(parent, name)
+        public DataCenter(ModelElement parent, string name) : base(parent, name)
         {
         }
 

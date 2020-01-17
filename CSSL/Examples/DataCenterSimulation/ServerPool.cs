@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CSSL.Examples.DataCenter
+namespace CSSL.Examples.DataCenterSimulation
 {
     public class Serverpool : SchedulingElement
     {
@@ -24,18 +24,18 @@ namespace CSSL.Examples.DataCenter
         {
             Job job = queue.DequeueFirst();
 
-            if (job.DepartureTime != GetTime())
+            if (job.DepartureTime != GetTime)
             {
                 throw new Exception($"Departure time of job {job.Id} is {job.DepartureTime} and does not match current time {GetTime()}");
             }
         }
 
-        public void HandleArrival(Job job)
+        private void HandleArrival(Job job)
         {
             queue.EnqueueAndSort(job);
         }
 
-        public class ServerPoolQueue : CSSLQueue<Job>
+        private class ServerPoolQueue : CSSLQueue<Job>
         {
             public ServerPoolQueue(ModelElement parent, string name) : base(parent, name)
             {

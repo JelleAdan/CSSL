@@ -4,9 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace CSSL.Examples.DataCenter.DataCenterObservers
+namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
 {
-    public class DispatcherObserver : ModelElementObserverBase<Dispatcher>
+    public class DispatcherObserver : ModelElementObserverBase
     {
         private double sumQueueLength;
 
@@ -34,10 +34,16 @@ namespace CSSL.Examples.DataCenter.DataCenterObservers
             throw new NotImplementedException();
         }
 
-        public override void OnNext(Dispatcher dispatcher)
+        protected sealed override void OnWarmUp(ModelElement modelElement)
         {
-            sumQueueLength += (dispatcher.GetTime() - oldTime) * dispatcher.QueueLength;
+            oldTime = modelElement.GetTime;
         }
 
+        protected sealed override void OnUpdate(ModelElement modelElement)
+        {
+            Dispatcher dispatcher = (Dispatcher)modelElement;
+            sumQueueLength += (dispatcher.GetTime - oldTime) * dispatcher.QueueLength;
+            sumTime += (dispatcher.GetTime - oldTime);
+        }
     }
 }
