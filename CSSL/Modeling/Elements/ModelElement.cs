@@ -202,16 +202,16 @@ namespace CSSL.Modeling.Elements
             }
         }
 
-        private List<ModelElementObserverBase> observers;
+        private List<IObserver<ModelElement>> observers;
 
-        public IDisposable Subscribe(ModelElementObserverBase observer)
+        public IDisposable Subscribe(IObserver<ModelElement> observer)
         {
             // Check whether observer is already registered. If not, add it.
             if (!observers.Contains(observer))
             {
                 observers.Add(observer);
             }
-            return new Unsubscriber<ModelElementObserverBase>(observers, observer);
+            return new Unsubscriber<IObserver<ModelElement>>(observers, observer);
         }
 
         protected void NotifyObservers(ModelElement info)

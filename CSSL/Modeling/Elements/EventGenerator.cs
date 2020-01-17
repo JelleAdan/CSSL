@@ -28,14 +28,26 @@ namespace CSSL.Modeling.Elements
             IsOn = true;
         }
 
-        public double NextEventTime()
-        {
-            return GetTime() + interEventTimeDistribution.Next();
-        }
+        //protected double NextEventTime()
+        //{
+        //    return GetTime + interEventTimeDistribution.Next();
+        //}
 
-        protected override void DoBeforeReplication()
-        {
-            ScheduleEvent(GetExecutive())
-        }
+        //private void HandleGeneration(CSSLEvent e)
+        //{
+        //    // Schedule the next generation event
+        //    ScheduleEvent(NextEventTime(), HandleGeneration);
+
+        //    // Instantiate a job
+        //    Job job = new Job(GetTime);
+
+        //    // Send to dispatcher
+        //    dispatcher.HandleArrival(job);
+        //}
+
+        //protected override void DoBeforeReplication()
+        //{
+        //    ScheduleEvent(NextEventTime(), )
+        //}
     }
 }

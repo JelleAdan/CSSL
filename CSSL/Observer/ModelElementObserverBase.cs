@@ -28,13 +28,9 @@ namespace CSSL.Observer
             }
         }
 
-        protected virtual void OnWarmUp(ModelElement modelElement)
-        {
-        }
+        protected abstract void OnWarmUp(ModelElement modelElement);
 
-        protected virtual void OnUpdate(ModelElement modelElement)
-        {
-        }
+        protected abstract void OnUpdate(ModelElement modelElement);
 
         private IDisposable cancellation;
 
