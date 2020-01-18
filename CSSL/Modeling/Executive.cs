@@ -38,6 +38,11 @@ namespace CSSL.Modeling
             e.Execute();
         }
 
+        internal void HandleEndEvent(CSSLEvent csslevent)
+        {
+            eventExecutionProcess.Stop();
+        }
+
         internal void ScheduleEvent(double time, CSSLEventAction action)
         {
             CSSLEvent e = new CSSLEvent(time, action);
@@ -71,6 +76,12 @@ namespace CSSL.Modeling
             {
                 CSSLEvent e = NextIteration();
                 executive.Execute(e);
+            }
+
+            protected sealed override void DoEnd()
+            {
+                base.DoEnd();
+
             }
         }
     }

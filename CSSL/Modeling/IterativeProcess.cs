@@ -8,6 +8,23 @@ namespace CSSL.Modeling
 {
     public abstract class IterativeProcess<T> : IProcess
     {
+        public enum EndStateIndicator
+        {
+            END_CONDITION_SATISFIED,
+            ALL_STEPS_COMPLETED,
+            EXECUTION_TIME_EXCEEDED
+        }
+
+        private maximumExecutionTime()
+        {
+            var ms = DateTime.Now;
+        }
+
+        private beginExecutionTime()
+        {
+
+        }
+
         public string Name => throw new NotImplementedException();
 
         public ProcessState CurrentState { get; private set; }
@@ -28,6 +45,10 @@ namespace CSSL.Modeling
 
         private EndedState endedState;
 
+        internal protected bool StopFlag { get; protected set; }
+
+        internal protected bool IsDoneFlag { get; protected set; }
+
         private void SetState(ProcessState processState)
         {
             CurrentState = processState;
@@ -40,6 +61,8 @@ namespace CSSL.Modeling
             runningState = new RunningState(this);
             endedState = new EndedState(this);
             CurrentState = createdState;
+            StopFlag = false;
+            IsDoneFlag = false;
         }
 
         protected virtual bool HasNext => throw new NotImplementedException();
@@ -54,6 +77,11 @@ namespace CSSL.Modeling
 
         public void TryRunAll()
         {
+            if (IsCreated || IsEnded)
+            {
+                TryInitialize();
+            }
+
             if (CurrentState.TryRunAll())
             {
                 DoRunAll();
@@ -62,6 +90,11 @@ namespace CSSL.Modeling
 
         public void TryRunNext()
         {
+            if (IsCreated || IsEnded)
+            {
+                TryInitialize();
+            }
+
             if (CurrentState.TryRunNext())
             {
                 DoRunNext();
@@ -83,34 +116,56 @@ namespace CSSL.Modeling
 
         protected void DoRunAll()
         {
-            if (!IsInitialized)
-            {
-                TryInitialize();
-            }
             SetState(runningState);
-            while (HasNext)
+
+            if (HasNext)
             {
-                RunIteration();
+                while (!IsDoneFlag)
+                {
+                    TryRunNext();
+                }
             }
+            else
+            {
+                throw new Exception($"Can not run {Name} because there are no iterations.");
+            }
+
             TryEnd();
         }
 
         protected void DoRunNext()
         {
-            if (!IsInitialized)
-            {
-                TryInitialize();
-            }
             SetState(runningState);
-            if (HasNext)
+
+            if (!IsDoneFlag && !HasNext)
             {
-                RunIteration();
+                throw new Exception($"Expected another step in {Name} but there is none.");
             }
-            else
-            {
-                TryEnd();
-            }
+
+            RunIteration();
+
+            CheckIsDoneFlag();
         }
+
+        private void CheckIsDoneFlag()
+        {
+            if (StopFlag)
+            {
+                IsDoneFlag = true;
+            }
+            else if (!HasNext)
+            {
+                IsDoneFlag = true;
+            }
+            else if (CheckComputationTimeExceeded())
+            {
+
+            }
+
+
+        }
+
+
 
         protected virtual void DoEnd()
         {
@@ -120,5 +175,10 @@ namespace CSSL.Modeling
         protected virtual T NextIteration() { throw new NotImplementedException(); }
 
         protected virtual void RunIteration() { throw new NotImplementedException(); }
+
+        internal void Stop()
+        {
+            StopFlag = true;
+        }
     }
 }

@@ -83,7 +83,6 @@ namespace CSSL.Modeling
             NextIteration();
             simulation.MyExecutive.TryInitialize();
             simulation.MyModel.StrictlyDoBeforeReplication();
-
         }
     }
 }

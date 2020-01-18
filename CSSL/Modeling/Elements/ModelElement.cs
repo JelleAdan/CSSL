@@ -161,10 +161,16 @@ namespace CSSL.Modeling.Elements
         {
             if (LengthOfWarmUp > 0)
             {
-                GetExecutive.ScheduleEvent(GetExecutive.Time, HandleWarmUp);
+                GetExecutive.ScheduleEvent(GetExecutive.Time, HandleEndWarmUp);
+                ObserverState = ModelElementObserverState.WARMUP;
+                NotifyObservers(this);
             }
-
-            DoBeforeReplication();
+            else
+            {
+                ObserverState = ModelElementObserverState.INITIALIZED;
+                NotifyObservers(this);
+                ObserverState = ModelElementObserverState.UPDATE;
+            }
 
             if (!modelElements.Any())
             {
@@ -189,16 +195,16 @@ namespace CSSL.Modeling.Elements
         /// </summary>
         public virtual double LengthOfWarmUp { get; set; }
 
-        private void HandleWarmUp(CSSLEvent e)
+        private void HandleEndWarmUp(CSSLEvent e)
         {
-            ObserverState = ModelElementObserverState.WARMUP;
-
+            ObserverState = ModelElementObserverState.INITIALIZED;
             NotifyObservers(this);
+            ObserverState = ModelElementObserverState.UPDATE;
 
             // Trigger the warm-up action in all children that allow.
             foreach (ModelElement modelElement in modelElements.Where(x => x.LengthOfWarmUp > 0))
             {
-                modelElement.HandleWarmUp(e);
+                modelElement.HandleEndWarmUp(e);
             }
         }
 

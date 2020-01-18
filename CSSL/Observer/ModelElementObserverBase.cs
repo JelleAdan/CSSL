@@ -19,18 +19,23 @@ namespace CSSL.Observer
         {
             switch (modelElement.ObserverState)
             {
+                case ModelElementObserverState.UPDATE:
+                    OnUpdate(modelElement);
+                    break;
                 case ModelElementObserverState.WARMUP:
                     OnWarmUp(modelElement);
                     break;
-                case ModelElementObserverState.UPDATE:
-                    OnUpdate(modelElement);
+                case ModelElementObserverState.INITIALIZED:
+                    OnInitialized(modelElement);
                     break;
             }
         }
 
+        protected abstract void OnUpdate(ModelElement modelElement);
+
         protected abstract void OnWarmUp(ModelElement modelElement);
 
-        protected abstract void OnUpdate(ModelElement modelElement);
+        protected abstract void OnInitialized(ModelElement modelElement);
 
         private IDisposable cancellation;
 

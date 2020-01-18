@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CSSL.Examples.DataCenterSimulation
 {
-    public class JobGenerator : EventGenerator
+    public class JobGenerator : EventGeneratorBase
     {
         public JobGenerator(ModelElement parent, string name, Distribution interEventTimeDistribution, Dispatcher dispatcher) : base(parent, name, interEventTimeDistribution)
         {
@@ -18,15 +18,15 @@ namespace CSSL.Examples.DataCenterSimulation
 
         private Dispatcher dispatcher;
 
-        private void HandleGeneration(CSSLEvent e)
+        protected override void HandleGeneration(CSSLEvent e)
         {
-            // Schedule the next generation event
+            // Schedule the next generation event.
             ScheduleEvent(NextEventTime(), HandleGeneration);
 
-            // Instantiate a job
+            // Instantiate a job.
             Job job = new Job(GetTime);
 
-            // Send to dispatcher
+            // Send to dispatcher.
             dispatcher.HandleArrival(job);
         }
     }

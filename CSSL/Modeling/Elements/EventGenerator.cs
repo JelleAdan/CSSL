@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace CSSL.Modeling.Elements
 {
-    public class EventGenerator : SchedulingElement, IEventGenerator
+    public abstract class EventGeneratorBase : SchedulingElement, IEventGenerator
     {
         private Distribution interEventTimeDistribution;
 
-        public EventGenerator(ModelElement parent, string name, Distribution interEventTimeDistribution) : base(parent, name)
+        public EventGeneratorBase(ModelElement parent, string name, Distribution interEventTimeDistribution) : base(parent, name)
         {
             this.interEventTimeDistribution = interEventTimeDistribution;
         }
@@ -28,26 +28,17 @@ namespace CSSL.Modeling.Elements
             IsOn = true;
         }
 
-        //protected double NextEventTime()
-        //{
-        //    return GetTime + interEventTimeDistribution.Next();
-        //}
+        protected double NextEventTime()
+        {
+            return GetTime + interEventTimeDistribution.Next();
+        }
 
-        //private void HandleGeneration(CSSLEvent e)
-        //{
-        //    // Schedule the next generation event
-        //    ScheduleEvent(NextEventTime(), HandleGeneration);
+        protected abstract void HandleGeneration(CSSLEvent e);
 
-        //    // Instantiate a job
-        //    Job job = new Job(GetTime);
-
-        //    // Send to dispatcher
-        //    dispatcher.HandleArrival(job);
-        //}
-
-        //protected override void DoBeforeReplication()
-        //{
-        //    ScheduleEvent(NextEventTime(), )
-        //}
+        protected override void DoBeforeReplication()
+        {
+            // Schedule first event.
+            ScheduleEvent(NextEventTime(), HandleGeneration);
+        }
     }
 }

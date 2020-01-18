@@ -16,14 +16,6 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
 
         private double currentTime;
 
-        public DispatcherObserver()
-        {
-            sumQueueLength = 0;
-            sumTime = 0;
-            oldTime = 0;
-            currentTime = 0;
-        }
-
         public override void OnCompleted()
         {
             throw new NotImplementedException();
@@ -34,16 +26,20 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
             throw new NotImplementedException();
         }
 
-        protected sealed override void OnWarmUp(ModelElement modelElement)
-        {
-            oldTime = modelElement.GetTime;
-        }
-
         protected sealed override void OnUpdate(ModelElement modelElement)
         {
             Dispatcher dispatcher = (Dispatcher)modelElement;
             sumQueueLength += (dispatcher.GetTime - oldTime) * dispatcher.QueueLength;
             sumTime += (dispatcher.GetTime - oldTime);
+        }
+
+        protected sealed override void OnInitialized(ModelElement modelElement)
+        {
+            oldTime = modelElement.GetTime;
+        }
+
+        protected sealed override void OnWarmUp(ModelElement modelElement)
+        {
         }
     }
 }

@@ -17,9 +17,18 @@ namespace CSSL.Modeling.Elements
 
         public override double LengthOfWarmUp => MySimulation.MyExperiment.LengthOfWarmUp;
 
-        protected sealed override Model GetModel()
+        protected sealed override Model GetModel => this;
+
+        internal void Initialize()
         {
-            return this;
+            StrictlyDoBeforeReplication();
+            DoBeforeReplication();
+            ScheduleEndEvent();
+        }
+
+        private void ScheduleEndEvent()
+        {
+            GetExecutive.ScheduleEvent(GetTime, GetExecutive.HandleEndEvent);
         }
     }
 }

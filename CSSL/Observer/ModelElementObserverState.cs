@@ -7,6 +7,7 @@ namespace CSSL.Observer
     public enum ModelElementObserverState
     {
         UPDATE,
-        WARMUP
+        WARMUP,
+        INITIALIZED
     }
 }
