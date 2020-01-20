@@ -17,19 +17,30 @@ namespace CSSL.Modeling
 
         private EventExecutionProcess eventExecutionProcess;
 
-        public Executive()
+        public Executive(Simulation simulation)
         {
+            MySimulation = simulation;
             calendar = new SimpleCalendar();
+            eventExecutionProcess = new EventExecutionProcess(this);
         }
 
-        public Executive(ICalendar calendar)
+        public Executive(Simulation simulation, ICalendar calendar)
         {
+            MySimulation = simulation;
             this.calendar = calendar;
+            eventExecutionProcess = new EventExecutionProcess(this);
         }
+
+        public Simulation MySimulation { get; }
 
         public void TryInitialize()
         {
             eventExecutionProcess.TryInitialize();
+        }
+
+        public void TryRunAll()
+        {
+            eventExecutionProcess.TryRunAll();
         }
 
         public void Execute(CSSLEvent e)
@@ -53,10 +64,12 @@ namespace CSSL.Modeling
         {
             private Executive executive;
 
-            public EventExecutionProcess(Executive executive) : base()
+            public EventExecutionProcess(Executive executive)
             {
                 this.executive = executive;
             }
+
+            protected override double maxComputationalTimeMiliseconds => executive.MySimulation.MyExperiment.MaxComputationalTimePerReplication;
 
             protected override bool HasNext => executive.calendar.HasNext();
 

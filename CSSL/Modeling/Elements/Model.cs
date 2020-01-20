@@ -30,5 +30,13 @@ namespace CSSL.Modeling.Elements
         {
             GetExecutive.ScheduleEvent(GetTime, GetExecutive.HandleEndEvent);
         }
+
+        protected override void DoBeforeExperiment()
+        {
+            if (!HasChildren)
+            {
+                throw new Exception("The model does not contain any child model elements.");
+            }
+        }
     }
 }

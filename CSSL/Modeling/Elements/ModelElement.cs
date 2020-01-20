@@ -36,7 +36,7 @@ namespace CSSL.Modeling.Elements
         /// This constuctor is only called by Model so that Model does not require a parent model element.
         /// </summary>
         /// <param name="name">The name of the model.</param>
-        public ModelElement(string name)
+        internal ModelElement(string name)
         {
             ConstructorCalls(name);
         }
@@ -119,6 +119,10 @@ namespace CSSL.Modeling.Elements
             }
         }
 
+        /// <summary>
+        /// Returns true if the model element contains any child model elements.
+        /// </summary>
+        public bool HasChildren => modelElements.Any();
 
         /// <summary>
         /// The observer state of the model element.
@@ -134,14 +138,13 @@ namespace CSSL.Modeling.Elements
         {
             DoBeforeExperiment();
 
-            if (!modelElements.Any())
+            if (modelElements.Any())
             {
                 foreach (ModelElement modelElement in modelElements)
                 {
                     modelElement.StrictlyDoBeforeExperiment();
                     modelElement.DoBeforeExperiment();
                 }
-
             }
         }
 

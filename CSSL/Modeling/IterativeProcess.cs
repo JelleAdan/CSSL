@@ -12,20 +12,16 @@ namespace CSSL.Modeling
         {
             END_CONDITION_SATISFIED,
             ALL_STEPS_COMPLETED,
-            EXECUTION_TIME_EXCEEDED
+            PROCESS_TIME_EXCEEDED
         }
 
-        private maximumExecutionTime()
-        {
-            var ms = DateTime.Now;
-        }
+        protected virtual double maxComputationalTimeMiliseconds => throw new NotImplementedException();
 
-        private beginExecutionTime()
-        {
+        private DateTime beginComputionalTime;
 
-        }
+        private bool IsComputationalTimeExceeded => DateTime.Now.Subtract(beginComputionalTime).TotalMilliseconds < maxComputationalTimeMiliseconds;
 
-        public string Name => throw new NotImplementedException();
+        public string Name => GetType().Name;
 
         public ProcessState CurrentState { get; private set; }
 
@@ -54,15 +50,13 @@ namespace CSSL.Modeling
             CurrentState = processState;
         }
 
-        public IterativeProcess()
+        internal IterativeProcess()
         {
             createdState = new CreatedState(this);
             initializedState = new InitializedState(this);
             runningState = new RunningState(this);
             endedState = new EndedState(this);
             CurrentState = createdState;
-            StopFlag = false;
-            IsDoneFlag = false;
         }
 
         protected virtual bool HasNext => throw new NotImplementedException();
@@ -112,6 +106,7 @@ namespace CSSL.Modeling
         protected virtual void DoInitialize()
         {
             SetState(initializedState);
+            beginComputionalTime = DateTime.Now;
         }
 
         protected void DoRunAll()
@@ -157,15 +152,11 @@ namespace CSSL.Modeling
             {
                 IsDoneFlag = true;
             }
-            else if (CheckComputationTimeExceeded())
+            else if (IsComputationalTimeExceeded)
             {
-
+                IsDoneFlag = true;
             }
-
-
         }
-
-
 
         protected virtual void DoEnd()
         {

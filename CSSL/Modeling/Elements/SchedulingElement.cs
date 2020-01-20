@@ -15,7 +15,7 @@ namespace CSSL.Modeling.Elements
 
         protected void ScheduleEvent(double time, CSSLEventAction action)
         {
-            GetExecutive().ScheduleEvent(time, action);
+            GetExecutive.ScheduleEvent(time, action);
         }
     }
 }

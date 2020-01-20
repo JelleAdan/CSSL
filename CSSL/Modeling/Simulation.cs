@@ -13,15 +13,16 @@ namespace CSSL.Modeling
     {
         public Simulation(string name)
         {
-            MyExecutive = new Executive();
-            MyModel = new Model(name + "_Model", MyExecutive, this);
+            MyExecutive = new Executive(this);
+            MyModel = new Model(name + "_Model", this);
             MyExperiment = new Experiment(name + "_Experiment");
+            replicationExecutionProcess = new ReplicationExecutionProcess(this);
         }
 
         public Simulation(string name, Executive executive)
         {
             MyExecutive = executive;
-            MyModel = new Model(name + "_Model", MyExecutive, this);
+            MyModel = new Model(name + "_Model", this);
             MyExperiment = new Experiment(name + "_Experiment");
             replicationExecutionProcess = new ReplicationExecutionProcess(this);
         }
@@ -64,6 +65,8 @@ namespace CSSL.Modeling
             this.simulation = simulation;
         }
 
+        protected override double maxComputationalTimeMiliseconds => simulation.MyExperiment.MaxComputationalTimeTotal;
+
         protected override bool HasNext => simulation.MyExperiment.HasMoreReplications;
 
         protected sealed override void DoInitialize()
@@ -83,6 +86,7 @@ namespace CSSL.Modeling
             NextIteration();
             simulation.MyExecutive.TryInitialize();
             simulation.MyModel.StrictlyDoBeforeReplication();
+            simulation.MyExecutive.TryRunAll();
         }
     }
 }

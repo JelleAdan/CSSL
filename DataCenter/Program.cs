@@ -32,6 +32,8 @@ namespace DataCenterSimulation
 
             // Attach model to simulation...
 
+
+
             // The experiment part...
 
             sim.MyExperiment.LengthOfReplication = 100;
@@ -41,11 +43,9 @@ namespace DataCenterSimulation
             DispatcherObserver dispatcherObserver = new DispatcherObserver();
             dispatcherObserver.Subscribe(dataCenter.Dispatcher);
 
-
+            sim.Run();
 
             Console.WriteLine("Test");
         }
-
-
     }
 }

@@ -29,8 +29,10 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
         protected sealed override void OnUpdate(ModelElement modelElement)
         {
             Dispatcher dispatcher = (Dispatcher)modelElement;
-            sumQueueLength += (dispatcher.GetTime - oldTime) * dispatcher.QueueLength;
-            sumTime += (dispatcher.GetTime - oldTime);
+            currentTime = dispatcher.GetTime;
+            sumQueueLength += (currentTime - oldTime) * dispatcher.QueueLength;
+            sumTime += (currentTime - oldTime);
+            oldTime = currentTime;
         }
 
         protected sealed override void OnInitialized(ModelElement modelElement)

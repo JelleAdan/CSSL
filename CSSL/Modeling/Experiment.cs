@@ -16,12 +16,16 @@ namespace CSSL.Modeling
         /// <param name="numberOfReplications">The number of replication.</param>
         /// <param name="lengthOfReplication">The simulation length of a single replication.</param>
         /// <param name="lengthOfWarmUp">The warm up time of a replication.</param>
-        public Experiment(string name, int numberOfReplications = 1, double lengthOfReplication = double.PositiveInfinity, double lengthOfWarmUp = 0.0)
+        /// <param name="maxCompuationalTimeTotal">The maximum total computational time in seconds.</param>
+        /// <param name="maxComputationalTimePerReplication">The maximum computational time per replication in seconds.</param>
+        public Experiment(string name, int numberOfReplications = 1, double lengthOfReplication = double.PositiveInfinity, double lengthOfWarmUp = 0.0, double maxComputationalTimePerReplication = double.PositiveInfinity, double maxCompuationalTimeTotal = double.PositiveInfinity)
         {
             Name = name;
             NumberOfReplications = numberOfReplications;
             LengthOfReplication = lengthOfReplication;
             LengthOfWarmUp = lengthOfWarmUp;
+            MaxComputationalTimePerReplication = maxComputationalTimePerReplication;
+            MaxComputationalTimeTotal = maxCompuationalTimeTotal;
         }
 
         public string Name { get; }
@@ -60,7 +64,7 @@ namespace CSSL.Modeling
 
         public double LengthOfWarmUp
         {
-            get { return LengthOfWarmUp; }
+            get { return lengthOfWarmUp; }
             set
             {
                 if (value < 0)
@@ -68,6 +72,36 @@ namespace CSSL.Modeling
                     throw new ArgumentOutOfRangeException($"{nameof(value)} must be positive.");
                 }
                 lengthOfWarmUp = value;
+            }
+        }
+
+        private double maxCompuationalTimePerReplication;
+
+        public double MaxComputationalTimePerReplication
+        {
+            get { return maxCompuationalTimePerReplication; }
+            set
+            {
+                if (value < 0)
+                {
+                    throw new ArgumentOutOfRangeException($"{nameof(value)} must be positive.");
+                }
+                maxCompuationalTimePerReplication = value;
+            }
+        }
+
+        private double maxCompuationalTimeTotal;
+
+        public double MaxComputationalTimeTotal
+        {
+            get { return maxCompuationalTimeTotal; }
+            set
+            {
+                if (value < 0)
+                {
+                    throw new ArgumentOutOfRangeException($"{nameof(value)} must be positive.");
+                }
+                maxCompuationalTimeTotal = value;
             }
         }
 
@@ -79,17 +113,17 @@ namespace CSSL.Modeling
         /// <summary>
         /// Resets the current replication number to zero. 
         /// </summary>
-        public void ResetCurrentReplicationNumber()
+        internal void ResetCurrentReplicationNumber()
         {
             currentReplicationNumber = 0;
         }
 
-        public bool HasMoreReplications => currentReplicationNumber < numberOfReplications;
+        internal bool HasMoreReplications => currentReplicationNumber < numberOfReplications;
 
         /// <summary>
         /// Increments the current replication number by one.
         /// </summary>
-        public int IncrementCurrentReplicationNumber()
+        internal int IncrementCurrentReplicationNumber()
         {
             return currentReplicationNumber++;
         }

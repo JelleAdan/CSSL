@@ -14,7 +14,7 @@ namespace CSSL.Examples.DataCenterSimulation
     {
         public Dispatcher(ModelElement parent, string name, Distribution serviceTimeDistribution, double serviceTimeThreshold, List<Serverpool> serverPools, double dispatchTime) : base(parent, name)
         {
-            queue = new CSSLQueue<Job>(parent, name + "_Queue");
+            queue = new CSSLQueue<Job>(this, name + "_Queue");
             this.serviceTimeDistribution = serviceTimeDistribution;
             this.serviceTimeThreshold = serviceTimeThreshold;
             rnd = new Random();
@@ -97,14 +97,16 @@ namespace CSSL.Examples.DataCenterSimulation
             job.ServiceTime = serviceTime1;
             job2.ServiceTime = serviceTime2;
 
-            job.DepartureTime = GetTime() + serviceTime1;
-            job2.DepartureTime = GetTime() + serviceTime2;
+            job.DepartureTime = GetTime + serviceTime1;
+            job2.DepartureTime = GetTime + serviceTime2;
 
             return job2;
         }
 
         private Serverpool ChooseServerpool()
         {
+            Console.WriteLine("Choose serverpool.");
+
             List<Serverpool> selection = new List<Serverpool>();
 
             double p = nrServerPools / serverPools.Count;

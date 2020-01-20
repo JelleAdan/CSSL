@@ -13,7 +13,7 @@ namespace CSSL.Examples.DataCenterSimulation
     {
         public Serverpool(ModelElement parent, string name) : base(parent, name)
         {
-            queue = new ServerPoolQueue(parent, name + "_Queue");
+            queue = new ServerPoolQueue(this, name + "_Queue");
         }
 
         private ServerPoolQueue queue { get; set; }
@@ -26,11 +26,11 @@ namespace CSSL.Examples.DataCenterSimulation
 
             if (job.DepartureTime != GetTime)
             {
-                throw new Exception($"Departure time of job {job.Id} is {job.DepartureTime} and does not match current time {GetTime()}");
+                throw new Exception($"Departure time of job {job.Id} is {job.DepartureTime} and does not match current time {GetTime}");
             }
         }
 
-        private void HandleArrival(Job job)
+        internal void HandleArrival(Job job)
         {
             queue.EnqueueAndSort(job);
         }
