@@ -30,9 +30,12 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
         {
             Dispatcher dispatcher = (Dispatcher)modelElement;
             currentTime = dispatcher.GetTime;
-            sumQueueLength += (currentTime - oldTime) * dispatcher.QueueLength;
+            int queueLength = dispatcher.QueueLength;
+            sumQueueLength += (currentTime - oldTime) * (double)queueLength;
             sumTime += (currentTime - oldTime);
             oldTime = currentTime;
+
+            Console.WriteLine($"Average queue length: {sumQueueLength / sumTime}");
         }
 
         protected sealed override void OnInitialized(ModelElement modelElement)

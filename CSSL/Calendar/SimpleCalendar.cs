@@ -18,12 +18,20 @@ namespace CSSL.Calendar
             {
                 fes.Add(e);
             }
-
-            for (int i = 0; i < fes.Count; i++)
+            else
             {
-                if (fes[i].Time > e.Time)
+                for (int i = 0; i <= fes.Count; i++)
                 {
-                    fes.Insert(i, e);
+                    if (i == fes.Count)
+                    {
+                        fes.Add(e);
+                        break;
+                    }
+                    else if (fes[i].Time > e.Time)
+                    {
+                        fes.Insert(i, e);
+                        break;
+                    }
                 }
             }
         }

@@ -1,4 +1,5 @@
-﻿using CSSL.Utilities;
+﻿using CSSL.Modeling.Elements;
+using CSSL.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,9 +9,10 @@ using System.Threading.Tasks;
 namespace CSSL.Modeling.CSSLQueue
 {
     /// <summary>
-    /// The CSSLQueueObject serves as a base class for object that need to be placed in a CSSLQueue. A CSSLQueueObject can be in one and only one CSSLQueue at the time. 
+    /// The CSSLQueueObject serves as a class for objects that need to be placed in a CSSLQueue. A CSSLQueueObject can be in one and only one CSSLQueue at the time. 
     /// </summary>
-    public class CSSLQueueObject : IIdentity, IComparable<CSSLQueueObject>
+    /// <typeparam name="T">Refers to its own type. E.g. when a class "job" extends CSSLQueueObject then T is "job".</typeparam>
+    public class CSSLQueueObject<T> : IIdentity, IComparable<T> where T : CSSLQueueObject<T>
     {
         /// <summary>
         /// The simulation time at which the CSSLQueueObject was created.
@@ -25,7 +27,7 @@ namespace CSSL.Modeling.CSSLQueue
         /// <summary>
         /// The current CSSLQueue that the CSSLQueueObject is in. Is null when the CSSLQueueObject is not in a queue.
         /// </summary>
-        public CSSLQueue<CSSLQueueObject> MyQueue { get; }
+        public CSSLQueue<T> MyQueue { get; internal set; } 
 
         /// <summary>
         /// The identity of the CSSLQueueObject.
@@ -37,7 +39,7 @@ namespace CSSL.Modeling.CSSLQueue
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        public int CompareTo(CSSLQueueObject other)
+        public int CompareTo(T other)
         {
             throw new NotImplementedException();
         }

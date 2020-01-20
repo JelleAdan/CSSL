@@ -18,6 +18,7 @@ namespace CSSL.Utilities.Distributions
         {
             Mean = mean;
             Variance = variance;
+            rnd = new ExtendedRandom();
         }
 
         public abstract double Next();

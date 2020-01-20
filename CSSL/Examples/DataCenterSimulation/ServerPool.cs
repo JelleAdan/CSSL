@@ -20,7 +20,7 @@ namespace CSSL.Examples.DataCenterSimulation
 
         public int JobCount => queue.Length;
 
-        public void HandleDeparture(CSSLEvent e)
+        private void HandleDeparture(CSSLEvent e)
         {
             Job job = queue.DequeueFirst();
 
@@ -30,8 +30,10 @@ namespace CSSL.Examples.DataCenterSimulation
             }
         }
 
-        internal void HandleArrival(Job job)
+        public void HandleArrival(Job job)
         {
+            ScheduleEvent(job.DepartureTime, HandleDeparture);
+
             queue.EnqueueAndSort(job);
         }
 
@@ -47,9 +49,9 @@ namespace CSSL.Examples.DataCenterSimulation
             /// <param name="job">The job to be added.</param>
             public void EnqueueAndSort(Job job)
             {
-                Items.Add(job);
+                items.Add(job);
 
-                Items = Items.OrderBy(x => x.DepartureTime).ToList();
+                items = items.OrderBy(x => x.DepartureTime).ToList();
             }
         }
     }

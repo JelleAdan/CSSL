@@ -8,30 +8,31 @@ using System.Threading.Tasks;
 
 namespace CSSL.Modeling.CSSLQueue
 {
-    public class CSSLQueue<CSSLQueueObject> : ModelElement
+    public class CSSLQueue<T> : ModelElement where T : CSSLQueueObject<T>
     {
         public CSSLQueue(ModelElement parent, string name) : base(parent, name)
         {
-            Items = new List<CSSLQueueObject>();
+            items = new List<T>();
         }
 
         /// <summary>
         /// List of items in the queue.
         /// </summary>
-        protected List<CSSLQueueObject> Items;
+        protected List<T> items;
 
         /// <summary>
         /// Returns the current length of the queue.
         /// </summary>
-        public int Length => Items.Count;
+        public int Length => items.Count;
 
         /// <summary>
         /// Adds an item to the end of the queue.
         /// </summary>
         /// <param name="item">The item to be added.</param>
-        public void EnqueueLast(CSSLQueueObject item)
+        public void EnqueueLast(T item)
         {
-            Items.Add(item);
+            items.Add(item);
+            item.MyQueue = this;
         }
 
         /// <summary>
@@ -39,10 +40,11 @@ namespace CSSL.Modeling.CSSLQueue
         /// </summary>
         /// <param name="index">Position of the item in the queue.</param>
         /// <returns></returns>
-        public CSSLQueueObject DequeueAt(int index)
+        public T DequeueAt(int index)
         {
-            CSSLQueueObject item = Items[index];
-            Items.RemoveAt(index);
+            T item = items[index];
+            items.RemoveAt(index);
+            item.MyQueue = null;
             return item;
         }
 
@@ -50,10 +52,11 @@ namespace CSSL.Modeling.CSSLQueue
         /// Retireves and removes the first item from the queue.
         /// </summary>
         /// <returns></returns>
-        public CSSLQueueObject DequeueFirst()
+        public T DequeueFirst()
         {
-            CSSLQueueObject item = Items.First();
-            Items.RemoveAt(0);
+            T item = items.First();
+            items.RemoveAt(0);
+            item.MyQueue = null;
             return item;
         }
     }

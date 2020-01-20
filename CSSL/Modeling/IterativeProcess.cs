@@ -10,18 +10,21 @@ namespace CSSL.Modeling
     {
         public enum EndStateIndicator
         {
-            END_CONDITION_SATISFIED,
+            DEFAULT,
+            STOP_CONDITION_SATISFIED,
             ALL_STEPS_COMPLETED,
-            PROCESS_TIME_EXCEEDED
+            COMPUTATIONAL_TIME_EXCEEDED
         }
 
         protected virtual double maxComputationalTimeMiliseconds => throw new NotImplementedException();
 
         private DateTime beginComputionalTime;
 
-        private bool IsComputationalTimeExceeded => DateTime.Now.Subtract(beginComputionalTime).TotalMilliseconds < maxComputationalTimeMiliseconds;
+        private bool IsComputationalTimeExceeded => DateTime.Now.Subtract(beginComputionalTime).TotalMilliseconds > maxComputationalTimeMiliseconds;
 
         public string Name => GetType().Name;
+
+        public EndStateIndicator MyEndStateIndicator;
 
         public ProcessState CurrentState { get; private set; }
 
@@ -147,14 +150,17 @@ namespace CSSL.Modeling
             if (StopFlag)
             {
                 IsDoneFlag = true;
+                MyEndStateIndicator = EndStateIndicator.STOP_CONDITION_SATISFIED;
             }
             else if (!HasNext)
             {
                 IsDoneFlag = true;
+                MyEndStateIndicator = EndStateIndicator.ALL_STEPS_COMPLETED;
             }
             else if (IsComputationalTimeExceeded)
             {
                 IsDoneFlag = true;
+                MyEndStateIndicator = EndStateIndicator.COMPUTATIONAL_TIME_EXCEEDED;
             }
         }
 

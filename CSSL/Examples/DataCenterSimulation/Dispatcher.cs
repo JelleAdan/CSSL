@@ -44,7 +44,9 @@ namespace CSSL.Examples.DataCenterSimulation
 
             queue.EnqueueLast(job);
 
-            if (queue.Length == 1)
+            Console.WriteLine(queue.Length);
+
+            if (queue.Length == 1) // Queue was empty upon arrival, schedule dispatch event immediately. 
             {
                 ScheduleEvent(GetTime, Dispatch);
             }
@@ -52,6 +54,8 @@ namespace CSSL.Examples.DataCenterSimulation
 
         private void Dispatch(CSSLEvent e)
         {
+            NotifyObservers(this);
+
             Job job = queue.DequeueFirst();
 
             job.ServiceTime = serviceTimeDistribution.Next();
@@ -80,8 +84,6 @@ namespace CSSL.Examples.DataCenterSimulation
 
             double departureTime = GetTime + job.ServiceTime;
 
-            ScheduleEvent(departureTime, serverPool.HandleDeparture);
-
             job.DepartureTime = departureTime;
 
             serverPool.HandleArrival(job);
@@ -105,8 +107,6 @@ namespace CSSL.Examples.DataCenterSimulation
 
         private Serverpool ChooseServerpool()
         {
-            Console.WriteLine("Choose serverpool.");
-
             List<Serverpool> selection = new List<Serverpool>();
 
             double p = nrServerPools / serverPools.Count;

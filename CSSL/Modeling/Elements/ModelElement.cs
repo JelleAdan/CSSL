@@ -108,7 +108,7 @@ namespace CSSL.Modeling.Elements
         /// Changes the parent model element of this model element to the supplied model element. 
         /// </summary>
         /// <param name="newParent">The parent for this model element.</param>
-        protected void ChangeParentModelElement(ModelElement newParent)
+        private void ChangeParentModelElement(ModelElement newParent)
         {
             ModelElement oldParent = parent;
             if (oldParent != newParent)
@@ -175,7 +175,7 @@ namespace CSSL.Modeling.Elements
                 ObserverState = ModelElementObserverState.UPDATE;
             }
 
-            if (!modelElements.Any())
+            if (modelElements.Any())
             {
                 foreach (ModelElement modelElement in modelElements)
                 {

@@ -94,7 +94,6 @@ namespace CSSL.Modeling
             protected sealed override void DoEnd()
             {
                 base.DoEnd();
-
             }
         }
     }

@@ -16,28 +16,24 @@ namespace DataCenterSimulation
 
             DataCenter dataCenter = new DataCenter(sim.MyModel, "DataCenter");
 
-            double lambda = 100;
-            JobGenerator jobGenerator = new JobGenerator(dataCenter, "JobGenerator", new ExponentialDistribution(1 / lambda, 1 / lambda / lambda), dataCenter.Dispatcher);
-            dataCenter.SetJobGenerator(jobGenerator);
-
             int numberServerpools = 10;
             for (int i = 0; i < numberServerpools; i++)
             {
                 dataCenter.AddServerpool(new Serverpool(dataCenter, $"Serverpool_{i}"));
             }
 
-            double dispatchTime = 1E-3;
+            double dispatchTime = 1E3;
             Dispatcher dispatcher = new Dispatcher(dataCenter, "Dispatcher", new ExponentialDistribution(1, 1), 2, dataCenter.ServerPools, dispatchTime);
             dataCenter.SetDispatcher(dispatcher);
 
-            // Attach model to simulation...
-
-
+            double lambda = 100;
+            JobGenerator jobGenerator = new JobGenerator(dataCenter, "JobGenerator", new ExponentialDistribution(1 / lambda, 1 / lambda / lambda), dispatcher);
+            dataCenter.SetJobGenerator(jobGenerator);
 
             // The experiment part...
 
-            sim.MyExperiment.LengthOfReplication = 100;
-            sim.MyExperiment.NumberOfReplications = 3;
+            sim.MyExperiment.NumberOfReplications = 1;
+            sim.MyExperiment.MaxComputationalTimeTotal = 60;
 
             // The observer part...
             DispatcherObserver dispatcherObserver = new DispatcherObserver();
