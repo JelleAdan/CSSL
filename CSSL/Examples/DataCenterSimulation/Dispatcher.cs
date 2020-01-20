@@ -44,11 +44,9 @@ namespace CSSL.Examples.DataCenterSimulation
 
             queue.EnqueueLast(job);
 
-            Console.WriteLine(queue.Length);
-
             if (queue.Length == 1) // Queue was empty upon arrival, schedule dispatch event immediately. 
             {
-                ScheduleEvent(GetTime, Dispatch);
+                ScheduleEvent(GetTime + dispatchTime, Dispatch);
             }
         }
 

@@ -22,7 +22,7 @@ namespace DataCenterSimulation
                 dataCenter.AddServerpool(new Serverpool(dataCenter, $"Serverpool_{i}"));
             }
 
-            double dispatchTime = 1E3;
+            double dispatchTime = 1E-3;
             Dispatcher dispatcher = new Dispatcher(dataCenter, "Dispatcher", new ExponentialDistribution(1, 1), 2, dataCenter.ServerPools, dispatchTime);
             dataCenter.SetDispatcher(dispatcher);
 
