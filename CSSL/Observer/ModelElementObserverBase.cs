@@ -13,6 +13,8 @@ namespace CSSL.Observer
     {
         public abstract void OnCompleted();
 
+        public static string OutputDirectory;
+
         public abstract void OnError(Exception error);
 
         public void OnNext(ModelElement modelElement)

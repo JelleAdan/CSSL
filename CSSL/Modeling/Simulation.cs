@@ -11,20 +11,22 @@ namespace CSSL.Modeling
 {
     public class Simulation
     {
-        public Simulation(string name)
+        public Simulation(string name, string outputDirectory)
         {
             MyExecutive = new Executive(this);
             MyModel = new Model(name + "_Model", this);
             MyExperiment = new Experiment(name + "_Experiment");
             replicationExecutionProcess = new ReplicationExecutionProcess(this);
+            OutputDirectory = outputDirectory;
         }
 
-        public Simulation(string name, Executive executive)
+        public Simulation(string name, string outputDirectory, Executive executive)
         {
             MyExecutive = executive;
             MyModel = new Model(name + "_Model", this);
             MyExperiment = new Experiment(name + "_Experiment");
             replicationExecutionProcess = new ReplicationExecutionProcess(this);
+            OutputDirectory = outputDirectory;
         }
 
         public Executive MyExecutive { get; }
@@ -34,6 +36,8 @@ namespace CSSL.Modeling
         public Experiment MyExperiment { get; }
 
         private ReplicationExecutionProcess replicationExecutionProcess { get; }
+
+        public string OutputDirectory { get; }
 
         public void TryInitialize()
         {

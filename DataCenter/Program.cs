@@ -3,6 +3,7 @@ using CSSL.Examples.DataCenterSimulation.DataCenterObservers;
 using CSSL.Modeling;
 using CSSL.Utilities.Distributions;
 using System;
+using System.IO;
 
 namespace DataCenterSimulation
 {
@@ -10,7 +11,7 @@ namespace DataCenterSimulation
     {
         static void Main(string[] args)
         {
-            Simulation sim = new Simulation("SomeSimulation");
+            Simulation sim = new Simulation("SomeSimulation", @"C:\CSSLtest");
 
             // The model part...
 
@@ -38,6 +39,8 @@ namespace DataCenterSimulation
             // The observer part...
             DispatcherObserver dispatcherObserver = new DispatcherObserver();
             dispatcherObserver.Subscribe(dataCenter.Dispatcher);
+
+            dispatcherObserver
 
             sim.Run();
 

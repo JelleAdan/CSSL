@@ -18,7 +18,7 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
 
         public override void OnCompleted()
         {
-            throw new NotImplementedException();
+            
         }
 
         public override void OnError(Exception error)

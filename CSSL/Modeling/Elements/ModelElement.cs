@@ -29,7 +29,7 @@ namespace CSSL.Modeling.Elements
             ConstructorCalls(name);
             this.parent = parent ?? throw new ArgumentNullException($"Tried to construct ModelElement with name \"{name}\" but the parent ModelElement is null.");
             parent.AddModelElement(this);
-            myModel = parent.GetModel;
+            MyModel = parent.MyModel;
         }
 
         /// <summary>
@@ -59,21 +59,20 @@ namespace CSSL.Modeling.Elements
         protected ModelElement parent;
 
         /// <summary>
-        /// Retrieves the main model. The highest container for all model elements.
+        /// A reference to the overall model, the highest container for all model elements.
         /// </summary>
-        /// <returns></returns>
-        protected virtual Model GetModel => parent.GetModel;
-
-        /// <summary>
-        /// A reference to the overall model.
-        /// </summary>
-        protected Model myModel;
+        public virtual Model MyModel { get; private set; }
 
         /// <summary>
         /// Retrieves the executive.
         /// </summary>
         /// <returns></returns>
-        protected Executive GetExecutive => myModel.MySimulation.MyExecutive;
+        protected Executive GetExecutive => MyModel.MySimulation.MyExecutive;
+
+        /// <summary>
+        /// Retrieves the simulation.
+        /// </summary>
+        public Simulation GetSimulation => MyModel.MySimulation;
 
         /// <summary>
         /// Retrieves the current simulation time.
@@ -115,7 +114,7 @@ namespace CSSL.Modeling.Elements
             {
                 oldParent.RemoveModelElement(this);
                 newParent.AddModelElement(this);
-                myModel = newParent.GetModel;
+                MyModel = newParent.MyModel;
             }
         }
 
