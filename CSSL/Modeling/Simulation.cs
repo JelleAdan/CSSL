@@ -37,7 +37,7 @@ namespace CSSL.Modeling
 
         private ReplicationExecutionProcess replicationExecutionProcess { get; }
 
-        public string OutputDirectory { get; }
+        internal string OutputDirectory { get; }
 
         public void TryInitialize()
         {
@@ -78,6 +78,8 @@ namespace CSSL.Modeling
             base.DoInitialize();
             simulation.MyExperiment.ResetCurrentReplicationNumber();
             simulation.MyModel.StrictlyDoBeforeExperiment();
+
+
         }
 
         protected sealed override int NextIteration()

@@ -37,7 +37,7 @@ namespace DataCenterSimulation
             sim.MyExperiment.MaxComputationalTimeTotal = 60;
 
             // The observer part...
-            DispatcherObserver dispatcherObserver = new DispatcherObserver();
+            DispatcherObserver dispatcherObserver = new DispatcherObserver(sim);
             dispatcherObserver.Subscribe(dataCenter.Dispatcher);
 
             dispatcherObserver

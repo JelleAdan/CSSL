@@ -1,4 +1,5 @@
-﻿using CSSL.Modeling.Elements;
+﻿using CSSL.Modeling;
+using CSSL.Modeling.Elements;
 using CSSL.Observer;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,11 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
 {
     public class DispatcherObserver : ModelElementObserverBase
     {
+        public DispatcherObserver(Simulation sim) : base(sim)
+        {
+
+        }
+
         private double sumQueueLength;
 
         private double sumTime;

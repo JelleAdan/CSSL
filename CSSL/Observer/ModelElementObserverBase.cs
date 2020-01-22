@@ -11,9 +11,14 @@ namespace CSSL.Observer
 {
     public abstract class ModelElementObserverBase : IObserver<ModelElement> 
     {
-        public abstract void OnCompleted();
+        public ModelElementObserverBase(Simulation simulation)
+        {
+            this.simulation = simulation;
+        }
 
-        public static string OutputDirectory;
+        protected Simulation simulation { get; }
+
+        public abstract void OnCompleted();
 
         public abstract void OnError(Exception error);
 
@@ -41,7 +46,7 @@ namespace CSSL.Observer
 
         private IDisposable cancellation;
 
-        public void Subscribe(IObservable<ModelElement> observable)
+        public void Subscribe(ModelElement observable)
         {
             cancellation = observable.Subscribe(this);
         }
