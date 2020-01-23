@@ -9,6 +9,10 @@ using System.Text;
 
 namespace CSSL.Observer
 {
+    /// <summary>
+    /// A base class for all CSSL observers
+    /// </summary>
+    /// <typeparam name="T">The observable object that is passed for notification information.</typeparam>
     public abstract class ObserverBase<T> : IIdentity, IName, IObserver<T>, IDisposable
     {
         /// <summary>
