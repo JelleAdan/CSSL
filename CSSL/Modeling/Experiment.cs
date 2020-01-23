@@ -77,33 +77,39 @@ namespace CSSL.Modeling
             }
         }
 
-        private double maxCompuationalTimePerReplication;
+        private double maxComputationalTimePerReplication;
 
+        /// <summary>
+        /// A threshold on the maximum computational time of a replication.
+        /// </summary>
         public double MaxComputationalTimePerReplication
         {
-            get { return maxCompuationalTimePerReplication; }
+            get { return maxComputationalTimePerReplication; }
             set
             {
                 if (value < 0)
                 {
                     throw new ArgumentOutOfRangeException($"{nameof(value)} must be positive.");
                 }
-                maxCompuationalTimePerReplication = value;
+                maxComputationalTimePerReplication = value;
             }
         }
 
-        private double maxCompuationalTimeTotal;
+        private double maxComputationalTimeTotal;
 
+        /// <summary>
+        /// A threshold on the maximum computational time of the experiment.
+        /// </summary>
         public double MaxComputationalTimeTotal
         {
-            get { return maxCompuationalTimeTotal; }
+            get { return maxComputationalTimeTotal; }
             set
             {
                 if (value < 0)
                 {
                     throw new ArgumentOutOfRangeException($"{nameof(value)} must be positive.");
                 }
-                maxCompuationalTimeTotal = value;
+                maxComputationalTimeTotal = value;
             }
         }
 

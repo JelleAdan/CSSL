@@ -24,6 +24,15 @@ namespace CSSL.Observer
             Writer = new StreamWriter(Path.Combine(mySimulation.MyExperiment.ReplicationOutputDirectory, Name + ".txt"));
         }
 
+        internal void StrictlyDoBeforeReplication()
+        {
+
+        }
+
+        protected void DoBeforeReplicatio()
+        {
+        }
+
         protected readonly StreamWriter Writer;
 
         protected List<Unsubscriber<ObserverBase<T>, IObservable<T>>> cancellations;

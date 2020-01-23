@@ -16,11 +16,11 @@ namespace CSSL.Modeling
             COMPUTATIONAL_TIME_EXCEEDED
         }
 
-        protected virtual double maxComputationalTimeMiliseconds => throw new NotImplementedException();
+        protected virtual double maxComputationalTimeMilliseconds => throw new NotImplementedException();
 
         private DateTime beginComputionalTime;
 
-        private bool IsComputationalTimeExceeded => DateTime.Now.Subtract(beginComputionalTime).TotalMilliseconds > maxComputationalTimeMiliseconds;
+        private bool IsComputationalTimeExceeded => DateTime.Now.Subtract(beginComputionalTime).TotalMilliseconds > maxComputationalTimeMilliseconds;
 
         public string Name => GetType().Name;
 

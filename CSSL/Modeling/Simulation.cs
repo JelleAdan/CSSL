@@ -58,7 +58,7 @@ namespace CSSL.Modeling
             }
             finally
             {
-                
+                Dispose();
             }
         }
 
@@ -74,7 +74,7 @@ namespace CSSL.Modeling
 
         public void Dispose()
         {
-            
+            DisposeObservers();
         }
 
         private void DisposeObservers()
@@ -95,7 +95,7 @@ namespace CSSL.Modeling
             this.simulation = simulation;
         }
 
-        protected override double maxComputationalTimeMiliseconds => simulation.MyExperiment.MaxComputationalTimeTotal;
+        protected override double maxComputationalTimeMilliseconds => simulation.MyExperiment.MaxComputationalTimeTotal * 1000;
 
         protected override bool HasNext => simulation.MyExperiment.HasMoreReplications;
 
@@ -117,7 +117,7 @@ namespace CSSL.Modeling
         {
             NextIteration();
             simulation.MyExecutive.TryInitialize();
-            simulation.MyExperiment.CreateReplicationOutputDirectory();
+            simulation.MyObservers.StrictlyDoBeforeReplication();
             simulation.MyModel.StrictlyDoBeforeReplication();
             simulation.MyExecutive.TryRunAll();
         }

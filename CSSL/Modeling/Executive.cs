@@ -69,7 +69,7 @@ namespace CSSL.Modeling
                 this.executive = executive;
             }
 
-            protected override double maxComputationalTimeMiliseconds => executive.MySimulation.MyExperiment.MaxComputationalTimePerReplication;
+            protected override double maxComputationalTimeMilliseconds => executive.MySimulation.MyExperiment.MaxComputationalTimePerReplication * 1000;
 
             protected override bool HasNext => executive.calendar.HasNext();
 
@@ -78,6 +78,7 @@ namespace CSSL.Modeling
                 base.DoInitialize();
                 executive.calendar.CancelAll();
                 executive.Time = 0;
+                executive.MySimulation.MyExperiment.CreateReplicationOutputDirectory();
             }
 
             protected sealed override CSSLEvent NextIteration()

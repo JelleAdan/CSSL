@@ -16,11 +16,6 @@ namespace CSSL.Observer
         {
         }
 
-        public override void Subscribe(IObservable<ModelElementBase> observable)
-        {
-            cancellations.Add(observable.Subscribe(this));
-        }
-
         public override void OnNext(ModelElementBase modelElement)
         {
             switch (modelElement.ObserverState)

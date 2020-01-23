@@ -8,6 +8,6 @@ namespace CSSL.Utilities
 {
     public interface IName
     {
-        readonly string Name { get; }
+        string Name { get; }
     }
 }

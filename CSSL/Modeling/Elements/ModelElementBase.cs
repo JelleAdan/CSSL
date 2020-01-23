@@ -142,7 +142,6 @@ namespace CSSL.Modeling.Elements
                 foreach (ModelElementBase modelElement in modelElements)
                 {
                     modelElement.StrictlyDoBeforeExperiment();
-                    modelElement.DoBeforeExperiment();
                 }
             }
         }
@@ -174,12 +173,13 @@ namespace CSSL.Modeling.Elements
                 ObserverState = ModelElementObserverState.UPDATE;
             }
 
+            DoBeforeReplication();
+
             if (modelElements.Any())
             {
                 foreach (ModelElementBase modelElement in modelElements)
                 {
                     modelElement.StrictlyDoBeforeReplication();
-                    modelElement.DoBeforeReplication();
                 }
             }
         }
