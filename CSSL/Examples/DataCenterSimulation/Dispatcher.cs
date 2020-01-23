@@ -12,7 +12,7 @@ namespace CSSL.Examples.DataCenterSimulation
 {
     public class Dispatcher : SchedulingElement
     {
-        public Dispatcher(ModelElement parent, string name, Distribution serviceTimeDistribution, double serviceTimeThreshold, List<Serverpool> serverPools, double dispatchTime) : base(parent, name)
+        public Dispatcher(ModelElementBase parent, string name, Distribution serviceTimeDistribution, double serviceTimeThreshold, List<Serverpool> serverPools, double dispatchTime) : base(parent, name)
         {
             queue = new CSSLQueue<Job>(this, name + "_Queue");
             this.serviceTimeDistribution = serviceTimeDistribution;

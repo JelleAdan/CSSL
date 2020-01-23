@@ -42,7 +42,7 @@ namespace DataCenterSimulation
 
             dispatcherObserver
 
-            sim.Run();
+            sim.TryRun();
 
             Console.WriteLine("Test");
         }

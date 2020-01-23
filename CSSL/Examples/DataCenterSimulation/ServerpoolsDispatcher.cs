@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CSSL.Examples.DataCenterSimulation
 {
-    public class DataCenter : ModelElement
+    public class DataCenter : ModelElementBase
     {
         public JobGenerator JobGenerator { get; private set; }
 
@@ -16,7 +16,7 @@ namespace CSSL.Examples.DataCenterSimulation
 
         public List<Serverpool> ServerPools { get; private set; }
 
-        public DataCenter(ModelElement parent, string name) : base(parent, name)
+        public DataCenter(ModelElementBase parent, string name) : base(parent, name)
         {
         }
 

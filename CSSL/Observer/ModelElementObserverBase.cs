@@ -3,26 +3,25 @@ using CSSL.Modeling.Elements;
 using CSSL.Utilities;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace CSSL.Observer
 {
-    public abstract class ModelElementObserverBase : IObserver<ModelElement> 
+    public abstract class ModelElementObserverBase : ObserverBase<ModelElementBase>
     {
-        public ModelElementObserverBase(Simulation simulation)
+        public ModelElementObserverBase(Simulation mySimulation) : base(mySimulation)
         {
-            this.simulation = simulation;
         }
 
-        protected Simulation simulation { get; }
+        public override void Subscribe(IObservable<ModelElementBase> observable)
+        {
+            cancellations.Add(observable.Subscribe(this));
+        }
 
-        public abstract void OnCompleted();
-
-        public abstract void OnError(Exception error);
-
-        public void OnNext(ModelElement modelElement)
+        public override void OnNext(ModelElementBase modelElement)
         {
             switch (modelElement.ObserverState)
             {
@@ -38,22 +37,10 @@ namespace CSSL.Observer
             }
         }
 
-        protected abstract void OnUpdate(ModelElement modelElement);
+        protected abstract void OnUpdate(ModelElementBase modelElement);
 
-        protected abstract void OnWarmUp(ModelElement modelElement);
+        protected abstract void OnWarmUp(ModelElementBase modelElement);
 
-        protected abstract void OnInitialized(ModelElement modelElement);
-
-        private IDisposable cancellation;
-
-        public void Subscribe(ModelElement observable)
-        {
-            cancellation = observable.Subscribe(this);
-        }
-
-        public void Unsubscribe()
-        {
-            cancellation.Dispose();
-        }
+        protected abstract void OnInitialized(ModelElementBase modelElement);
     }
 }

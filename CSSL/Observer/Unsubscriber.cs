@@ -4,13 +4,13 @@ using System.Text;
 
 namespace CSSL.Observer
 {
-    public class Unsubscriber<observerClass, observableClass> : IDisposable
+    public class Unsubscriber<Observer, Observable> : IDisposable
     {
-        private List<observerClass> observers;
-        private observerClass observer;
-        private IObservable<observableClass> observable;
+        private List<Observer> observers;
+        private Observer observer;
+        private IObservable<Observable> observable;
 
-        internal Unsubscriber(List<observerClass> observers, observerClass observer, IObservable<observableClass> observable)
+        internal Unsubscriber(List<Observer> observers, Observer observer, IObservable<Observable> observable)
         {
             this.observers = observers;
             this.observer = observer;

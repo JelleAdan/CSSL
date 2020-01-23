@@ -3,6 +3,7 @@ using CSSL.Modeling.Elements;
 using CSSL.Observer;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
@@ -22,17 +23,12 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
 
         private double currentTime;
 
-        public override void OnCompleted()
-        {
-            
-        }
-
         public override void OnError(Exception error)
         {
             throw new NotImplementedException();
         }
 
-        protected sealed override void OnUpdate(ModelElement modelElement)
+        protected sealed override void OnUpdate(ModelElementBase modelElement)
         {
             Dispatcher dispatcher = (Dispatcher)modelElement;
             currentTime = dispatcher.GetTime;
@@ -41,15 +37,16 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
             sumTime += (currentTime - oldTime);
             oldTime = currentTime;
 
-            Console.WriteLine($"Average queue length: {sumQueueLength / sumTime}");
+            Writer.WriteLine(queueLength);
+            //Console.WriteLine($"Average queue length: {sumQueueLength / sumTime}");
         }
 
-        protected sealed override void OnInitialized(ModelElement modelElement)
+        protected sealed override void OnInitialized(ModelElementBase modelElement)
         {
             oldTime = modelElement.GetTime;
         }
 
-        protected sealed override void OnWarmUp(ModelElement modelElement)
+        protected sealed override void OnWarmUp(ModelElementBase modelElement)
         {
         }
     }

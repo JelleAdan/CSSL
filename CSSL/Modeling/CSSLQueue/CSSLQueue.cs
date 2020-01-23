@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace CSSL.Modeling.CSSLQueue
 {
-    public class CSSLQueue<T> : ModelElement where T : CSSLQueueObject<T>
+    public class CSSLQueue<T> : ModelElementBase where T : CSSLQueueObject<T>
     {
-        public CSSLQueue(ModelElement parent, string name) : base(parent, name)
+        public CSSLQueue(ModelElementBase parent, string name) : base(parent, name)
         {
             items = new List<T>();
         }

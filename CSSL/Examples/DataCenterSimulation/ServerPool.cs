@@ -11,7 +11,7 @@ namespace CSSL.Examples.DataCenterSimulation
 {
     public class Serverpool : SchedulingElement
     {
-        public Serverpool(ModelElement parent, string name) : base(parent, name)
+        public Serverpool(ModelElementBase parent, string name) : base(parent, name)
         {
             queue = new ServerPoolQueue(this, name + "_Queue");
         }
@@ -39,7 +39,7 @@ namespace CSSL.Examples.DataCenterSimulation
 
         private class ServerPoolQueue : CSSLQueue<Job>
         {
-            public ServerPoolQueue(ModelElement parent, string name) : base(parent, name)
+            public ServerPoolQueue(ModelElementBase parent, string name) : base(parent, name)
             {
             }
 

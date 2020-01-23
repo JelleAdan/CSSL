@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CSSL.Modeling.Elements
 {
-    public abstract class ModelElement : IIdentity, IName, IObservable<ModelElement>
+    public abstract class ModelElementBase : IIdentity, IName, IObservable<ModelElementBase>
     {
         /// <summary>
         /// Incremented to store the total number of created model elements.
@@ -24,7 +24,7 @@ namespace CSSL.Modeling.Elements
         /// </summary>
         /// <param name="parent">A reference to the parent model element.</param>
         /// <param name="name">The name of the model element.</param>
-        public ModelElement(ModelElement parent, string name)
+        public ModelElementBase(ModelElementBase parent, string name)
         {
             ConstructorCalls(name);
             this.parent = parent ?? throw new ArgumentNullException($"Tried to construct ModelElement with name \"{name}\" but the parent ModelElement is null.");
@@ -36,7 +36,7 @@ namespace CSSL.Modeling.Elements
         /// This constuctor is only called by Model so that Model does not require a parent model element.
         /// </summary>
         /// <param name="name">The name of the model.</param>
-        internal ModelElement(string name)
+        internal ModelElementBase(string name)
         {
             ConstructorCalls(name);
         }
@@ -49,14 +49,14 @@ namespace CSSL.Modeling.Elements
         {
             Name = name;
             Id = modelElementCounter++;
-            modelElements = new List<ModelElement>();
-            observers = new List<IObserver<ModelElement>>();
+            modelElements = new List<ModelElementBase>();
+            observers = new List<IObserver<ModelElementBase>>();
         }
 
         /// <summary>
         /// A reference to the parent model element.
         /// </summary>
-        protected ModelElement parent;
+        protected ModelElementBase parent;
 
         /// <summary>
         /// A reference to the overall model, the highest container for all model elements.
@@ -83,13 +83,13 @@ namespace CSSL.Modeling.Elements
         /// <summary>
         /// 
         /// </summary>
-        private List<ModelElement> modelElements;
+        private List<ModelElementBase> modelElements;
 
         /// <summary>
         /// Adds the supplied model element as a child to this model element. 
         /// </summary>
         /// <param name="modelElement">The model element to be added.</param>
-        private void AddModelElement(ModelElement modelElement)
+        private void AddModelElement(ModelElementBase modelElement)
         {
             modelElements.Add(modelElement);
         }
@@ -98,7 +98,7 @@ namespace CSSL.Modeling.Elements
         /// Removes the supplied child model element from this model element.
         /// </summary>
         /// <param name="modelElement">The model element to be removed.</param>
-        private void RemoveModelElement(ModelElement modelElement)
+        private void RemoveModelElement(ModelElementBase modelElement)
         {
             modelElements.Remove(modelElement);
         }
@@ -107,9 +107,9 @@ namespace CSSL.Modeling.Elements
         /// Changes the parent model element of this model element to the supplied model element. 
         /// </summary>
         /// <param name="newParent">The parent for this model element.</param>
-        private void ChangeParentModelElement(ModelElement newParent)
+        private void ChangeParentModelElement(ModelElementBase newParent)
         {
-            ModelElement oldParent = parent;
+            ModelElementBase oldParent = parent;
             if (oldParent != newParent)
             {
                 oldParent.RemoveModelElement(this);
@@ -139,7 +139,7 @@ namespace CSSL.Modeling.Elements
 
             if (modelElements.Any())
             {
-                foreach (ModelElement modelElement in modelElements)
+                foreach (ModelElementBase modelElement in modelElements)
                 {
                     modelElement.StrictlyDoBeforeExperiment();
                     modelElement.DoBeforeExperiment();
@@ -176,7 +176,7 @@ namespace CSSL.Modeling.Elements
 
             if (modelElements.Any())
             {
-                foreach (ModelElement modelElement in modelElements)
+                foreach (ModelElementBase modelElement in modelElements)
                 {
                     modelElement.StrictlyDoBeforeReplication();
                     modelElement.DoBeforeReplication();
@@ -204,25 +204,25 @@ namespace CSSL.Modeling.Elements
             ObserverState = ModelElementObserverState.UPDATE;
 
             // Trigger the warm-up action in all children that allow.
-            foreach (ModelElement modelElement in modelElements.Where(x => x.LengthOfWarmUp > 0))
+            foreach (ModelElementBase modelElement in modelElements.Where(x => x.LengthOfWarmUp > 0))
             {
                 modelElement.HandleEndWarmUp(e);
             }
         }
 
-        private List<IObserver<ModelElement>> observers;
+        private List<IObserver<ModelElementBase>> observers;
 
-        public IDisposable Subscribe(IObserver<ModelElement> observer)
+        public IDisposable Subscribe(IObserver<ModelElementBase> observer)
         {
             // Check whether observer is already registered. If not, add it.
             if (!observers.Contains(observer))
             {
                 observers.Add(observer);
             }
-            return new Unsubscriber<IObserver<ModelElement>>(observers, observer);
+            return new Unsubscriber<IObserver<ModelElementBase>, ModelElementBase>(observers, observer, this);
         }
 
-        protected void NotifyObservers(ModelElement info)
+        protected void NotifyObservers(ModelElementBase info)
         {
             foreach (ModelElementObserverBase observer in observers)
             {

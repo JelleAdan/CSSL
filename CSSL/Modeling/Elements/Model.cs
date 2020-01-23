@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CSSL.Modeling.Elements
 {
-    public class Model : ModelElement
+    public class Model : ModelElementBase
     {
         public Model(string name, Simulation simulation) : base(name)
         {

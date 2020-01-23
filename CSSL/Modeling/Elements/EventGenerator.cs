@@ -11,7 +11,7 @@ namespace CSSL.Modeling.Elements
     {
         private Distribution interEventTimeDistribution;
 
-        public EventGeneratorBase(ModelElement parent, string name, Distribution interEventTimeDistribution) : base(parent, name)
+        public EventGeneratorBase(ModelElementBase parent, string name, Distribution interEventTimeDistribution) : base(parent, name)
         {
             this.interEventTimeDistribution = interEventTimeDistribution;
         }

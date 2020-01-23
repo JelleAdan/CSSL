@@ -1,21 +1,24 @@
 ﻿using CSSL.Calendar;
 using CSSL.Modeling.Elements;
+using CSSL.Observer;
 using CSSL.Utilities;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace CSSL.Modeling
 {
-    public class Simulation
+    public class Simulation : IDisposable
     {
         public Simulation(string name, string outputDirectory)
         {
             MyExecutive = new Executive(this);
             MyModel = new Model(name + "_Model", this);
-            MyExperiment = new Experiment(name + "_Experiment");
+            MyExperiment = new Experiment(name + "_Experiment", outputDirectory);
+            MyObservers = new List<IDisposable>();
             replicationExecutionProcess = new ReplicationExecutionProcess(this);
             OutputDirectory = outputDirectory;
         }
@@ -24,7 +27,8 @@ namespace CSSL.Modeling
         {
             MyExecutive = executive;
             MyModel = new Model(name + "_Model", this);
-            MyExperiment = new Experiment(name + "_Experiment");
+            MyExperiment = new Experiment(name + "_Experiment", outputDirectory);
+            MyObservers = new List<IDisposable>();
             replicationExecutionProcess = new ReplicationExecutionProcess(this);
             OutputDirectory = outputDirectory;
         }
@@ -35,6 +39,8 @@ namespace CSSL.Modeling
 
         public Experiment MyExperiment { get; }
 
+        internal readonly List<IDisposable> MyObservers;
+
         private ReplicationExecutionProcess replicationExecutionProcess { get; }
 
         internal string OutputDirectory { get; }
@@ -44,12 +50,19 @@ namespace CSSL.Modeling
             replicationExecutionProcess.TryInitialize();
         }
 
-        public void Run()
+        public void TryRun()
         {
-            replicationExecutionProcess.TryRunAll();
+            try
+            {
+                replicationExecutionProcess.TryRunAll();
+            }
+            finally
+            {
+                
+            }
         }
 
-        public void RunNext()
+        public void TryRunNext()
         {
             replicationExecutionProcess.TryRunNext();
         }
@@ -57,6 +70,19 @@ namespace CSSL.Modeling
         public void End()
         {
             replicationExecutionProcess.TryEnd();
+        }
+
+        public void Dispose()
+        {
+            
+        }
+
+        private void DisposeObservers()
+        {
+            foreach(IDisposable observer in MyObservers)
+            {
+                observer.Dispose();
+            }
         }
     }
 
@@ -77,8 +103,8 @@ namespace CSSL.Modeling
         {
             base.DoInitialize();
             simulation.MyExperiment.ResetCurrentReplicationNumber();
+            simulation.MyExperiment.CreateExperimentOutputDirectory();
             simulation.MyModel.StrictlyDoBeforeExperiment();
-
 
         }
 
@@ -91,6 +117,7 @@ namespace CSSL.Modeling
         {
             NextIteration();
             simulation.MyExecutive.TryInitialize();
+            simulation.MyExperiment.CreateReplicationOutputDirectory();
             simulation.MyModel.StrictlyDoBeforeReplication();
             simulation.MyExecutive.TryRunAll();
         }

@@ -11,7 +11,7 @@ namespace CSSL.Examples.DataCenterSimulation
 {
     public class JobGenerator : EventGeneratorBase
     {
-        public JobGenerator(ModelElement parent, string name, Distribution interEventTimeDistribution, Dispatcher dispatcher) : base(parent, name, interEventTimeDistribution)
+        public JobGenerator(ModelElementBase parent, string name, Distribution interEventTimeDistribution, Dispatcher dispatcher) : base(parent, name, interEventTimeDistribution)
         {
             this.dispatcher = dispatcher;
         }
