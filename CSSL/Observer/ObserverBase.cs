@@ -32,10 +32,13 @@ namespace CSSL.Observer
         /// Subscribes the observer to an observable.
         /// </summary>
         /// <param name="observable">The model element to observe.</param>
-        public abstract void Subscribe(IObservable<T> observable);
+        public void Subscribe(IObservable<T> observable)
+        {
+            cancellations.Add((Unsubscriber<ObserverBase<T>, IObservable<T>>)observable.Subscribe(this));
+        }
 
         /// <summary>
-        /// 
+        /// Unsubscribe observer from all subscribed observables.
         /// </summary>
         public void UnsubscribeAll()
         {
@@ -46,10 +49,13 @@ namespace CSSL.Observer
         }
 
         /// <summary>
-        /// 
+        /// Unsubsribe from specific observable.
         /// </summary>
-        /// <param name="observable"></param>
-        public abstract void Unsubscribe(T observable);
+        /// <param name="observable">The observable to unsubscribe from.</param>
+        public void Unsubscribe(IObservable<T> observable)
+        {
+            cancellations.Where(x => x.observable == observable).First().Dispose();
+        }
 
         public int Id { get; }
 

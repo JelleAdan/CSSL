@@ -8,7 +8,7 @@ namespace CSSL.Observer
     {
         private List<Observer> observers;
         private Observer observer;
-        private IObservable<Observable> observable;
+        public IObservable<Observable> observable;
 
         internal Unsubscriber(List<Observer> observers, Observer observer, IObservable<Observable> observable)
         {
