@@ -10,14 +10,16 @@ using System.Threading.Tasks;
 
 namespace CSSL.Observer
 {
-    public abstract class ModelElementObserverBase : ObserverBase<ModelElementBase>
+    public abstract class ModelElementObserverBase : ObserverBase
     {
         public ModelElementObserverBase(Simulation mySimulation) : base(mySimulation)
         {
         }
 
-        public override void OnNext(ModelElementBase modelElement)
+        public override void OnNext(object info)
         {
+            ModelElementBase modelElement = (ModelElementBase)info;
+
             switch (modelElement.ObserverState)
             {
                 case ModelElementObserverState.UPDATE:

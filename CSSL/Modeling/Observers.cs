@@ -8,28 +8,32 @@ namespace CSSL.Modeling
 {
     internal class Observers : IDisposable
     {
-        internal List<ObserverBase<ModelElementBase>> ModelElementObservers { get; set; }
-        internal List<ObserverBase<Executive>> ExecutiveObservers { get; set; }
+        internal List<ObserverBase> MyObservers { get; set; }
 
-
-        void IDisposable.Dispose()
+        public Observers()
         {
-            foreach (var observer in ModelElementObservers)
-            {
-                observer.Dispose();
-            }
-
-            foreach (var observer in ExecutiveObservers)
-            {
-                observer.Dispose();
-            }
-
-            // Append this in case of more observer lists
+            MyObservers = new List<ObserverBase>();
         }
 
-        internal void Add(ObserverBase<T> observer)
+        internal void Add(ObserverBase observer)
         {
+            MyObservers.Add(observer);
+        }
 
+        internal void StrictlyDoBeforeReplication()
+        {
+            foreach (ObserverBase observer in MyObservers)
+            {
+                observer.StrictlyDoBeforeReplication();
+            }
+        }
+
+        public void Dispose()
+        {
+            foreach (ObserverBase observer in MyObservers)
+            {
+                observer.Dispose();
+            }
         }
     }
 }

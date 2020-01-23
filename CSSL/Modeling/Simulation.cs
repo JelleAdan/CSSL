@@ -18,6 +18,7 @@ namespace CSSL.Modeling
             MyExecutive = new Executive(this);
             MyModel = new Model(name + "_Model", this);
             MyExperiment = new Experiment(name + "_Experiment", outputDirectory);
+            MyObservers = new Observers();
             replicationExecutionProcess = new ReplicationExecutionProcess(this);
             OutputDirectory = outputDirectory;
         }
@@ -27,6 +28,7 @@ namespace CSSL.Modeling
             MyExecutive = executive;
             MyModel = new Model(name + "_Model", this);
             MyExperiment = new Experiment(name + "_Experiment", outputDirectory);
+            MyObservers = new Observers();
             replicationExecutionProcess = new ReplicationExecutionProcess(this);
             OutputDirectory = outputDirectory;
         }
@@ -37,7 +39,7 @@ namespace CSSL.Modeling
 
         public Experiment MyExperiment { get; }
 
-        internal readonly Observers MyObservers;
+        internal Observers MyObservers { get; }
 
         private ReplicationExecutionProcess replicationExecutionProcess { get; }
 
@@ -71,11 +73,6 @@ namespace CSSL.Modeling
         }
 
         public void Dispose()
-        {
-            DisposeObservers();
-        }
-
-        private void DisposeObservers()
         {
             MyObservers.Dispose();
         }

@@ -13,7 +13,7 @@ namespace CSSL.Observer
     /// A base class for all CSSL observers
     /// </summary>
     /// <typeparam name="T">The observable object that is passed for notification information.</typeparam>
-    public abstract class ObserverBase<T> : IIdentity, IName, IObserver<T>, IDisposable
+    public abstract class ObserverBase : IIdentity, IName, IObserver<object>, IDisposable
     {
         /// <summary>
         /// Incremented to store the total number of observers.
@@ -24,30 +24,35 @@ namespace CSSL.Observer
         {
             Id = observerCounter++;
             Name = GetType().Name + "_" + Id;
+            this.mySimulation = mySimulation;
             mySimulation.MyObservers.Add(this);
-            Writer = new StreamWriter(Path.Combine(mySimulation.MyExperiment.ReplicationOutputDirectory, Name + ".txt"));
+            cancellations = new List<Unsubscriber>();
         }
+
+        private readonly Simulation mySimulation;
 
         internal void StrictlyDoBeforeReplication()
         {
+            Writer = new StreamWriter(Path.Combine(mySimulation.MyExperiment.ReplicationOutputDirectory, Name + ".txt"));
 
+            DoBeforeReplication();
         }
 
-        protected void DoBeforeReplicatio()
+        protected virtual void DoBeforeReplication()
         {
         }
 
-        protected readonly StreamWriter Writer;
+        protected StreamWriter Writer { get; private set; }
 
-        protected List<Unsubscriber<ObserverBase<T>, IObservable<T>>> cancellations;
+        protected List<Unsubscriber> cancellations;
 
         /// <summary>
         /// Subscribes the observer to an observable.
         /// </summary>
         /// <param name="observable">The model element to observe.</param>
-        public void Subscribe(IObservable<T> observable)
+        public void Subscribe(IObservable<object> observable)
         {
-            cancellations.Add((Unsubscriber<ObserverBase<T>, IObservable<T>>)observable.Subscribe(this));
+            cancellations.Add((Unsubscriber)observable.Subscribe(this));
         }
 
         /// <summary>
@@ -65,7 +70,7 @@ namespace CSSL.Observer
         /// Unsubsribe from specific observable.
         /// </summary>
         /// <param name="observable">The observable to unsubscribe from.</param>
-        public void Unsubscribe(IObservable<T> observable)
+        public void Unsubscribe(IObservable<object> observable)
         {
             cancellations.Where(x => x.observable == observable).First().Dispose();
         }
@@ -84,7 +89,7 @@ namespace CSSL.Observer
             throw new NotImplementedException();
         }
 
-        public virtual void OnNext(T value)
+        public virtual void OnNext(object value)
         {
             throw new NotImplementedException();
         }

@@ -37,7 +37,7 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
             sumTime += (currentTime - oldTime);
             oldTime = currentTime;
 
-            Writer.WriteLine($"{queueLength}, {currentTime}");
+            Writer.WriteLine($"{queueLength},{currentTime}");
             //Console.WriteLine($"Average queue length: {sumQueueLength / sumTime}");
         }
 

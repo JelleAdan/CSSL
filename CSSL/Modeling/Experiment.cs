@@ -152,6 +152,7 @@ namespace CSSL.Modeling
                 }
                 ExperimentOutputDirectory = ExperimentOutputDirectory + $"_{counter}";
             }
+            Directory.CreateDirectory(ExperimentOutputDirectory);
         }
 
         internal string ReplicationOutputDirectory;
@@ -159,6 +160,11 @@ namespace CSSL.Modeling
         internal void CreateReplicationOutputDirectory()
         {
             ReplicationOutputDirectory = Path.Combine(ExperimentOutputDirectory, $"rep_{currentReplicationNumber}");
+
+            if (!Directory.Exists(ReplicationOutputDirectory))
+            {
+                Directory.CreateDirectory(ReplicationOutputDirectory);
+            }
         }
     }
 }

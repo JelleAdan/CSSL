@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CSSL.Modeling.Elements
 {
-    public abstract class ModelElementBase : IIdentity, IName, IObservable<ModelElementBase>
+    public abstract class ModelElementBase : IIdentity, IName, IObservable<object>
     {
         /// <summary>
         /// Incremented to store the total number of created model elements.
@@ -50,7 +50,7 @@ namespace CSSL.Modeling.Elements
             Name = name;
             Id = modelElementCounter++;
             modelElements = new List<ModelElementBase>();
-            observers = new List<IObserver<ModelElementBase>>();
+            observers = new List<IObserver<object>>();
         }
 
         /// <summary>
@@ -210,19 +210,30 @@ namespace CSSL.Modeling.Elements
             }
         }
 
-        private List<IObserver<ModelElementBase>> observers;
+        private List<IObserver<object>> observers;
 
-        public IDisposable Subscribe(IObserver<ModelElementBase> observer)
+        public IDisposable Subscribe(IObserver<object> observer)
         {
+            // Check if observer is permitted.
+            try
+            {
+                ModelElementObserverBase modelElementObserver = (ModelElementObserverBase)observer;
+            }
+            catch
+            {
+                throw new Exception($"Tried to attach an observer of class {observer.GetType().Name} of the wrong type to {Name}");
+            }
+
             // Check whether observer is already registered. If not, add it.
             if (!observers.Contains(observer))
             {
                 observers.Add(observer);
             }
-            return new Unsubscriber<IObserver<ModelElementBase>, ModelElementBase>(observers, observer, this);
+
+            return new Unsubscriber(observers, observer, this);
         }
 
-        protected void NotifyObservers(ModelElementBase info)
+        protected void NotifyObservers(object info)
         {
             foreach (ModelElementObserverBase observer in observers)
             {
