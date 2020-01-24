@@ -123,7 +123,7 @@ namespace CSSL.Modeling
         /// </summary>
         internal void ResetCurrentReplicationNumber()
         {
-            currentReplicationNumber = -1;
+            currentReplicationNumber = 0;
         }
 
         internal bool HasMoreReplications => currentReplicationNumber < numberOfReplications;
@@ -133,6 +133,8 @@ namespace CSSL.Modeling
         /// </summary>
         internal int IncrementCurrentReplicationNumber()
         {
+            Console.WriteLine(currentReplicationNumber);
+
             return currentReplicationNumber++;
         }
 

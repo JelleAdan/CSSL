@@ -69,7 +69,16 @@ namespace CSSL.Modeling
                 this.executive = executive;
             }
 
-            protected override double maxComputationalTimeMilliseconds => executive.MySimulation.MyExperiment.MaxComputationalTimePerReplication * 1000;
+
+            protected override double maxComputationalTime
+            {
+                get
+                {
+                    double maxCompTimePerReplication = executive.MySimulation.MyExperiment.MaxComputationalTimePerReplication;
+
+                    return maxCompTimePerReplication == double.PositiveInfinity ? executive.MySimulation.MyExperiment.MaxComputationalTimeTotal : maxCompTimePerReplication;
+                }
+            }
 
             protected override bool HasNext => executive.calendar.HasNext();
 
@@ -95,6 +104,8 @@ namespace CSSL.Modeling
             protected sealed override void DoEnd()
             {
                 base.DoEnd();
+
+                Console.WriteLine(MyEndStateIndicator.ToString());
             }
         }
     }

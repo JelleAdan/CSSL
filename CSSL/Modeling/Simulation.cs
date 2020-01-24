@@ -87,7 +87,7 @@ namespace CSSL.Modeling
             this.simulation = simulation;
         }
 
-        protected override double maxComputationalTimeMilliseconds => simulation.MyExperiment.MaxComputationalTimeTotal * 1000;
+        protected override double maxComputationalTime => simulation.MyExperiment.MaxComputationalTimeTotal * 1000;
 
         protected override bool HasNext => simulation.MyExperiment.HasMoreReplications;
 

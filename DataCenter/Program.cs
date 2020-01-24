@@ -33,8 +33,8 @@ namespace DataCenterSimulation
 
             // The experiment part...
 
-            sim.MyExperiment.NumberOfReplications = 1;
-            sim.MyExperiment.MaxComputationalTimeTotal = 10;
+            sim.MyExperiment.NumberOfReplications = 3;
+            sim.MyExperiment.MaxComputationalTimePerReplication = 10;
 
             // The observer part...
             DispatcherObserver dispatcherObserver = new DispatcherObserver(sim);
