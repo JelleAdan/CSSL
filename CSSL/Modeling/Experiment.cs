@@ -138,6 +138,11 @@ namespace CSSL.Modeling
             return currentReplicationNumber++;
         }
 
+        public int GetCurrentReplicationNumber()
+        {
+            return currentReplicationNumber;
+        }
+
         private string outputDirectory;
 
         internal string ExperimentOutputDirectory;

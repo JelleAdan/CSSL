@@ -12,10 +12,11 @@ using System.Threading.Tasks;
 
 namespace CSSL.Modeling
 {
-    public class Simulation : IDisposable
+    public class Simulation : IDisposable, IName
     {
         public Simulation(string name, string outputDirectory)
         {
+            Name = name;
             MyExecutive = new Executive(this);
             MyModel = new Model(name + "_Model", this);
             MyExperiment = new Experiment(name + "_Experiment", outputDirectory);
@@ -26,6 +27,7 @@ namespace CSSL.Modeling
 
         public Simulation(string name, string outputDirectory, Executive executive)
         {
+            Name = name;
             MyExecutive = executive;
             MyModel = new Model(name + "_Model", this);
             MyExperiment = new Experiment(name + "_Experiment", outputDirectory);
@@ -45,6 +47,18 @@ namespace CSSL.Modeling
         private ReplicationExecutionProcess replicationExecutionProcess { get; }
 
         internal string OutputDirectory { get; }
+
+        public string Name { get; }
+
+        public string GetEndStateIndicator()
+        {
+            return replicationExecutionProcess.MyEndStateIndicator.ToString();
+        }
+
+        public TimeSpan GetElapsedComputationalTime()
+        {
+            return replicationExecutionProcess.GetElapsedComputationalTime;
+        }
 
         public void TryInitialize()
         {
@@ -103,7 +117,6 @@ namespace CSSL.Modeling
             simulation.MyExperiment.ResetCurrentReplicationNumber();
             simulation.MyExperiment.CreateExperimentOutputDirectory();
             simulation.MyModel.StrictlyDoBeforeExperiment();
-
         }
 
         protected sealed override int NextIteration()

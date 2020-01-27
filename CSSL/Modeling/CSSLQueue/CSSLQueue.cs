@@ -48,6 +48,8 @@ namespace CSSL.Modeling.CSSLQueue
             return item;
         }
 
+
+
         /// <summary>
         /// Retireves and removes the first item from the queue.
         /// </summary>
