@@ -1,6 +1,7 @@
 ﻿using CSSL.Calendar;
 using CSSL.Modeling.Elements;
 using CSSL.Observer;
+using CSSL.Reporting;
 using CSSL.Utilities;
 using System;
 using System.Collections.Generic;
@@ -75,6 +76,11 @@ namespace CSSL.Modeling
         public void Dispose()
         {
             MyObservers.Dispose();
+        }
+
+        public SimulationReporter MakeSimulationReporter()
+        {
+            return new SimulationReporter(this);
         }
     }
 

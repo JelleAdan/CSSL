@@ -1,6 +1,7 @@
 ﻿using CSSL.Examples.DataCenterSimulation;
 using CSSL.Examples.DataCenterSimulation.DataCenterObservers;
 using CSSL.Modeling;
+using CSSL.Reporting;
 using CSSL.Utilities.Distributions;
 using System;
 using System.IO;
@@ -34,13 +35,17 @@ namespace DataCenterSimulation
             // The experiment part...
 
             sim.MyExperiment.NumberOfReplications = 3;
-            sim.MyExperiment.MaxComputationalTimePerReplication = 10;
+            sim.MyExperiment.MaxComputationalTimePerReplication = 1;
 
             // The observer part...
             DispatcherObserver dispatcherObserver = new DispatcherObserver(sim);
             dispatcherObserver.Subscribe(dataCenter.Dispatcher);
 
             sim.TryRun();
+
+            SimulationReporter reporter = sim.MakeSimulationReporter();
+
+            reporter.PrintSummaryToFile();
 
             Console.WriteLine("Test");
         }
