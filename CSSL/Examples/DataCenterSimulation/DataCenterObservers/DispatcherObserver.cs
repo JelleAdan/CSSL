@@ -31,19 +31,21 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
         protected sealed override void OnUpdate(ModelElementBase modelElement)
         {
             Dispatcher dispatcher = (Dispatcher)modelElement;
-            currentTime = dispatcher.GetTime;
+            currentTime = dispatcher.GetSimulationTime;
             int queueLength = dispatcher.QueueLength;
             sumQueueLength += (currentTime - oldTime) * queueLength;
             sumTime += (currentTime - oldTime);
             oldTime = currentTime;
 
-            Writer.WriteLine($"{queueLength},{currentTime}");
+            Writer.WriteLine($"{currentTime},{sumQueueLength / sumTime}");
             //Console.WriteLine($"Average queue length: {sumQueueLength / sumTime}");
         }
 
         protected sealed override void OnInitialized(ModelElementBase modelElement)
         {
-            oldTime = modelElement.GetTime;
+            oldTime = modelElement.GetSimulationTime;
+
+            Writer.WriteLine($"Current simulation time, Average queue length");
         }
 
         protected sealed override void OnWarmUp(ModelElementBase modelElement)

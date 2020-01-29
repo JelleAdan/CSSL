@@ -30,7 +30,7 @@ namespace CSSL.Modeling.Elements
 
         protected double NextEventTime()
         {
-            return GetTime + interEventTimeDistribution.Next();
+            return GetSimulationTime + interEventTimeDistribution.Next();
         }
 
         protected abstract void HandleGeneration(CSSLEvent e);

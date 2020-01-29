@@ -12,7 +12,7 @@ namespace CSSL.Examples.DataCenterSimulation
 {
     public class Dispatcher : SchedulingElement
     {
-        public Dispatcher(ModelElementBase parent, string name, Distribution serviceTimeDistribution, double serviceTimeThreshold, List<Serverpool> serverPools, double dispatchTime) : base(parent, name)
+        public Dispatcher(ModelElementBase parent, string name, Distribution serviceTimeDistribution, double serviceTimeThreshold, List<ServerPool> serverPools, double dispatchTime) : base(parent, name)
         {
             queue = new CSSLQueue<Job>(this, name + "_Queue");
             this.serviceTimeDistribution = serviceTimeDistribution;
@@ -20,11 +20,25 @@ namespace CSSL.Examples.DataCenterSimulation
             rnd = new Random();
             this.serverPools = serverPools;
             this.dispatchTime = dispatchTime;
+            nrServerPools = serverPools.Count();
+        }
+
+        public Dispatcher(ModelElementBase parent, string name, Distribution serviceTimeDistribution, double serviceTimeThreshold, List<ServerPool> serverPools, double dispatchTime, int nrServerPools) : base(parent, name)
+        {
+            queue = new CSSLQueue<Job>(this, name + "_Queue");
+            this.serviceTimeDistribution = serviceTimeDistribution;
+            this.serviceTimeThreshold = serviceTimeThreshold;
+            rnd = new Random();
+            this.serverPools = serverPools;
+            this.dispatchTime = dispatchTime;
+            this.nrServerPools = nrServerPools;
         }
 
         private CSSLQueue<Job> queue;
 
         public int QueueLength => queue.Length;
+
+        public int TotalNrJobsInSystem => QueueLength + serverPools.Sum(x => x.JobCount);
 
         private Distribution serviceTimeDistribution;
 
@@ -32,9 +46,9 @@ namespace CSSL.Examples.DataCenterSimulation
 
         private Random rnd;
 
-        private List<Serverpool> serverPools;
+        private List<ServerPool> serverPools;
 
-        private int nrServerPools => serverPools.Count;
+        private int nrServerPools;
 
         private double dispatchTime;
 
@@ -46,7 +60,7 @@ namespace CSSL.Examples.DataCenterSimulation
 
             if (queue.Length == 1) // Queue was empty upon arrival, schedule dispatch event immediately. 
             {
-                ScheduleEvent(GetTime + dispatchTime, Dispatch);
+                ScheduleEvent(GetSimulationTime + dispatchTime, Dispatch);
             }
         }
 
@@ -72,15 +86,15 @@ namespace CSSL.Examples.DataCenterSimulation
             // Schedule next dispatch event, if queue is nonempty
             if (queue.Length > 0)
             {
-                ScheduleEvent(GetTime + dispatchTime, Dispatch);
+                ScheduleEvent(GetSimulationTime + dispatchTime, Dispatch);
             }
         }
 
         private void SendToServerPool(Job job)
         {
-            Serverpool serverPool = ChooseServerpool();
+            ServerPool serverPool = ChooseServerpool();
 
-            double departureTime = GetTime + job.ServiceTime;
+            double departureTime = GetSimulationTime + job.ServiceTime;
 
             job.DepartureTime = departureTime;
 
@@ -97,17 +111,17 @@ namespace CSSL.Examples.DataCenterSimulation
             job.ServiceTime = serviceTime1;
             job2.ServiceTime = serviceTime2;
 
-            job.DepartureTime = GetTime + serviceTime1;
-            job2.DepartureTime = GetTime + serviceTime2;
+            job.DepartureTime = GetSimulationTime + serviceTime1;
+            job2.DepartureTime = GetSimulationTime + serviceTime2;
 
             return job2;
         }
 
-        private Serverpool ChooseServerpool()
+        private ServerPool ChooseServerpool()
         {
-            List<Serverpool> selection = new List<Serverpool>();
+            List<ServerPool> selection = new List<ServerPool>();
 
-            double p = nrServerPools / serverPools.Count;
+            double p = (double)nrServerPools / serverPools.Count;
 
             for (int i = 0; i < serverPools.Count; i++)
             {
@@ -117,7 +131,7 @@ namespace CSSL.Examples.DataCenterSimulation
                     if(selection.Count == nrServerPools) { break; }
                 }
 
-                p = (nrServerPools - selection.Count) / (serverPools.Count - i - 1);
+                p = ((double)nrServerPools - selection.Count) / (serverPools.Count - i - 1);
             }
 
             return selection.OrderBy(x => x.JobCount).First();

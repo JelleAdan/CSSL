@@ -14,7 +14,7 @@ namespace CSSL.Examples.DataCenterSimulation
 
         public  Dispatcher Dispatcher { get; private set; }
 
-        public List<Serverpool> ServerPools { get; private set; }
+        public List<ServerPool> ServerPools { get; private set; }
 
         public DataCenter(ModelElementBase parent, string name) : base(parent, name)
         {
@@ -30,11 +30,11 @@ namespace CSSL.Examples.DataCenterSimulation
             Dispatcher = dispatcher;
         }
 
-        public void AddServerpool(Serverpool serverPool)
+        public void AddServerpool(ServerPool serverPool)
         {
             if (ServerPools == null)
             {
-                ServerPools = new List<Serverpool>();
+                ServerPools = new List<ServerPool>();
             }
             ServerPools.Add(serverPool);
         }

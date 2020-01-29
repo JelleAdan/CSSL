@@ -28,7 +28,7 @@ namespace CSSL.Modeling.Elements
         public ModelElementBase(ModelElementBase parent, string name)
         {
             ConstructorCalls(name);
-            this.parent = parent ?? throw new ArgumentNullException($"Tried to construct ModelElement with name \"{name}\" but the parent ModelElement is null.");
+            Parent = parent ?? throw new ArgumentNullException($"Tried to construct ModelElement with name \"{name}\" but the parent ModelElement is null.");
             parent.AddModelElement(this);
             MyModel = parent.MyModel;
         }
@@ -57,7 +57,7 @@ namespace CSSL.Modeling.Elements
         /// <summary>
         /// A reference to the parent model element.
         /// </summary>
-        protected ModelElementBase parent;
+        public ModelElementBase Parent { get; private set; }
 
         /// <summary>
         /// A reference to the overall model, the highest container for all model elements.
@@ -76,10 +76,15 @@ namespace CSSL.Modeling.Elements
         public Simulation GetSimulation => MyModel.MySimulation;
 
         /// <summary>
-        /// Retrieves the current simulation time.
+        /// Retrieves the current elapsed simulation time.
         /// </summary>
         /// <returns></returns>
-        public double GetTime => GetExecutive.Time;
+        public double GetSimulationTime => GetExecutive.SimulationTime;
+
+        /// <summary>
+        /// Retrieves the current elapsed computational time.
+        /// </summary>
+        public double GetComputationalTime => GetExecutive.ComputationalTime;
 
         /// <summary>
         /// 
@@ -111,7 +116,7 @@ namespace CSSL.Modeling.Elements
         /// <param name="newParent">The parent for this model element.</param>
         private void ChangeParentModelElement(ModelElementBase newParent)
         {
-            ModelElementBase oldParent = parent;
+            ModelElementBase oldParent = Parent;
             if (oldParent != newParent)
             {
                 oldParent.RemoveModelElement(this);
@@ -164,7 +169,7 @@ namespace CSSL.Modeling.Elements
         {
             if (LengthOfWarmUp > 0)
             {
-                GetExecutive.ScheduleEvent(GetExecutive.Time, HandleEndWarmUp);
+                GetExecutive.ScheduleEvent(GetExecutive.SimulationTime, HandleEndWarmUp);
                 ObserverState = ModelElementObserverState.WARMUP;
                 NotifyObservers(this);
             }

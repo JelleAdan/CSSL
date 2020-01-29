@@ -28,7 +28,7 @@ namespace CSSL.Modeling.Elements
 
         private void ScheduleEndEvent()
         {
-            GetExecutive.ScheduleEvent(GetTime, GetExecutive.HandleEndEvent);
+            GetExecutive.ScheduleEvent(GetSimulationTime, GetExecutive.HandleEndEvent);
         }
 
         protected override void DoBeforeExperiment()

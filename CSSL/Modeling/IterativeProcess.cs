@@ -24,8 +24,8 @@ namespace CSSL.Modeling
 
         public bool IsComputationalTimeExceeded => DateTime.Now.Subtract(beginComputationalTime).TotalMilliseconds > maxComputationalTime * 1000;
 
-        public double GetElapsedComputationalTimeSeconds => endComputationalTime == default(DateTime) ? endComputationalTime.Subtract(beginComputationalTime).TotalSeconds : DateTime.Now.Subtract(beginComputationalTime).TotalSeconds;
-        public TimeSpan GetElapsedComputationalTime => endComputationalTime == default(DateTime) ? endComputationalTime.Subtract(beginComputationalTime) : DateTime.Now.Subtract(beginComputationalTime);
+        public double GetElapsedComputationalTimeSeconds => endComputationalTime != default(DateTime) ? endComputationalTime.Subtract(beginComputationalTime).TotalSeconds : DateTime.Now.Subtract(beginComputationalTime).TotalSeconds;
+        public TimeSpan GetElapsedComputationalTime => endComputationalTime != default(DateTime) ? endComputationalTime.Subtract(beginComputationalTime) : DateTime.Now.Subtract(beginComputationalTime);
 
         public string Name => GetType().Name;
 

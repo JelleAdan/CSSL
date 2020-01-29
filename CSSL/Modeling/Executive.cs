@@ -11,11 +11,13 @@ namespace CSSL.Modeling
 {
     public class Executive
     {
-        public double Time { get; private set; }
+        public double SimulationTime { get; private set; }
 
         private ICalendar calendar;
 
         private EventExecutionProcess eventExecutionProcess;
+
+        public double ComputationalTime => eventExecutionProcess.GetElapsedComputationalTimeSeconds;
 
         public Executive(Simulation simulation)
         {
@@ -45,7 +47,7 @@ namespace CSSL.Modeling
 
         public void Execute(CSSLEvent e)
         {
-            Time = e.Time;
+            SimulationTime = e.Time;
             e.Execute();
         }
 
@@ -86,7 +88,7 @@ namespace CSSL.Modeling
             {
                 base.DoInitialize();
                 executive.calendar.CancelAll();
-                executive.Time = 0;
+                executive.SimulationTime = 0;
                 executive.MySimulation.MyExperiment.CreateReplicationOutputDirectory();
             }
 
@@ -105,7 +107,7 @@ namespace CSSL.Modeling
             {
                 base.DoEnd();
 
-                Console.WriteLine(MyEndStateIndicator.ToString());
+                Console.WriteLine("Ended replication in state: " + MyEndStateIndicator.ToString());
             }
         }
     }

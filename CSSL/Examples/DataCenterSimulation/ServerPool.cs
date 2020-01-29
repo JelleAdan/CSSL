@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace CSSL.Examples.DataCenterSimulation
 {
-    public class Serverpool : SchedulingElement
+    public class ServerPool : SchedulingElement
     {
-        public Serverpool(ModelElementBase parent, string name) : base(parent, name)
+        public ServerPool(ModelElementBase parent, string name) : base(parent, name)
         {
             queue = new ServerPoolQueue(this, name + "_Queue");
         }
@@ -22,16 +22,20 @@ namespace CSSL.Examples.DataCenterSimulation
 
         private void HandleDeparture(CSSLEvent e)
         {
+            NotifyObservers(this);
+
             Job job = queue.DequeueFirst();
 
-            if (job.DepartureTime != GetTime)
+            if (job.DepartureTime != GetSimulationTime)
             {
-                throw new Exception($"Departure time of job {job.Id} is {job.DepartureTime} and does not match current time {GetTime}");
+                throw new Exception($"Departure time of job {job.Id} is {job.DepartureTime} and does not match current time {GetSimulationTime}");
             }
         }
 
         public void HandleArrival(Job job)
         {
+            NotifyObservers(this);
+
             ScheduleEvent(job.DepartureTime, HandleDeparture);
 
             queue.EnqueueAndSort(job);

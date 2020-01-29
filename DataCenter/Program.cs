@@ -5,6 +5,7 @@ using CSSL.Reporting;
 using CSSL.Utilities.Distributions;
 using System;
 using System.IO;
+using System.Linq;
 
 namespace DataCenterSimulation
 {
@@ -14,32 +15,45 @@ namespace DataCenterSimulation
         {
             Simulation sim = new Simulation("SomeSimulation", @"C:\CSSLtest");
 
+            // Parameters...
+
+            double dispatchTime = 1E-3;
+            double lambda = 100;
+            int numberServerpools = 10;
+            int numberServerpoolsToChooseFrom = 10;
+
             // The model part...
 
             DataCenter dataCenter = new DataCenter(sim.MyModel, "DataCenter");
 
-            int numberServerpools = 10;
             for (int i = 0; i < numberServerpools; i++)
             {
-                dataCenter.AddServerpool(new Serverpool(dataCenter, $"Serverpool_{i}"));
+                dataCenter.AddServerpool(new ServerPool(dataCenter, $"Serverpool_{i}"));
             }
 
-            double dispatchTime = 1E-3;
-            Dispatcher dispatcher = new Dispatcher(dataCenter, "Dispatcher", new ExponentialDistribution(1, 1), 2, dataCenter.ServerPools, dispatchTime);
+            Dispatcher dispatcher = new Dispatcher(dataCenter, "Dispatcher", new ExponentialDistribution(1, 1), 2, dataCenter.ServerPools, dispatchTime, numberServerpoolsToChooseFrom);
             dataCenter.SetDispatcher(dispatcher);
 
-            double lambda = 100;
             JobGenerator jobGenerator = new JobGenerator(dataCenter, "JobGenerator", new ExponentialDistribution(1 / lambda, 1 / lambda / lambda), dispatcher);
             dataCenter.SetJobGenerator(jobGenerator);
 
             // The experiment part...
 
             sim.MyExperiment.NumberOfReplications = 3;
-            sim.MyExperiment.MaxComputationalTimePerReplication = 5;
+            sim.MyExperiment.MaxComputationalTimePerReplication = 10;
 
             // The observer part...
             DispatcherObserver dispatcherObserver = new DispatcherObserver(sim);
             dispatcherObserver.Subscribe(dataCenter.Dispatcher);
+
+            DataCenterObserver dataCenterObserver = new DataCenterObserver(sim);
+            dataCenterObserver.Subscribe(dataCenter.Dispatcher);
+
+            foreach(ServerPool serverpool in dataCenter.ServerPools)
+            {
+                ServerPoolObserver serverpoolObserver = new ServerPoolObserver(sim);
+                serverpoolObserver.Subscribe(serverpool);
+            }
 
             sim.TryRun();
 

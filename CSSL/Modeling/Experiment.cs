@@ -133,7 +133,7 @@ namespace CSSL.Modeling
         /// </summary>
         internal int IncrementCurrentReplicationNumber()
         {
-            Console.WriteLine(currentReplicationNumber);
+            Console.WriteLine($"Replication number: {currentReplicationNumber}");
 
             return currentReplicationNumber++;
         }
