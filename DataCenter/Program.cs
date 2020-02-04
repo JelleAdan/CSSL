@@ -31,7 +31,7 @@ namespace DataCenterSimulation
                 dataCenter.AddServerpool(new ServerPool(dataCenter, $"Serverpool_{i}"));
             }
 
-            Dispatcher dispatcher = new Dispatcher(dataCenter, "Dispatcher", new ExponentialDistribution(1, 1), 2, dataCenter.ServerPools, dispatchTime, numberServerpoolsToChooseFrom);
+            Dispatcher dispatcher = new Dispatcher(dataCenter, "Dispatcher", new ExponentialDistribution(1, 1), double.PositiveInfinity, dataCenter.ServerPools, dispatchTime, numberServerpoolsToChooseFrom);
             dataCenter.SetDispatcher(dispatcher);
 
             JobGenerator jobGenerator = new JobGenerator(dataCenter, "JobGenerator", new ExponentialDistribution(1 / lambda, 1 / lambda / lambda), dispatcher);
@@ -39,8 +39,8 @@ namespace DataCenterSimulation
 
             // The experiment part...
 
-            sim.MyExperiment.NumberOfReplications = 3;
-            sim.MyExperiment.MaxComputationalTimePerReplication = 10;
+            sim.MyExperiment.NumberOfReplications = 4;
+            sim.MyExperiment.LengthOfReplicationSimulationClock = 10;
 
             // The observer part...
             DispatcherObserver dispatcherObserver = new DispatcherObserver(sim);
@@ -49,13 +49,15 @@ namespace DataCenterSimulation
             DataCenterObserver dataCenterObserver = new DataCenterObserver(sim);
             dataCenterObserver.Subscribe(dataCenter.Dispatcher);
 
-            foreach(ServerPool serverpool in dataCenter.ServerPools)
+            foreach (ServerPool serverpool in dataCenter.ServerPools)
             {
                 ServerPoolObserver serverpoolObserver = new ServerPoolObserver(sim);
                 serverpoolObserver.Subscribe(serverpool);
             }
 
-            sim.TryRun();
+            sim.Run();
+
+            Console.WriteLine($"Number of jobs dispatched {dataCenter.ServerPools.First().GetNrJobs}. Comp time: {dataCenter.GetElapsedWallClockTime}");
 
             SimulationReporter reporter = sim.MakeSimulationReporter();
 

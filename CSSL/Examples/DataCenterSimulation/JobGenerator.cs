@@ -24,7 +24,7 @@ namespace CSSL.Examples.DataCenterSimulation
             ScheduleEvent(NextEventTime(), HandleGeneration);
 
             // Instantiate a job.
-            Job job = new Job(GetSimulationTime);
+            Job job = new Job(GetElapsedSimulationClockTime);
 
             // Send to dispatcher.
             dispatcher.HandleArrival(job);

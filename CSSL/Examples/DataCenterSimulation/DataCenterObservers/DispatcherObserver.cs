@@ -31,7 +31,7 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
         protected sealed override void OnUpdate(ModelElementBase modelElement)
         {
             Dispatcher dispatcher = (Dispatcher)modelElement;
-            currentTime = dispatcher.GetSimulationTime;
+            currentTime = dispatcher.GetElapsedSimulationClockTime;
             int queueLength = dispatcher.QueueLength;
             sumQueueLength += (currentTime - oldTime) * queueLength;
             sumTime += (currentTime - oldTime);
@@ -43,7 +43,7 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
 
         protected sealed override void OnInitialized(ModelElementBase modelElement)
         {
-            oldTime = modelElement.GetSimulationTime;
+            oldTime = modelElement.GetElapsedSimulationClockTime;
 
             Writer.WriteLine($"Current simulation time, Average queue length");
         }

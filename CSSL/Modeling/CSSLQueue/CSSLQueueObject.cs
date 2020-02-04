@@ -24,6 +24,12 @@ namespace CSSL.Modeling.CSSLQueue
             CreationTime = creationTime;
         }
 
+        public CSSLQueueObject(double creationTime, int id)
+        {
+            CreationTime = creationTime;
+            Id = id;
+        }
+
         /// <summary>
         /// The current CSSLQueue that the CSSLQueueObject is in. Is null when the CSSLQueueObject is not in a queue.
         /// </summary>

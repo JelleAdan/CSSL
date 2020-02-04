@@ -55,17 +55,12 @@ namespace CSSL.Modeling
             return replicationExecutionProcess.MyEndStateIndicator.ToString();
         }
 
-        public TimeSpan GetElapsedComputationalTime()
+        public TimeSpan GetElapsedWallClockTime()
         {
-            return replicationExecutionProcess.GetElapsedComputationalTime;
+            return replicationExecutionProcess.GetElapsedWallClockTime;
         }
 
-        public void TryInitialize()
-        {
-            replicationExecutionProcess.TryInitialize();
-        }
-
-        public void TryRun()
+        public void Run()
         {
             try
             {
@@ -75,11 +70,6 @@ namespace CSSL.Modeling
             {
                 Dispose();
             }
-        }
-
-        public void TryRunNext()
-        {
-            replicationExecutionProcess.TryRunNext();
         }
 
         public void End()
@@ -107,7 +97,7 @@ namespace CSSL.Modeling
             this.simulation = simulation;
         }
 
-        protected override double maxComputationalTime => simulation.MyExperiment.MaxComputationalTimeTotal * 1000;
+        protected override double maxWallClockTime => simulation.MyExperiment.MaxWallClockTimeTotal * 1000;
 
         protected override bool HasNext => simulation.MyExperiment.HasMoreReplications;
 

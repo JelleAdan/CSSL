@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CSSL.Modeling.Elements
 {
-    public abstract class EventGeneratorBase : SchedulingElement, IEventGenerator
+    public abstract class EventGeneratorBase: SchedulingElement, IEventGenerator
     {
         private Distribution interEventTimeDistribution;
 
@@ -30,7 +30,7 @@ namespace CSSL.Modeling.Elements
 
         protected double NextEventTime()
         {
-            return GetSimulationTime + interEventTimeDistribution.Next();
+            return GetElapsedSimulationClockTime + interEventTimeDistribution.Next();
         }
 
         protected abstract void HandleGeneration(CSSLEvent e);

@@ -32,14 +32,15 @@ namespace CSSL.Reporting
 
             summary.Add("EXPERIMENT");
             summary.Add($"Maximum number of replications: {experiment.NumberOfReplications}");
-            summary.Add($"Maximum computational time per replication: {experiment.MaxComputationalTimePerReplication} s");
-            summary.Add($"Maximum total computational time: {experiment.MaxComputationalTimeTotal} s");
-            summary.Add($"Length of warm-up: {experiment.LengthOfWarmUp} s\n");
+            summary.Add($"Maximum computational time per replication: {experiment.LengthOfReplicationWallClock} s");
+            summary.Add($"Maximum total computational time: {experiment.MaxWallClockTimeTotal} s");
+            summary.Add($"Length of warm-up: {experiment.LengthOfWarmUp} s");
+            summary.Add($"Length of replication: {experiment.LengthOfReplicationSimulationClock} s\n");
 
             summary.Add("EXECUTION SUMMARY");
             summary.Add($"Number of replications: {experiment.GetCurrentReplicationNumber()}");
             summary.Add($"Stopped in state: {simulation.GetEndStateIndicator()}");
-            TimeSpan time = simulation.GetElapsedComputationalTime();
+            TimeSpan time = simulation.GetElapsedWallClockTime();
             summary.Add($"Total computational time:{time.Days}d:{time.Hours}h:{time.Minutes}m:{time.Seconds}s:{time.Milliseconds}ms");
         }
 

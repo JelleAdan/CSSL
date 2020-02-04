@@ -17,23 +17,29 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
 
         private double computationalTime;
 
+        private double simulationTime;
+
 
         protected sealed override void OnInitialized(ModelElementBase modelElement)
         {
             DataCenter dataCenter = (DataCenter)modelElement.Parent;
             totalJobCount = dataCenter.Dispatcher.TotalNrJobsInSystem;
-            computationalTime = dataCenter.Dispatcher.GetComputationalTime;
+            computationalTime = dataCenter.Dispatcher.GetElapsedWallClockTime;
+            simulationTime = dataCenter.Dispatcher.GetElapsedSimulationClockTime;
 
-            Writer.WriteLine("Computational Time,Job Count");
+
+            Writer.WriteLine("Simulation Time\tComputational Time\tJob Count");
         }
 
         protected sealed override void OnUpdate(ModelElementBase modelElement)
         {
             DataCenter dataCenter = (DataCenter)modelElement.Parent;
             totalJobCount = dataCenter.Dispatcher.TotalNrJobsInSystem;
-            computationalTime = dataCenter.Dispatcher.GetComputationalTime;
+            computationalTime = dataCenter.Dispatcher.GetElapsedWallClockTime;
+            simulationTime = dataCenter.Dispatcher.GetElapsedSimulationClockTime;
 
-            Writer.WriteLine($"{computationalTime},{totalJobCount}");
+            Writer.WriteLine($"{simulationTime}\t{computationalTime}\t{totalJobCount}");
+            Console.WriteLine($"{simulationTime}\t{computationalTime}\t{totalJobCount}");
         }
 
         protected override void OnWarmUp(ModelElementBase modelElement)

@@ -16,6 +16,10 @@ namespace CSSL.Examples.DataCenterSimulation
             queue = new ServerPoolQueue(this, name + "_Queue");
         }
 
+        public static int NrJobsDispatched;
+
+        public int GetNrJobs => NrJobsDispatched;
+        
         private ServerPoolQueue queue { get; set; }
 
         public int JobCount => queue.Length;
@@ -26,11 +30,14 @@ namespace CSSL.Examples.DataCenterSimulation
 
             Job job = queue.DequeueFirst();
 
-            if (job.DepartureTime != GetSimulationTime)
+            NrJobsDispatched++;
+
+            if (job.DepartureTime != GetElapsedSimulationClockTime)
             {
-                throw new Exception($"Departure time of job {job.Id} is {job.DepartureTime} and does not match current time {GetSimulationTime}");
+                throw new Exception($"Departure time of job {job.Id} is {job.DepartureTime} and does not match current time {GetElapsedSimulationClockTime}");
             }
         }
+
 
         public void HandleArrival(Job job)
         {

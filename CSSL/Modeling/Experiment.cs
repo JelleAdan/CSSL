@@ -14,26 +14,30 @@ namespace CSSL.Modeling
         /// Constructs an experiment.
         /// </summary>
         /// <param name="name">The name of the experiment.</param>
-        /// <param name="numberOfReplications">The number of replication.</param>
-        /// <param name="lengthOfReplication">The simulation length of a single replication.</param>
-        /// <param name="lengthOfWarmUp">The warm up time of a replication.</param>
-        /// <param name="maxCompuationalTimeTotal">The maximum total computational time in seconds.</param>
-        /// <param name="maxComputationalTimePerReplication">The maximum computational time per replication in seconds.</param>
-        public Experiment(string name, string outputDirectory, int numberOfReplications = 1, double lengthOfReplication = double.PositiveInfinity, double lengthOfWarmUp = 0.0, double maxComputationalTimePerReplication = double.PositiveInfinity, double maxCompuationalTimeTotal = double.PositiveInfinity)
+        /// <param name="numberOfReplications">The number of replications.</param>
+        /// <param name="outputDirectory">The output directory the the results have to be written to.</param>
+        /// <param name="lengthOfWarmUp">The warm up time of a replication in simulation clock time.</param>
+        /// <param name="maxWallClockTimeTotal">The maximum total wall clock time in seconds.</param>
+        /// <param name="maxWallClockTimePerReplication">The maximum wall clock time per replication in seconds.</param>
+        /// <param name="lengthOfReplication">The maximum simulation clock time per replication in seconds.</param>
+        public Experiment(string name, string outputDirectory, int numberOfReplications = 1, double lengthOfWarmUp = 0.0, double maxWallClockTimePerReplication = double.PositiveInfinity, double maxWallClockTimeTotal = double.PositiveInfinity, double lengthOfReplication = double.PositiveInfinity)
         {
             Name = name;
             this.outputDirectory = outputDirectory;
             NumberOfReplications = numberOfReplications;
-            LengthOfReplication = lengthOfReplication;
             LengthOfWarmUp = lengthOfWarmUp;
-            MaxComputationalTimePerReplication = maxComputationalTimePerReplication;
-            MaxComputationalTimeTotal = maxCompuationalTimeTotal;
+            LengthOfReplicationWallClock = maxWallClockTimePerReplication;
+            MaxWallClockTimeTotal = maxWallClockTimeTotal;
+            LengthOfReplicationSimulationClock = LengthOfReplicationSimulationClock;
         }
 
         public string Name { get; }
 
         private int numberOfReplications;
 
+        /// <summary>
+        /// The number of replications.
+        /// </summary>
         public int NumberOfReplications
         {
             get { return numberOfReplications; }
@@ -47,23 +51,11 @@ namespace CSSL.Modeling
             }
         }
 
-        private double lengthOfReplication;
-
-        public double LengthOfReplication
-        {
-            get { return lengthOfReplication; }
-            set
-            {
-                if (value < 0)
-                {
-                    throw new ArgumentOutOfRangeException($"{nameof(value)} must be positive.");
-                }
-                lengthOfReplication = value;
-            }
-        }
-
         private double lengthOfWarmUp;
 
+        /// <summary>
+        /// Length of warm up in seconds in simulation clock time.
+        /// </summary>
         public double LengthOfWarmUp
         {
             get { return lengthOfWarmUp; }
@@ -77,39 +69,57 @@ namespace CSSL.Modeling
             }
         }
 
-        private double maxComputationalTimePerReplication;
+        private double lengthOfReplication;
 
         /// <summary>
-        /// A threshold on the maximum computational time of a replication.
+        /// Length of replication in seconds in simulation clock time.
         /// </summary>
-        public double MaxComputationalTimePerReplication
+        public double LengthOfReplicationSimulationClock
         {
-            get { return maxComputationalTimePerReplication; }
+            get { return lengthOfReplication; }
             set
             {
                 if (value < 0)
                 {
                     throw new ArgumentOutOfRangeException($"{nameof(value)} must be positive.");
                 }
-                maxComputationalTimePerReplication = value;
+                lengthOfReplication = value;
             }
         }
 
-        private double maxComputationalTimeTotal;
+        private double lengthOfReplicationWallClock;
 
         /// <summary>
-        /// A threshold on the maximum computational time of the experiment.
+        /// Length of replication in seconds in wall clock time.
         /// </summary>
-        public double MaxComputationalTimeTotal
+        public double LengthOfReplicationWallClock
         {
-            get { return maxComputationalTimeTotal; }
+            get { return lengthOfReplicationWallClock; }
             set
             {
                 if (value < 0)
                 {
                     throw new ArgumentOutOfRangeException($"{nameof(value)} must be positive.");
                 }
-                maxComputationalTimeTotal = value;
+                lengthOfReplicationWallClock = value;
+            }
+        }
+
+        private double maxWallClockTimeTotal;
+
+        /// <summary>
+        /// A threshold on the maximum computational wall clock time of the experiment.
+        /// </summary>
+        public double MaxWallClockTimeTotal
+        {
+            get { return maxWallClockTimeTotal; }
+            set
+            {
+                if (value < 0)
+                {
+                    throw new ArgumentOutOfRangeException($"{nameof(value)} must be positive.");
+                }
+                maxWallClockTimeTotal = value;
             }
         }
 

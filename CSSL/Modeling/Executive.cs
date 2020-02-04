@@ -11,13 +11,12 @@ namespace CSSL.Modeling
 {
     public class Executive
     {
-        public double SimulationTime { get; private set; }
+        public double SimulationClockTime { get; private set; }
+        public double WallClockTime => eventExecutionProcess.GetElapsedWallClockTimeSeconds;
 
         private ICalendar calendar;
 
         private EventExecutionProcess eventExecutionProcess;
-
-        public double ComputationalTime => eventExecutionProcess.GetElapsedComputationalTimeSeconds;
 
         public Executive(Simulation simulation)
         {
@@ -47,7 +46,7 @@ namespace CSSL.Modeling
 
         public void Execute(CSSLEvent e)
         {
-            SimulationTime = e.Time;
+            SimulationClockTime = e.Time;
             e.Execute();
         }
 
@@ -72,13 +71,13 @@ namespace CSSL.Modeling
             }
 
 
-            protected override double maxComputationalTime
+            protected override double maxWallClockTime
             {
                 get
                 {
-                    double maxCompTimePerReplication = executive.MySimulation.MyExperiment.MaxComputationalTimePerReplication;
+                    double maxCompTimePerReplication = executive.MySimulation.MyExperiment.LengthOfReplicationWallClock;
 
-                    return maxCompTimePerReplication == double.PositiveInfinity ? executive.MySimulation.MyExperiment.MaxComputationalTimeTotal : maxCompTimePerReplication;
+                    return maxCompTimePerReplication == double.PositiveInfinity ? executive.MySimulation.MyExperiment.MaxWallClockTimeTotal : maxCompTimePerReplication;
                 }
             }
 
@@ -88,8 +87,18 @@ namespace CSSL.Modeling
             {
                 base.DoInitialize();
                 executive.calendar.CancelAll();
-                executive.SimulationTime = 0;
+                executive.SimulationClockTime = 0;
                 executive.MySimulation.MyExperiment.CreateReplicationOutputDirectory();
+
+                if(executive.MySimulation.MyExperiment.LengthOfReplicationSimulationClock != double.PositiveInfinity)
+                {
+                    ScheduleEndEvent();
+                }
+            }
+
+            private void ScheduleEndEvent()
+            {
+                executive.ScheduleEvent(executive.MySimulation.MyExperiment.LengthOfReplicationSimulationClock, executive.HandleEndEvent);
             }
 
             protected sealed override CSSLEvent NextIteration()

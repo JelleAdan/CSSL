@@ -16,16 +16,16 @@ namespace CSSL.Modeling
             COMPUTATIONAL_TIME_EXCEEDED
         }
 
-        protected virtual double maxComputationalTime => throw new NotImplementedException();
+        protected virtual double maxWallClockTime => throw new NotImplementedException();
 
-        private DateTime beginComputationalTime;
+        private DateTime beginWallClockTime;
 
-        private DateTime endComputationalTime;
+        private DateTime endWallClockTime;
 
-        public bool IsComputationalTimeExceeded => DateTime.Now.Subtract(beginComputationalTime).TotalMilliseconds > maxComputationalTime * 1000;
+        public bool IsComputationalTimeExceeded => DateTime.Now.Subtract(beginWallClockTime).TotalMilliseconds > maxWallClockTime * 1000;
 
-        public double GetElapsedComputationalTimeSeconds => endComputationalTime != default(DateTime) ? endComputationalTime.Subtract(beginComputationalTime).TotalSeconds : DateTime.Now.Subtract(beginComputationalTime).TotalSeconds;
-        public TimeSpan GetElapsedComputationalTime => endComputationalTime != default(DateTime) ? endComputationalTime.Subtract(beginComputationalTime) : DateTime.Now.Subtract(beginComputationalTime);
+        public double GetElapsedWallClockTimeSeconds => endWallClockTime != default(DateTime) ? endWallClockTime.Subtract(beginWallClockTime).TotalSeconds : DateTime.Now.Subtract(beginWallClockTime).TotalSeconds;
+        public TimeSpan GetElapsedWallClockTime => endWallClockTime != default(DateTime) ? endWallClockTime.Subtract(beginWallClockTime) : DateTime.Now.Subtract(beginWallClockTime);
 
         public string Name => GetType().Name;
 
@@ -114,9 +114,10 @@ namespace CSSL.Modeling
         protected virtual void DoInitialize()
         {
             SetState(initializedState);
-            beginComputationalTime = DateTime.Now;
-            endComputationalTime = default(DateTime);
+            beginWallClockTime = DateTime.Now;
+            endWallClockTime = default(DateTime);
             IsDoneFlag = false;
+            StopFlag = false;
         }
 
         protected void DoRunAll()
@@ -174,7 +175,7 @@ namespace CSSL.Modeling
         protected virtual void DoEnd()
         {
             SetState(endedState);
-            endComputationalTime = DateTime.Now;
+            endWallClockTime = DateTime.Now;
         }
 
         protected virtual T NextIteration() { throw new NotImplementedException(); }
