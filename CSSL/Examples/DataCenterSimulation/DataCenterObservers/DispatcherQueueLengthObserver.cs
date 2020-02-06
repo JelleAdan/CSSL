@@ -21,7 +21,7 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
         protected override void OnUpdate(ModelElementBase modelElement)
         {
             Variable<int> queueLength = (Variable<int>)modelElement;
-            queueLengthStatistic.Collect(queueLength.Value);
+            queueLengthStatistic.Collect(queueLength.Value, queueLength.Weight);
         }
 
         protected override void OnWarmUp(ModelElementBase modelElement)
