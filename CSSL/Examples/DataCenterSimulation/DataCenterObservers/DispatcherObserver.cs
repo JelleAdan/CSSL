@@ -51,5 +51,10 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
         protected sealed override void OnWarmUp(ModelElementBase modelElement)
         {
         }
+
+        public override void OnCompleted()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

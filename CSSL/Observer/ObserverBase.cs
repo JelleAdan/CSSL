@@ -79,20 +79,11 @@ namespace CSSL.Observer
 
         public string Name { get; }
 
-        public virtual void OnCompleted()
-        {
-            throw new NotImplementedException();
-        }
+        public abstract void OnCompleted();
 
-        public virtual void OnError(Exception error)
-        {
-            throw new NotImplementedException();
-        }
+        public abstract void OnError(Exception error);
 
-        public virtual void OnNext(object value)
-        {
-            throw new NotImplementedException();
-        }
+        public abstract void OnNext(object value);
 
         public void Dispose()
         {

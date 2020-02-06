@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CSSL.Examples.DataCenterSimulation
 {
-    public class ServerPool : SchedulingElement
+    public class ServerPool : SchedulingElementBase
     {
         public ServerPool(ModelElementBase parent, string name) : base(parent, name)
         {

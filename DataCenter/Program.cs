@@ -46,6 +46,9 @@ namespace DataCenterSimulation
             DispatcherObserver dispatcherObserver = new DispatcherObserver(sim);
             dispatcherObserver.Subscribe(dataCenter.Dispatcher);
 
+            DispatcherQueueLengthObserver dispatcherQueueLengthObserver = new DispatcherQueueLengthObserver(sim);
+            dispatcherQueueLengthObserver.Subscribe(dispatcher.Queue);
+
             DataCenterObserver dataCenterObserver = new DataCenterObserver(sim);
             dataCenterObserver.Subscribe(dataCenter.Dispatcher);
 

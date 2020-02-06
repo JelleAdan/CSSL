@@ -1,6 +1,7 @@
 ﻿using CSSL.Modeling;
 using CSSL.Modeling.CSSLQueue;
 using CSSL.Modeling.Elements;
+using CSSL.Modeling.Elements.Variables;
 using CSSL.Utilities.Distributions;
 using System;
 using System.Collections.Generic;
@@ -10,11 +11,11 @@ using System.Threading.Tasks;
 
 namespace CSSL.Examples.DataCenterSimulation
 {
-    public class Dispatcher : SchedulingElement
+    public class Dispatcher : SchedulingElementBase
     {
         public Dispatcher(ModelElementBase parent, string name, Distribution serviceTimeDistribution, double serviceTimeThreshold, List<ServerPool> serverPools, double dispatchTime) : base(parent, name)
         {
-            queue = new CSSLQueue<Job>(this, name + "_Queue");
+            Queue = new CSSLQueue<Job>(this, name + "_Queue");
             this.serviceTimeDistribution = serviceTimeDistribution;
             this.serviceTimeThreshold = serviceTimeThreshold;
             rnd = new Random();
@@ -25,7 +26,7 @@ namespace CSSL.Examples.DataCenterSimulation
 
         public Dispatcher(ModelElementBase parent, string name, Distribution serviceTimeDistribution, double serviceTimeThreshold, List<ServerPool> serverPools, double dispatchTime, int nrServerPools) : base(parent, name)
         {
-            queue = new CSSLQueue<Job>(this, name + "_Queue");
+            Queue = new CSSLQueue<Job>(this, name + "_Queue");
             this.serviceTimeDistribution = serviceTimeDistribution;
             this.serviceTimeThreshold = serviceTimeThreshold;
             rnd = new Random();
@@ -34,9 +35,9 @@ namespace CSSL.Examples.DataCenterSimulation
             this.nrServerPoolsToChooseFrom = nrServerPools;
         }
 
-        private CSSLQueue<Job> queue;
+        public CSSLQueue<Job> Queue;
 
-        public int QueueLength => queue.Length;
+        public int QueueLength => Queue.Length.Value;
 
         public int TotalNrJobsInSystem => QueueLength + serverPools.Sum(x => x.JobCount);
 
@@ -56,9 +57,9 @@ namespace CSSL.Examples.DataCenterSimulation
         {
             NotifyObservers(this);
 
-            queue.EnqueueLast(job);
+            Queue.EnqueueLast(job);
 
-            if (queue.Length == 1) // Queue was empty upon arrival, schedule dispatch event immediately. 
+            if (QueueLength == 1) // Queue was empty upon arrival, schedule dispatch event immediately. 
             {
                 ScheduleEvent(GetElapsedSimulationClockTime + dispatchTime, Dispatch);
             }
@@ -68,7 +69,7 @@ namespace CSSL.Examples.DataCenterSimulation
         {
             NotifyObservers(this);
 
-            Job job = queue.DequeueFirst();
+            Job job = Queue.DequeueFirst();
 
             job.ServiceTime = serviceTimeDistribution.Next();
 
@@ -84,7 +85,7 @@ namespace CSSL.Examples.DataCenterSimulation
             }
 
             // Schedule next dispatch event, if queue is nonempty
-            if (queue.Length > 0)
+            if (QueueLength > 0)
             {
                 ScheduleEvent(GetElapsedSimulationClockTime + dispatchTime, Dispatch);
             }

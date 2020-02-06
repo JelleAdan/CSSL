@@ -21,7 +21,7 @@ namespace CSSL.Modeling.Elements
         public string Name { get; private set; }
 
         /// <summary>
-        /// This constuctor called to construct any ModelElement.
+        /// This constuctor is called to construct any ModelElement.
         /// </summary>
         /// <param name="parent">A reference to the parent model element.</param>
         /// <param name="name">The name of the model element.</param>
@@ -224,6 +224,7 @@ namespace CSSL.Modeling.Elements
             // Check if observer is permitted.
             try
             {
+                //ModelElementObserverBase modelElementObserver = (ModelElementObserverBase)observer;
                 ModelElementObserverBase modelElementObserver = (ModelElementObserverBase)observer;
             }
             catch
@@ -242,7 +243,7 @@ namespace CSSL.Modeling.Elements
 
         protected void NotifyObservers(object info)
         {
-            foreach (ModelElementObserverBase observer in observers)
+            foreach (ObserverBase observer in observers)
             {
                 observer.OnNext(info);
             }

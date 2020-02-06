@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CSSL.Modeling.Elements
 {
-    public abstract class EventGeneratorBase: SchedulingElement, IEventGenerator
+    public abstract class EventGeneratorBase: SchedulingElementBase, IEventGenerator
     {
         private Distribution interEventTimeDistribution;
 

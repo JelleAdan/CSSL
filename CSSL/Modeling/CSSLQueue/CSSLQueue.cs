@@ -1,4 +1,5 @@
 ﻿using CSSL.Modeling.Elements;
+using CSSL.Modeling.Elements.Variables;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace CSSL.Modeling.CSSLQueue
     /// <summary>
     /// If you derive a class from this one, it should contain emptying the queue logic in the DoBeforeReplication() method.
     /// </summary>
-    /// <typeparam name="T">The class of the items which will be in the queue</typeparam>
+    /// <typeparam name="T">The class of the items which will be in the queue.</typeparam>
     public class CSSLQueue<T> : ModelElementBase where T : CSSLQueueObject<T>
     {
         public CSSLQueue(ModelElementBase parent, string name) : base(parent, name)
@@ -27,7 +28,9 @@ namespace CSSL.Modeling.CSSLQueue
         /// <summary>
         /// Returns the current length of the queue.
         /// </summary>
-        public int Length => items.Count;
+        //public int Length => items.Count;
+
+        public Variable<int> Length;
 
         /// <summary>
         /// Adds an item to the end of the queue.
