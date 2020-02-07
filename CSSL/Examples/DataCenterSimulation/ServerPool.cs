@@ -38,7 +38,6 @@ namespace CSSL.Examples.DataCenterSimulation
             }
         }
 
-
         public void HandleArrival(Job job)
         {
             NotifyObservers(this);

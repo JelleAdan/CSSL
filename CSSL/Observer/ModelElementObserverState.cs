@@ -8,6 +8,8 @@ namespace CSSL.Observer
     {
         UPDATE,
         WARMUP,
-        INITIALIZED
+        INITIALIZED,
+        BEFORE_REPLICATION,
+        AFTER_REPLICATION
     }
 }

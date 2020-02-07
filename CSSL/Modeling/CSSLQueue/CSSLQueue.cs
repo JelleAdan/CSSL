@@ -1,5 +1,4 @@
 ﻿using CSSL.Modeling.Elements;
-using CSSL.Modeling.Elements.Variables;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -28,9 +27,7 @@ namespace CSSL.Modeling.CSSLQueue
         /// <summary>
         /// Returns the current length of the queue.
         /// </summary>
-        //public int Length => items.Count;
-
-        public Variable<int> Length;
+        public int Length => items.Count;
 
         /// <summary>
         /// Adds an item to the end of the queue.

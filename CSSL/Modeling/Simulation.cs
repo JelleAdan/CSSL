@@ -50,15 +50,11 @@ namespace CSSL.Modeling
 
         public string Name { get; }
 
-        public string GetEndStateIndicator()
-        {
-            return replicationExecutionProcess.MyEndStateIndicator.ToString();
-        }
+        public string GetEndStateIndicator => replicationExecutionProcess.MyEndStateIndicator.ToString();
 
-        public TimeSpan GetElapsedWallClockTime()
-        {
-            return replicationExecutionProcess.GetElapsedWallClockTime;
-        }
+        public TimeSpan GetElapsedWallClockTime => replicationExecutionProcess.GetElapsedWallClockTime;
+
+        public double GetElapsedSimulationClockTime => MyExecutive.SimulationClockTime;
 
         public void Run()
         {

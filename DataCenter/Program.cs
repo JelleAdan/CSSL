@@ -41,6 +41,7 @@ namespace DataCenterSimulation
 
             sim.MyExperiment.NumberOfReplications = 4;
             sim.MyExperiment.LengthOfReplicationSimulationClock = 10;
+            sim.MyExperiment.LengthOfWarmUp = 2;
 
             // The observer part...
             DispatcherObserver dispatcherObserver = new DispatcherObserver(sim);

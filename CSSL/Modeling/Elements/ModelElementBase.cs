@@ -167,9 +167,12 @@ namespace CSSL.Modeling.Elements
         /// </summary>
         public void StrictlyDoBeforeReplication()
         {
+            ObserverState = ModelElementObserverState.BEFORE_REPLICATION;
+            NotifyObservers(this);
+
             if (LengthOfWarmUp > 0)
             {
-                GetExecutive.ScheduleEvent(GetExecutive.SimulationClockTime, HandleEndWarmUp);
+                GetExecutive.ScheduleEvent(GetExecutive.SimulationClockTime + LengthOfWarmUp, HandleEndWarmUp);
                 ObserverState = ModelElementObserverState.WARMUP;
                 NotifyObservers(this);
             }
@@ -202,7 +205,7 @@ namespace CSSL.Modeling.Elements
         /// The warm-up length of the model element, the default warm-up length is zero.
         /// A warm-up length of zero implies that the model element allowes its parent to call its warm-up action. 
         /// </summary>
-        public virtual double LengthOfWarmUp { get; set; }
+        public virtual double LengthOfWarmUp => Parent.LengthOfWarmUp;
 
         private void HandleEndWarmUp(CSSLEvent e)
         {

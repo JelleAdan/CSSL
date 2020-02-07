@@ -1,6 +1,5 @@
 ﻿using CSSL.Modeling;
 using CSSL.Modeling.Elements;
-using CSSL.Modeling.Elements.Variables;
 using CSSL.Observer;
 using CSSL.Utilities.Statistics;
 using System;
@@ -13,25 +12,33 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
     {
         public DispatcherQueueLengthObserver(Simulation mySimulation) : base(mySimulation)
         {
+            queueLength = new Variable<int>(this);
             queueLengthStatistic = new WeightedStatistic("Dispatcher queue length");
         }
+
+        private Variable<int> queueLength;
 
         private WeightedStatistic queueLengthStatistic;
 
         protected override void OnUpdate(ModelElementBase modelElement)
         {
-            Variable<int> queueLength = (Variable<int>)modelElement;
-            queueLengthStatistic.Collect(queueLength.Value, queueLength.Weight);
+            Dispatcher dispatcher = (Dispatcher)modelElement;
+            queueLength.UpdateValue(dispatcher.QueueLength);
+            queueLengthStatistic.Collect(queueLength.PreviousValue, queueLength.Weight);
         }
 
         protected override void OnWarmUp(ModelElementBase modelElement)
         {
-            throw new NotImplementedException();
         }
 
         protected override void OnInitialized(ModelElementBase modelElement)
         {
-            throw new NotImplementedException();
+            queueLength.UpdateValue(queueLength.Value);
+        }
+
+        protected override void OnReplicationStart(ModelElementBase modelElement)
+        {
+            queueLength.Reset();
         }
 
         public override void OnCompleted()

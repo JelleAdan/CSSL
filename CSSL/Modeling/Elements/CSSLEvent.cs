@@ -7,8 +7,10 @@ using System.Threading.Tasks;
 
 namespace CSSL.Modeling.Elements
 {
-    public class CSSLEvent : IComparable<CSSLEvent>
+    public class CSSLEvent : IComparable<CSSLEvent>, IIdentity
     {
+        public int Id { get; }
+
         public delegate void CSSLEventAction(CSSLEvent csslevent);
 
         public double Time { get; }
@@ -38,12 +40,12 @@ namespace CSSL.Modeling.Elements
                 return 1;
             }
 
-            if (id < other.id)
+            if (Id < other.Id)
             {
                 return -1;
             }
 
-            if (id > other.id)
+            if (Id > other.Id)
             {
                 return 1;
             }
@@ -57,8 +59,6 @@ namespace CSSL.Modeling.Elements
                 throw new Exception("Times and ids were equal, but references were not, in CSSLEvent compareTo.");
             }
         }
-
-        private long id;
     }
 }
 

@@ -52,6 +52,10 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
         {
         }
 
+        protected override void OnReplicationStart(ModelElementBase modelElement)
+        {
+        }
+
         public override void OnCompleted()
         {
             throw new NotImplementedException();

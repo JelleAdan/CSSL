@@ -1,7 +1,6 @@
 ﻿using CSSL.Modeling;
 using CSSL.Modeling.CSSLQueue;
 using CSSL.Modeling.Elements;
-using CSSL.Modeling.Elements.Variables;
 using CSSL.Utilities.Distributions;
 using System;
 using System.Collections.Generic;
@@ -37,7 +36,7 @@ namespace CSSL.Examples.DataCenterSimulation
 
         public CSSLQueue<Job> Queue;
 
-        public int QueueLength => Queue.Length.Value;
+        public int QueueLength => Queue.Length;
 
         public int TotalNrJobsInSystem => QueueLength + serverPools.Sum(x => x.JobCount);
 

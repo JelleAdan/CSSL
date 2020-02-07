@@ -31,6 +31,10 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
             Writer.WriteLine("Simulation Time\tComputational Time\tJob Count");
         }
 
+        protected override void OnWarmUp(ModelElementBase modelElement)
+        {
+        }
+
         protected sealed override void OnUpdate(ModelElementBase modelElement)
         {
             DataCenter dataCenter = (DataCenter)modelElement.Parent;
@@ -42,8 +46,18 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
             Console.WriteLine($"{simulationTime}\t{computationalTime}\t{totalJobCount}");
         }
 
-        protected override void OnWarmUp(ModelElementBase modelElement)
+        protected override void OnReplicationStart(ModelElementBase modelElement)
         {
+        }
+
+        public override void OnCompleted()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void OnError(Exception error)
+        {
+            throw new NotImplementedException();
         }
     }
 }

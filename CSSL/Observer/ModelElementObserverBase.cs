@@ -31,6 +31,9 @@ namespace CSSL.Observer
                 case ModelElementObserverState.INITIALIZED:
                     OnInitialized(modelElement);
                     break;
+                case ModelElementObserverState.BEFORE_REPLICATION:
+                    OnReplicationStart(modelElement);
+                    break;
             }
         }
 
@@ -39,5 +42,7 @@ namespace CSSL.Observer
         protected abstract void OnWarmUp(ModelElementBase modelElement);
 
         protected abstract void OnInitialized(ModelElementBase modelElement);
+
+        protected abstract void OnReplicationStart(ModelElementBase modelElement); 
     }
 }

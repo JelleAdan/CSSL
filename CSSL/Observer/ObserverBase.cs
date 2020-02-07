@@ -24,16 +24,16 @@ namespace CSSL.Observer
         {
             Id = observerCounter++;
             Name = GetType().Name + "_" + Id;
-            this.mySimulation = mySimulation;
+            MySimulation = mySimulation;
             mySimulation.MyObservers.Add(this);
             cancellations = new List<Unsubscriber>();
         }
 
-        private readonly Simulation mySimulation;
+        public readonly Simulation MySimulation;
 
         internal void StrictlyDoBeforeReplication()
         {
-            Writer = new StreamWriter(Path.Combine(mySimulation.MyExperiment.ReplicationOutputDirectory, Name + ".txt"));
+            Writer = new StreamWriter(Path.Combine(MySimulation.MyExperiment.ReplicationOutputDirectory, Name + ".txt"));
 
             DoBeforeReplication();
         }

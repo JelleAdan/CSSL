@@ -23,6 +23,16 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
         {
         }
 
+        public override void OnCompleted()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void OnError(Exception error)
+        {
+            throw new NotImplementedException();
+        }
+
         protected override void OnInitialized(ModelElementBase modelElement)
         {
             oldTime = modelElement.GetElapsedSimulationClockTime;
@@ -52,6 +62,10 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
         }
 
         protected override void OnWarmUp(ModelElementBase modelElement)
+        {
+        }
+
+        protected override void OnReplicationStart(ModelElementBase modelElement)
         {
         }
     }
