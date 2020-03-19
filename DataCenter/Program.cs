@@ -31,10 +31,10 @@ namespace DataCenterSimulation
                 dataCenter.AddServerpool(new ServerPool(dataCenter, $"Serverpool_{i}"));
             }
 
-            Dispatcher dispatcher = new Dispatcher(dataCenter, "Dispatcher", new ExponentialDistribution(1, 1), double.PositiveInfinity, dataCenter.ServerPools, dispatchTime, numberServerpoolsToChooseFrom);
+            Dispatcher dispatcher = new Dispatcher(dataCenter, "Dispatcher", new ExponentialDistribution(1), double.PositiveInfinity, dataCenter.ServerPools, dispatchTime, numberServerpoolsToChooseFrom);
             dataCenter.SetDispatcher(dispatcher);
 
-            JobGenerator jobGenerator = new JobGenerator(dataCenter, "JobGenerator", new ExponentialDistribution(1 / lambda, 1 / lambda / lambda), dispatcher);
+            JobGenerator jobGenerator = new JobGenerator(dataCenter, "JobGenerator", new ExponentialDistribution(lambda), dispatcher);
             dataCenter.SetJobGenerator(jobGenerator);
 
             // The experiment part...

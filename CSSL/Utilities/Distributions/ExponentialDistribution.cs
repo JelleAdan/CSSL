@@ -8,9 +8,12 @@ namespace CSSL.Utilities.Distributions
 {
     public class ExponentialDistribution : Distribution
     {
-        public ExponentialDistribution(double mean, double variance) : base(mean, variance)
+        public ExponentialDistribution(double rate) : base(1 / rate, 1 / rate / rate)
         {
+            Rate = rate;
         }
+
+        public double Rate { get; }
 
         public override double Next()
         {
