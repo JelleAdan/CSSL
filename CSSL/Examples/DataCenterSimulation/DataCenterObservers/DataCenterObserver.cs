@@ -24,8 +24,8 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
         {
             DataCenter dataCenter = (DataCenter)modelElement.Parent;
             totalJobCount = dataCenter.Dispatcher.TotalNrJobsInSystem;
-            computationalTime = dataCenter.Dispatcher.GetElapsedWallClockTime;
-            simulationTime = dataCenter.Dispatcher.GetElapsedSimulationClockTime;
+            computationalTime = dataCenter.Dispatcher.GetWallClockTime;
+            simulationTime = dataCenter.Dispatcher.GetTime;
 
 
             Writer.WriteLine("Simulation Time\tComputational Time\tJob Count");
@@ -39,8 +39,8 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
         {
             DataCenter dataCenter = (DataCenter)modelElement.Parent;
             totalJobCount = dataCenter.Dispatcher.TotalNrJobsInSystem;
-            computationalTime = dataCenter.Dispatcher.GetElapsedWallClockTime;
-            simulationTime = dataCenter.Dispatcher.GetElapsedSimulationClockTime;
+            computationalTime = dataCenter.Dispatcher.GetWallClockTime;
+            simulationTime = dataCenter.Dispatcher.GetTime;
 
             Writer.WriteLine($"{simulationTime}\t{computationalTime}\t{totalJobCount}");
             Console.WriteLine($"{simulationTime}\t{computationalTime}\t{totalJobCount}");

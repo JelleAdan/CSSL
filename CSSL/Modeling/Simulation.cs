@@ -54,7 +54,7 @@ namespace CSSL.Modeling
 
         public TimeSpan GetElapsedWallClockTime => replicationExecutionProcess.GetElapsedWallClockTime;
 
-        public double GetElapsedSimulationClockTime => MyExecutive.SimulationClockTime;
+        public double GetElapsedSimulationClockTime => MyExecutive.Time;
 
         public void Run()
         {

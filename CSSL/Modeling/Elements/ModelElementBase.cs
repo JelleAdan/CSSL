@@ -79,12 +79,14 @@ namespace CSSL.Modeling.Elements
         /// Retrieves the current elapsed simulation clock time.
         /// </summary>
         /// <returns></returns>
-        public double GetElapsedSimulationClockTime => GetExecutive.SimulationClockTime;
+        public double GetTime => GetExecutive.Time;
+
+        public double GetPreviousEventTime => GetExecutive.PreviousEventTime;
 
         /// <summary>
         /// Retrieves the current elapsed wall clock time.
         /// </summary>
-        public double GetElapsedWallClockTime => GetExecutive.WallClockTime;
+        public double GetWallClockTime => GetExecutive.WallClockTime;
 
         /// <summary>
         /// 
@@ -99,7 +101,6 @@ namespace CSSL.Modeling.Elements
         {
             modelElements.Add(modelElement);
         }
-
 
         /// <summary>
         /// Removes the supplied child model element from this model element.
@@ -172,7 +173,7 @@ namespace CSSL.Modeling.Elements
 
             if (LengthOfWarmUp > 0)
             {
-                GetExecutive.ScheduleEvent(GetExecutive.SimulationClockTime + LengthOfWarmUp, HandleEndWarmUp);
+                GetExecutive.ScheduleEvent(GetExecutive.Time + LengthOfWarmUp, HandleEndWarmUp);
                 ObserverState = ModelElementObserverState.WARMUP;
                 NotifyObservers(this);
             }

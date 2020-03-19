@@ -34,7 +34,7 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
         {
             JobCount++;
 
-            Writer.WriteLine($"{modelElement.GetElapsedWallClockTime}");
+            Writer.WriteLine($"{modelElement.GetWallClockTime}");
         }
 
         protected override void OnReplicationStart(ModelElementBase modelElement)

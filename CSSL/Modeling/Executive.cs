@@ -11,7 +11,10 @@ namespace CSSL.Modeling
 {
     public class Executive
     {
-        public double SimulationClockTime { get; private set; }
+        public double PreviousEventTime { get; private set; }
+
+        public double Time { get; private set; }
+
         public double WallClockTime => eventExecutionProcess.GetElapsedWallClockTimeSeconds;
 
         private ICalendar calendar;
@@ -46,7 +49,8 @@ namespace CSSL.Modeling
 
         public void Execute(CSSLEvent e)
         {
-            SimulationClockTime = e.Time;
+            PreviousEventTime = Time;
+            Time = e.Time;
             e.Execute();
         }
 
@@ -70,7 +74,6 @@ namespace CSSL.Modeling
                 this.executive = executive;
             }
 
-
             protected override double maxWallClockTime
             {
                 get
@@ -87,7 +90,8 @@ namespace CSSL.Modeling
             {
                 base.DoInitialize();
                 executive.calendar.CancelAll();
-                executive.SimulationClockTime = 0;
+                executive.PreviousEventTime = 0;
+                executive.Time = 0;
                 executive.MySimulation.MyExperiment.CreateReplicationOutputDirectory();
 
                 if(executive.MySimulation.MyExperiment.LengthOfReplicationSimulationClock != double.PositiveInfinity)

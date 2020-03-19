@@ -61,7 +61,7 @@ namespace DataCenterSimulation
 
             sim.Run();
 
-            Console.WriteLine($"Number of jobs dispatched {dataCenter.ServerPools.First().GetNrJobs}. Comp time: {dataCenter.GetElapsedWallClockTime}");
+            Console.WriteLine($"Number of jobs dispatched {dataCenter.ServerPools.First().GetNrJobs}. Comp time: {dataCenter.GetWallClockTime}");
 
             SimulationReporter reporter = sim.MakeSimulationReporter();
 

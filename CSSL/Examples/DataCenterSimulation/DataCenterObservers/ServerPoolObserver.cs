@@ -35,7 +35,7 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
 
         protected override void OnInitialized(ModelElementBase modelElement)
         {
-            oldTime = modelElement.GetElapsedSimulationClockTime;
+            oldTime = modelElement.GetTime;
             sumNrOfJobs = 0;
             sumNrOfJobs2 = 0;
             sumTime = 0;
@@ -46,7 +46,7 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
         protected override void OnUpdate(ModelElementBase modelElement)
         {
             ServerPool serverPool = (ServerPool)modelElement;
-            currentTime = serverPool.GetElapsedSimulationClockTime;
+            currentTime = serverPool.GetTime;
             sumNrOfJobs += (currentTime - oldTime) * serverPool.JobCount;
             sumNrOfJobs2 += (currentTime - oldTime) * Math.Pow(serverPool.JobCount, 2);
             sumTime += (currentTime - oldTime);

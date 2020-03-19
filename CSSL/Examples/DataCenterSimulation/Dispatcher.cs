@@ -60,7 +60,7 @@ namespace CSSL.Examples.DataCenterSimulation
 
             if (QueueLength == 1) // Queue was empty upon arrival, schedule dispatch event immediately. 
             {
-                ScheduleEvent(GetElapsedSimulationClockTime + dispatchTime, Dispatch);
+                ScheduleEvent(GetTime + dispatchTime, Dispatch);
             }
         }
 
@@ -86,7 +86,7 @@ namespace CSSL.Examples.DataCenterSimulation
             // Schedule next dispatch event, if queue is nonempty
             if (QueueLength > 0)
             {
-                ScheduleEvent(GetElapsedSimulationClockTime + dispatchTime, Dispatch);
+                ScheduleEvent(GetTime + dispatchTime, Dispatch);
             }
         }
 
@@ -94,7 +94,7 @@ namespace CSSL.Examples.DataCenterSimulation
         {
             ServerPool serverPool = ChooseServerpool();
 
-            double departureTime = GetElapsedSimulationClockTime + job.ServiceTime;
+            double departureTime = GetTime + job.ServiceTime;
 
             job.DepartureTime = departureTime;
 
@@ -111,8 +111,8 @@ namespace CSSL.Examples.DataCenterSimulation
             job.ServiceTime = serviceTime1;
             job2.ServiceTime = serviceTime2;
 
-            job.DepartureTime = GetElapsedSimulationClockTime + serviceTime1;
-            job2.DepartureTime = GetElapsedSimulationClockTime + serviceTime2;
+            job.DepartureTime = GetTime + serviceTime1;
+            job2.DepartureTime = GetTime + serviceTime2;
 
             return job2;
         }

@@ -32,9 +32,9 @@ namespace CSSL.Examples.DataCenterSimulation
 
             NrJobsDispatched++;
 
-            if (job.DepartureTime != GetElapsedSimulationClockTime)
+            if (job.DepartureTime != GetTime)
             {
-                throw new Exception($"Departure time of job {job.Id} is {job.DepartureTime} and does not match current time {GetElapsedSimulationClockTime}");
+                throw new Exception($"Departure time of job {job.Id} is {job.DepartureTime} and does not match current time {GetTime}");
             }
         }
 
