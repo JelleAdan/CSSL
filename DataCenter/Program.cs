@@ -40,7 +40,7 @@ namespace DataCenterSimulation
             // The experiment part...
 
             sim.MyExperiment.NumberOfReplications = 4;
-            sim.MyExperiment.LengthOfReplicationSimulationClock = 10;
+            sim.MyExperiment.LengthOfReplication = 10;
             sim.MyExperiment.LengthOfWarmUp = 2;
 
             // The observer part...

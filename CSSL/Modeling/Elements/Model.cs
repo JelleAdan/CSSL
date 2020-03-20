@@ -19,18 +19,6 @@ namespace CSSL.Modeling.Elements
 
         public override Model MyModel => this;
 
-        internal void Initialize()
-        {
-            StrictlyDoBeforeReplication();
-            DoBeforeReplication();
-            ScheduleEndEvent();
-        }
-
-        private void ScheduleEndEvent()
-        {
-            GetExecutive.ScheduleEvent(GetTime, GetExecutive.HandleEndEvent);
-        }
-
         protected override void DoBeforeExperiment()
         {
             if (!HasChildren)

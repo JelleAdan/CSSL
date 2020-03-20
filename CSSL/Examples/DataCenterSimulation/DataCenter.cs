@@ -12,7 +12,7 @@ namespace CSSL.Examples.DataCenterSimulation
     {
         public JobGenerator JobGenerator { get; private set; }
 
-        public  Dispatcher Dispatcher { get; private set; }
+        public Dispatcher Dispatcher { get; private set; }
 
         public List<ServerPool> ServerPools { get; private set; }
 

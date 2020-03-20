@@ -14,21 +14,21 @@ namespace CSSL.Modeling
         /// Constructs an experiment.
         /// </summary>
         /// <param name="name">The name of the experiment.</param>
-        /// <param name="numberOfReplications">The number of replications.</param>
         /// <param name="outputDirectory">The output directory the the results have to be written to.</param>
+        /// <param name="numberOfReplications">The number of replications.</param>
         /// <param name="lengthOfWarmUp">The warm up time of a replication in simulation clock time.</param>
-        /// <param name="maxWallClockTimeTotal">The maximum total wall clock time in seconds.</param>
-        /// <param name="maxWallClockTimePerReplication">The maximum wall clock time per replication in seconds.</param>
+        /// <param name="lengthOfReplicationWallClock">The maximum wall clock time per replication in seconds.</param>
+        /// <param name="lengthOfExperimentWallClock">The maximum total wall clock time in seconds.</param>
         /// <param name="lengthOfReplication">The maximum simulation clock time per replication in seconds.</param>
-        public Experiment(string name, string outputDirectory, int numberOfReplications = 1, double lengthOfWarmUp = 0.0, double maxWallClockTimePerReplication = double.PositiveInfinity, double maxWallClockTimeTotal = double.PositiveInfinity, double lengthOfReplication = double.PositiveInfinity)
+        public Experiment(string name, string outputDirectory, int numberOfReplications = 1, double lengthOfWarmUp = 0.0, double lengthOfReplicationWallClock = double.PositiveInfinity, double lengthOfExperimentWallClock = double.PositiveInfinity, double lengthOfReplication = double.PositiveInfinity)
         {
             Name = name;
             this.outputDirectory = outputDirectory;
             NumberOfReplications = numberOfReplications;
             LengthOfWarmUp = lengthOfWarmUp;
-            LengthOfReplicationWallClock = maxWallClockTimePerReplication;
-            MaxWallClockTimeTotal = maxWallClockTimeTotal;
-            LengthOfReplicationSimulationClock = LengthOfReplicationSimulationClock;
+            LengthOfReplicationWallClock = lengthOfReplicationWallClock;
+            LengthOfExperimentWallClock = lengthOfExperimentWallClock;
+            LengthOfReplication = LengthOfReplication;
         }
 
         public string Name { get; }
@@ -74,7 +74,7 @@ namespace CSSL.Modeling
         /// <summary>
         /// Length of replication in seconds in simulation clock time.
         /// </summary>
-        public double LengthOfReplicationSimulationClock
+        public double LengthOfReplication
         {
             get { return lengthOfReplication; }
             set
@@ -105,21 +105,21 @@ namespace CSSL.Modeling
             }
         }
 
-        private double maxWallClockTimeTotal;
+        private double lengthOfExperimentWallClock;
 
         /// <summary>
         /// A threshold on the maximum computational wall clock time of the experiment.
         /// </summary>
-        public double MaxWallClockTimeTotal
+        public double LengthOfExperimentWallClock
         {
-            get { return maxWallClockTimeTotal; }
+            get { return lengthOfExperimentWallClock; }
             set
             {
                 if (value < 0)
                 {
                     throw new ArgumentOutOfRangeException($"{nameof(value)} must be positive.");
                 }
-                maxWallClockTimeTotal = value;
+                lengthOfExperimentWallClock = value;
             }
         }
 

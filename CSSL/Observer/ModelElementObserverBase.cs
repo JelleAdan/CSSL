@@ -34,6 +34,9 @@ namespace CSSL.Observer
                 case ModelElementObserverState.BEFORE_REPLICATION:
                     OnReplicationStart(modelElement);
                     break;
+                case ModelElementObserverState.AFTER_REPLICATION:
+                    OnReplicationEnd(modelElement);
+                    break;
             }
         }
 
@@ -44,5 +47,7 @@ namespace CSSL.Observer
         protected abstract void OnInitialized(ModelElementBase modelElement);
 
         protected abstract void OnReplicationStart(ModelElementBase modelElement); 
+
+        protected abstract void OnReplicationEnd(ModelElementBase modelElement);
     }
 }

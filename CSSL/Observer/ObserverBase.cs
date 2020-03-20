@@ -42,6 +42,15 @@ namespace CSSL.Observer
         {
         }
 
+        internal void StrictlyDoAfterReplication()
+        {
+            DoAfterReplication();
+        }
+
+        protected virtual void DoAfterReplication()
+        {
+        }
+
         protected StreamWriter Writer { get; private set; }
 
         protected List<Unsubscriber> cancellations;
@@ -79,7 +88,12 @@ namespace CSSL.Observer
 
         public string Name { get; }
 
-        public abstract void OnCompleted();
+        /// <summary>
+        /// On purpose not an abstract method to prevent obligatory implementation in derived classes. 
+        /// </summary>
+        public void OnCompleted()
+        {
+        }
 
         public abstract void OnError(Exception error);
 
@@ -89,5 +103,6 @@ namespace CSSL.Observer
         {
             Writer.Dispose();
         }
+
     }
 }

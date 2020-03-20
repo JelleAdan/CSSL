@@ -162,11 +162,36 @@ namespace CSSL.Modeling.Elements
         }
 
         /// <summary>
+        /// This method contains logic to be performed after an experiment. 
+        /// It is called once after the first replication. This method ensures that each contained model element has its StrictlyDoAfterExperiment method called.
+        /// It also calls the DoBeforeExperiment method which contains optional logic. 
+        /// </summary>
+        public void StrictlyDoAfterExperiment()
+        {
+            DoAfterExperiment();
+
+            if (modelElements.Any())
+            {
+                foreach (ModelElementBase modelElement in modelElements)
+                {
+                    modelElement.StrictlyDoBeforeExperiment();
+                }
+            }
+        }
+
+        /// <summary>
+        /// This method should be overridden by derived classes that need logic to be performed after an experiment. 
+        /// </summary>
+        protected virtual void DoAfterExperiment()
+        {
+        }
+
+        /// <summary>
         /// This method contains logic to be performed prior to a replication. 
         /// It is called once before every replication. This method ensures that each contained model element has its StrictlyDoBeforeReplication method called.
         /// It also calls the DoBeforeReplication method which contains optional logic.
         /// </summary>
-        public void StrictlyDoBeforeReplication()
+        internal void StrictlyDoBeforeReplication()
         {
             ObserverState = ModelElementObserverState.BEFORE_REPLICATION;
             NotifyObservers(this);
@@ -199,6 +224,34 @@ namespace CSSL.Modeling.Elements
         /// This method should be overridden by derived classes that need additional logic to be performed prior to a replication. 
         /// </summary>
         protected virtual void DoBeforeReplication()
+        {
+        }
+
+        /// <summary>
+        /// This method contains logic to be performed after a replication. 
+        /// It is called once after every replication. This method ensures that each contained model element has its StrictlyDoAfterReplication method called.
+        /// It also calls the DoAfterReplication method which contains optional logic.
+        /// </summary>
+        internal void StrictlyDoAfterReplication()
+        {
+            ObserverState = ModelElementObserverState.AFTER_REPLICATION;
+            NotifyObservers(this);
+
+            DoAfterReplication();
+
+            if (modelElements.Any())
+            {
+                foreach (ModelElementBase modelElement in modelElements)
+                {
+                    modelElement.StrictlyDoAfterReplication();
+                }
+            }
+        }
+
+        /// <summary>
+        /// This method should be overridden by derived classes that need additional logic to be performed after a replication. 
+        /// </summary>
+        protected virtual void DoAfterReplication()
         {
         }
 

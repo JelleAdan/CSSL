@@ -41,9 +41,8 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
             queueLength.Reset();
         }
 
-        public override void OnCompleted()
+        protected override void OnReplicationEnd(ModelElementBase modelElement)
         {
-            throw new NotImplementedException();
         }
 
         public override void OnError(Exception error)

@@ -93,7 +93,7 @@ namespace CSSL.Modeling
             this.simulation = simulation;
         }
 
-        protected override double maxWallClockTime => simulation.MyExperiment.MaxWallClockTimeTotal * 1000;
+        protected override double maxWallClockTime => simulation.MyExperiment.LengthOfExperimentWallClock * 1000;
 
         protected override bool HasNext => simulation.MyExperiment.HasMoreReplications;
 
@@ -117,6 +117,8 @@ namespace CSSL.Modeling
             simulation.MyObservers.StrictlyDoBeforeReplication();
             simulation.MyModel.StrictlyDoBeforeReplication();
             simulation.MyExecutive.TryRunAll();
+            simulation.MyObservers.StrictlyDoAfterReplication();
+            simulation.MyModel.StrictlyDoAfterReplication();
         }
     }
 }

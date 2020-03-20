@@ -15,16 +15,6 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
         {
         }
 
-        public override void OnCompleted()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void OnError(Exception error)
-        {
-            throw new NotImplementedException();
-        }
-
         protected override void OnInitialized(ModelElementBase modelElement)
         {
             Writer.WriteLine("Computational Time\tSimulation Time\t");
@@ -42,6 +32,14 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
         }
 
         protected override void OnWarmUp(ModelElementBase modelElement)
+        {
+        }
+
+        protected override void OnReplicationEnd(ModelElementBase modelElement)
+        {
+        }
+
+        public override void OnError(Exception error)
         {
             throw new NotImplementedException();
         }

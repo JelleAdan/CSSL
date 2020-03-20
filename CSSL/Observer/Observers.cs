@@ -28,6 +28,14 @@ namespace CSSL.Modeling
             }
         }
 
+        internal void StrictlyDoAfterReplication()
+        {
+            foreach (ObserverBase observer in MyObservers)
+            {
+                observer.StrictlyDoAfterReplication();
+            }
+        }
+
         public void Dispose()
         {
             foreach (ObserverBase observer in MyObservers)

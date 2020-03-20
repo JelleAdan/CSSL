@@ -12,7 +12,6 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
     {
         public DispatcherObserver(Simulation sim) : base(sim)
         {
-
         }
 
         private double sumQueueLength;
@@ -22,11 +21,6 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
         private double oldTime;
 
         private double currentTime;
-
-        public override void OnError(Exception error)
-        {
-            throw new NotImplementedException();
-        }
 
         protected sealed override void OnUpdate(ModelElementBase modelElement)
         {
@@ -56,7 +50,11 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
         {
         }
 
-        public override void OnCompleted()
+        protected override void OnReplicationEnd(ModelElementBase modelElement)
+        {
+        }
+
+        public override void OnError(Exception error)
         {
             throw new NotImplementedException();
         }

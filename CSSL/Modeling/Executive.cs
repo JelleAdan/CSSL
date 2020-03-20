@@ -80,7 +80,7 @@ namespace CSSL.Modeling
                 {
                     double maxCompTimePerReplication = executive.MySimulation.MyExperiment.LengthOfReplicationWallClock;
 
-                    return maxCompTimePerReplication == double.PositiveInfinity ? executive.MySimulation.MyExperiment.MaxWallClockTimeTotal : maxCompTimePerReplication;
+                    return maxCompTimePerReplication == double.PositiveInfinity ? executive.MySimulation.MyExperiment.LengthOfExperimentWallClock : maxCompTimePerReplication;
                 }
             }
 
@@ -94,7 +94,7 @@ namespace CSSL.Modeling
                 executive.Time = 0;
                 executive.MySimulation.MyExperiment.CreateReplicationOutputDirectory();
 
-                if(executive.MySimulation.MyExperiment.LengthOfReplicationSimulationClock != double.PositiveInfinity)
+                if (executive.MySimulation.MyExperiment.LengthOfReplication != double.PositiveInfinity)
                 {
                     ScheduleEndEvent();
                 }
@@ -102,7 +102,7 @@ namespace CSSL.Modeling
 
             private void ScheduleEndEvent()
             {
-                executive.ScheduleEvent(executive.MySimulation.MyExperiment.LengthOfReplicationSimulationClock, executive.HandleEndEvent);
+                executive.ScheduleEvent(executive.MySimulation.MyExperiment.LengthOfReplication, executive.HandleEndEvent);
             }
 
             protected sealed override CSSLEvent NextIteration()
