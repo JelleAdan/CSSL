@@ -10,7 +10,6 @@ namespace CSSL.Examples.WaferFab
 
         public LotType Type { get; }
 
-
         public bool HasNextStep(int currentStepCount)
         {
             return currentStepCount + 1 < lotSteps.Count;
@@ -29,7 +28,7 @@ namespace CSSL.Examples.WaferFab
             }
             else
             {
-                throw new Exception($"Tried to acces next step / workcenter of {Type}, but there is no next step.");
+                return null;
             }
         }
 
@@ -40,7 +39,14 @@ namespace CSSL.Examples.WaferFab
 
         public WorkCenter GetNextWorkCenter(int currentStepCount)
         {
-            return GetNextStep(currentStepCount).WorkCenter;
+            if (HasNextStep(currentStepCount))
+            {
+                return GetNextStep(currentStepCount).WorkCenter;
+            }
+            else
+            {
+                return null;
+            }
         }
                
         public void AddStep(LotStep lotstep)

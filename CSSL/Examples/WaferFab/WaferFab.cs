@@ -13,7 +13,7 @@ namespace CSSL.Examples.WaferFab
 
         public Dictionary<LotType, Sequence> Sequences { get; set; }
 
-
+        public Dictionary<LotType, int> LotStarts { get; set; }
 
         public WaferFab(string name) : base(name)
         {

@@ -15,27 +15,23 @@ namespace CSSL.Examples.WaferFab
 
         private WaferFab waferFab { get; }
 
-        private LotType GetLotType()
-        {
-            Random rnd = new Random();
-
-            int rndd = rnd.Next(waferFab.Sequences.Count);
-
-            //return waferFab.Sequences.Values;
-
-            return new LotType();
-        }
-
         protected override void HandleGeneration(CSSLEvent e)
         {
             // Schedule next generation
             ScheduleEvent(NextEventTime(), HandleGeneration);
 
+            // Create lots according to preset quantities in LotStarts and send all lots to first workstation
+            foreach(KeyValuePair<LotType, int> lotStart in waferFab.LotStarts)
+            {
+                Sequence sequence = waferFab.Sequences[lotStart.Key];
 
-            // Create lot
+                for (int i = 0; i < lotStart.Value; i++)
+                {
+                    Lot newLot = new Lot(GetTime, sequence);
 
-            // Send lot to first workstation
-
+                    newLot.SendToNextWorkCenter();
+                }
+            }
         }
     }
 }
