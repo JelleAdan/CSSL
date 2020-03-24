@@ -8,9 +8,9 @@ using System.Text;
 
 namespace CSSL.Examples.WaferFab.Observers
 {
-    public class QueueObserver : ModelElementObserverBase
+    public class TotalQueueObserver : ModelElementObserverBase
     {
-        public QueueObserver(Simulation mySimulation) : base(mySimulation)
+        public TotalQueueObserver(Simulation mySimulation) : base(mySimulation)
         {
             queueLength = new Variable<int>(this);
             queueLengthStatistic = new WeightedStatistic("QueueLength");
@@ -22,27 +22,34 @@ namespace CSSL.Examples.WaferFab.Observers
 
         protected override void OnUpdate(ModelElementBase modelElement)
         {
-            throw new NotImplementedException();
+            WorkCenter workCenter = (WorkCenter)modelElement;
+            queueLength.UpdateValue(workCenter.TotalQueueLength);
+            queueLengthStatistic.Collect(queueLength.PreviousValue, queueLength.Weight);
+
+            Writer.Write(workCenter.GetTime + "\t" + workCenter.GetWallClockTime + "\t" + queueLength.Value);
         }
 
         protected override void OnWarmUp(ModelElementBase modelElement)
         {
-            throw new NotImplementedException();
         }
 
         protected override void OnInitialized(ModelElementBase modelElement)
         {
-            throw new NotImplementedException();
+            Writer.Write("Simulation Time\tComputational Time\tQueue Length");
+
+            WorkCenter workCenter = (WorkCenter)modelElement;
+            queueLength.UpdateValue(workCenter.TotalQueueLength);
         }
 
         protected override void OnReplicationStart(ModelElementBase modelElement)
         {
-            throw new NotImplementedException();
+            queueLength.Reset();
+            // Uncomment below if one want to save across replication statistics
+            queueLengthStatistic.Reset();
         }
 
         protected override void OnReplicationEnd(ModelElementBase modelElement)
         {
-            throw new NotImplementedException();
         }
 
         public override void OnError(Exception error)

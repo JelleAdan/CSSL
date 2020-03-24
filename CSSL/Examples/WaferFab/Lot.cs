@@ -32,9 +32,9 @@ namespace CSSL.Examples.WaferFab
             {
                 WorkCenter nextWorkCenter = GetNextWorkCenter;
 
-                nextWorkCenter.HandleArrival(this);
-
                 CurrentStepCount++;
+
+                nextWorkCenter.HandleArrival(this);
             }
             else
             {

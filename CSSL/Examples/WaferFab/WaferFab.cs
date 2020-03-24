@@ -15,12 +15,29 @@ namespace CSSL.Examples.WaferFab
 
         public Dictionary<LotType, int> LotStarts { get; set; }
 
-        public WaferFab(string name) : base(name)
-        {
-        }
-
         public WaferFab(ModelElementBase parent, string name) : base(parent, name)
         {
         }
+
+        public void SetLotGenerator(LotGenerator lotGenerator)
+        {
+            LotGenerator = lotGenerator;
+        }
+
+        public void AddWorkCenter(WorkCenter workCenter)
+        {
+            WorkCenters.Add(workCenter);
+        }
+
+        public void AddSequence(LotType lotType, Sequence sequence)
+        {
+            Sequences.Add(lotType, sequence);
+        }
+
+        public void AddLotStart(LotType lotType, int quantity)
+        {
+            LotStarts.Add(lotType, quantity);
+        }
+
     }
 }

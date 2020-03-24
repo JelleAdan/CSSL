@@ -13,8 +13,8 @@ namespace CSSL.Examples.WaferFab
     {
         public WorkCenter(ModelElementBase parent, string name, Distribution serviceTimeDistribution, List<LotStep> lotSteps, DispatcherBase dispatcher) : base(parent, name)
         {
-            this.lotSteps = lotSteps;
-            this.ServiceTimeDistribution = serviceTimeDistribution;
+            LotSteps = lotSteps;
+            ServiceTimeDistribution = serviceTimeDistribution;
             this.dispatcher = dispatcher;
             LotStepInService = null;
 
@@ -28,21 +28,23 @@ namespace CSSL.Examples.WaferFab
 
         private DispatcherBase dispatcher { get; }
 
-        private List<LotStep> lotSteps { get; set; }
+        public List<LotStep> LotSteps { get; set; }
+
+        public Lot LastArrivedLot { get; set; }
 
         public LotStep LotStepInService { get; set; }
 
-        public int TotalNrOfLots => Queues.Select(x => x.Value.Length).Sum(); 
-
         public Dictionary<LotStep, CSSLQueue<Lot>> Queues { get; set; }
 
-        public int TotalNrOfJobs { get; private set; }
+        public int TotalQueueLength { get; private set; }
 
         public void HandleArrival(Lot lot)
         {
+            LastArrivedLot = lot;
+
             NotifyObservers(this);
 
-            TotalNrOfJobs++;
+            TotalQueueLength++;
 
             dispatcher.HandleArrival(lot);
         }
@@ -57,7 +59,7 @@ namespace CSSL.Examples.WaferFab
             {
                 NotifyObservers(this);
 
-                TotalNrOfJobs--;
+                TotalQueueLength--;
 
                 dispatcher.HandleDeparture();
             }
