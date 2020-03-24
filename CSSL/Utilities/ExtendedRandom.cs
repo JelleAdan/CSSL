@@ -8,6 +8,14 @@ namespace CSSL.Utilities
 {
     public class ExtendedRandom : Random
     {
+        public ExtendedRandom()
+        {
+        }
+
+        public ExtendedRandom(int seed) : base(seed)
+        {
+        }
+
         public double NextNonzeroDouble()
         {
             double sample = NextDouble();

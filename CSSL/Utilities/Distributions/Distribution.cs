@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CSSL.Modeling;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,7 +19,15 @@ namespace CSSL.Utilities.Distributions
         {
             Mean = mean;
             Variance = variance;
-            rnd = new ExtendedRandom();
+            
+            if (Settings.FixSeed)
+            {
+                rnd = new ExtendedRandom(200844210);
+            }
+            else
+            {
+                rnd = new ExtendedRandom();
+            }
         }
 
         public abstract double Next();

@@ -12,14 +12,14 @@ namespace CSSL.Examples.WaferFab.Observers
     {
         public SeperateQueuesObserver(Simulation mySimulation, WorkCenter workCenter) : base(mySimulation)
         {
-            foreach(LotStep step in workCenter.LotSteps)
+            foreach (LotStep step in workCenter.LotSteps)
             {
                 queueLengths.Add(step, new Variable<int>(this));
                 queueLengthsStatistic.Add(step, new WeightedStatistic("QueueLength_" + step.Name));
             }
         }
 
-        private Dictionary<LotStep,Variable<int>> queueLengths;
+        private Dictionary<LotStep, Variable<int>> queueLengths;
 
         private Dictionary<LotStep, WeightedStatistic> queueLengthsStatistic;
 
@@ -49,7 +49,7 @@ namespace CSSL.Examples.WaferFab.Observers
         {
             WorkCenter workCenter = (WorkCenter)modelElement;
             LotStep step = workCenter.LastArrivedLot.GetCurrentStep;
-            
+
             queueLengths[step].UpdateValue(workCenter.Queues[step].Length);
             queueLengthsStatistic[step].Collect(queueLengths[step].PreviousValue, queueLengths[step].Weight);
 
@@ -67,7 +67,7 @@ namespace CSSL.Examples.WaferFab.Observers
 
             WorkCenter workCenter = (WorkCenter)modelElement;
 
-            foreach(LotStep step in workCenter.LotSteps)
+            foreach (LotStep step in workCenter.LotSteps)
             {
                 queueLengths[step].UpdateValue(workCenter.Queues[step].Length);
 
@@ -83,7 +83,7 @@ namespace CSSL.Examples.WaferFab.Observers
         {
             WorkCenter workCenter = (WorkCenter)modelElement;
 
-            foreach(LotStep step in workCenter.LotSteps)
+            foreach (LotStep step in workCenter.LotSteps)
             {
                 queueLengths[step].Reset();
                 // Uncomment below if one want to save across replication statistics
@@ -98,6 +98,14 @@ namespace CSSL.Examples.WaferFab.Observers
         public override void OnError(Exception error)
         {
             throw new NotImplementedException();
+        }
+
+        protected override void OnExperimentStart(ModelElementBase modelElement)
+        {
+        }
+
+        protected override void OnExperimentEnd(ModelElementBase modelElement)
+        {
         }
     }
 }

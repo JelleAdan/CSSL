@@ -43,5 +43,13 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
         {
             throw new NotImplementedException();
         }
+
+        protected override void OnExperimentStart(ModelElementBase modelElement)
+        {
+        }
+
+        protected override void OnExperimentEnd(ModelElementBase modelElement)
+        {
+        }
     }
 }

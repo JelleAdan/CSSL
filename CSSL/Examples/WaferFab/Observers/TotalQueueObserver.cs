@@ -56,5 +56,13 @@ namespace CSSL.Examples.WaferFab.Observers
         {
             throw new NotImplementedException();
         }
+
+        protected override void OnExperimentStart(ModelElementBase modelElement)
+        {
+        }
+
+        protected override void OnExperimentEnd(ModelElementBase modelElement)
+        {
+        }
     }
 }

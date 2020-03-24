@@ -143,6 +143,9 @@ namespace CSSL.Modeling.Elements
         /// </summary>
         public void StrictlyDoBeforeExperiment()
         {
+            ObserverState = ModelElementObserverState.BEFORE_EXPERIMENT;
+            NotifyObservers(this);
+
             DoBeforeExperiment();
 
             if (modelElements.Any())
@@ -168,6 +171,9 @@ namespace CSSL.Modeling.Elements
         /// </summary>
         public void StrictlyDoAfterExperiment()
         {
+            ObserverState = ModelElementObserverState.AFTER_EXPERIMENT;
+            NotifyObservers(this);
+
             DoAfterExperiment();
 
             if (modelElements.Any())

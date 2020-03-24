@@ -20,6 +20,15 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
 
         private WeightedStatistic queueLengthStatistic;
 
+        protected override void OnExperimentStart(ModelElementBase modelElement)
+        {
+        }
+
+        protected override void OnReplicationStart(ModelElementBase modelElement)
+        {
+            queueLength.Reset();
+        }
+
         protected override void OnUpdate(ModelElementBase modelElement)
         {
             Dispatcher dispatcher = (Dispatcher)modelElement;
@@ -36,11 +45,6 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
             queueLength.UpdateValue(queueLength.Value);
         }
 
-        protected override void OnReplicationStart(ModelElementBase modelElement)
-        {
-            queueLength.Reset();
-        }
-
         protected override void OnReplicationEnd(ModelElementBase modelElement)
         {
         }
@@ -48,6 +52,10 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
         public override void OnError(Exception error)
         {
             throw new NotImplementedException();
+        }
+
+        protected override void OnExperimentEnd(ModelElementBase modelElement)
+        {
         }
     }
 }

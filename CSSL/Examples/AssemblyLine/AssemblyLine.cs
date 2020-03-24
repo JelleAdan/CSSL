@@ -2,27 +2,34 @@
 using CSSL.Utilities.Distributions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace CSSL.Examples.AssemblyLine
 {
-    public class AssemblyLine : ModelElementBase
+    public class AssemblyLine : SchedulingElementBase
     {
+        /// <summary>
+        /// Container for all elements (i.e. machines and buffers) in the assembly line. 
+        /// </summary>
+        /// <param name="parent"></param>
+        /// <param name="name"></param>
+        /// <param name="length">The length (i.e. number of machines) in the assembly line.</param>
         public AssemblyLine(ModelElementBase parent, string name, int length) : base(parent, name)
         {
-            machines = new Machine[length];
-            buffers = new Buffer[length];
+            Machines = new Machine[length];
+            Buffers = new Buffer[length];
         }
 
-        private int length => machines.Length;
+        public int Length => Machines.Length;
 
-        private Machine[] machines;
+        public Machine[] Machines { get; private set; }
 
-        private Buffer[] buffers;
+        public Buffer[] Buffers { get; private set; }
 
         public void AddMachine(int index, double maxSpeed, Distribution upTimeDistribution, Distribution downTimeDistribution)
         {
-            machines[index] = new Machine(this, $"Machine_{index}", maxSpeed, upTimeDistribution, downTimeDistribution);
+            Machines[index] = new Machine(this, $"Machine_{index}", index, maxSpeed, upTimeDistribution, downTimeDistribution);
         }
 
         public void AddBuffer(int index, double capacity)
@@ -33,22 +40,21 @@ namespace CSSL.Examples.AssemblyLine
             }
             else
             {
-                buffers[index] = new Buffer(this, $"Buffer_{index}") { Capacity = capacity };
+                Buffers[index] = new Buffer(this, $"Buffer_{index}", index, capacity);
             }
         }
 
         protected override void DoBeforeExperiment()
         {
             base.DoBeforeExperiment();
-            
-            // Check if all machines and buffers are defined. 
-            for (int i = 0; i < length; i++)
+
+            for (int i = 0; i < Length; i++)
             {
-                if (machines[i] == null)
+                if (Machines[i] == null)
                 {
                     throw new Exception($"Machine at position {i} in the assembly line is not defined.");
                 }
-                if (buffers[i] == null && i > 0) // There is no zeroth buffer.
+                if (Buffers[i] == null && i > 0) // There is no zeroth buffer.
                 {
                     throw new Exception($"Buffer at position {i} in the assembly line is not defined.");
                 }
@@ -58,21 +64,93 @@ namespace CSSL.Examples.AssemblyLine
         protected override void DoBeforeReplication()
         {
             base.DoBeforeReplication();
-            
-            // The first machine starts at maximum speed.
-            machines[0].ActualSpeed = machines[0].MaxSpeed;
 
-            for (int i = 1; i < length; i++)
+            Machines[0].ActualSpeed = Machines[0].MaxSpeed;
+
+            for (int i = 1; i < Length; i++)
             {
-                // Downstream machines start running at the speed of the upstream machine, or its maximum speed.
-                machines[i].ActualSpeed = Math.Min(machines[i].MaxSpeed, machines[i - 1].ActualSpeed);
+                Machines[i].ActualSpeed = Math.Min(Machines[i].MaxSpeed, Machines[i - 1].ActualSpeed);
 
-                // Start with empty buffers.
-                buffers[i].Content = 0;
+                Buffers[i].Content = 0;
 
-                buffers[i].NetSpeed = machines[i - 1].ActualSpeed - machines[i].ActualSpeed;
-
+                Buffers[i].NetSpeed = Machines[i - 1].ActualSpeed - Machines[i].ActualSpeed;
             }
+
+            ScheduleEvent(0, ScheduleFirstEvent);
+        }
+
+        public void ScheduleFirstEvent(CSSLEvent e)
+        {
+            ScheduleEvent(NextEventTime(), HandleEvent);
+        }
+
+        private void UpdateBufferContents()
+        {
+            foreach (Buffer buffer in Buffers.Skip(1))
+            {
+                buffer.Content += buffer.NetSpeed * (GetTime - GetPreviousEventTime);
+            }
+        }
+
+        private double NextEventTime()
+        {
+            double nextEventTime = double.MaxValue;
+
+            foreach (Machine machine in Machines)
+            {
+                if (machine.EventTime < nextEventTime)
+                {
+                    nextEventTime = machine.EventTime;
+                }
+            }
+
+            foreach (Buffer buffer in Buffers.Skip(1))
+            {
+                if (buffer.EventTime < nextEventTime)
+                {
+                    nextEventTime = buffer.EventTime;
+                }
+            }
+
+            return nextEventTime;
+        }
+
+        public void HandleEvent(CSSLEvent e)
+        {
+            int machineIndex = 0;
+
+            for (int i = 0; i < Length; i++)
+            {
+                if (Machines[i].EventTime < Machines[machineIndex].EventTime)
+                {
+                    machineIndex = i;
+                }
+            }
+
+            int bufferIndex = 1;
+
+            for (int i = 1; i < Length; i++)
+            {
+                if (Buffers[i].EventTime < Buffers[bufferIndex].EventTime)
+                {
+                    bufferIndex = i;
+                }
+            }
+
+            NotifyObservers(this);
+
+            UpdateBufferContents();
+
+            if (Machines[machineIndex].EventTime < Buffers[bufferIndex].EventTime)
+            {
+                Machines[machineIndex].HandleMachineEvent();
+            }
+            else
+            {
+                Buffers[bufferIndex].HandleBufferEvent();
+            }
+
+            ScheduleEvent(NextEventTime(), HandleEvent);
         }
     }
 }

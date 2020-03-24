@@ -20,7 +20,7 @@ namespace CSSL.Modeling
         /// <param name="lengthOfReplicationWallClock">The maximum wall clock time per replication in seconds.</param>
         /// <param name="lengthOfExperimentWallClock">The maximum total wall clock time in seconds.</param>
         /// <param name="lengthOfReplication">The maximum simulation clock time per replication in seconds.</param>
-        public Experiment(string name, string outputDirectory, int numberOfReplications = 1, double lengthOfWarmUp = 0.0, double lengthOfReplicationWallClock = double.PositiveInfinity, double lengthOfExperimentWallClock = double.PositiveInfinity, double lengthOfReplication = double.PositiveInfinity)
+        public Experiment(string name, string outputDirectory, int numberOfReplications = 1, double lengthOfWarmUp = 0.0, double lengthOfReplicationWallClock = double.PositiveInfinity, double lengthOfExperimentWallClock = double.PositiveInfinity, double lengthOfReplication = double.PositiveInfinity, bool fixSeed = false)
         {
             Name = name;
             this.outputDirectory = outputDirectory;
@@ -69,7 +69,7 @@ namespace CSSL.Modeling
             }
         }
 
-        private double lengthOfReplication;
+        public static double lengthOfReplication;
 
         /// <summary>
         /// Length of replication in seconds in simulation clock time.
