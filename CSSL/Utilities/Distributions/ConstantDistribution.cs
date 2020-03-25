@@ -8,18 +8,19 @@ namespace CSSL.Utilities.Distributions
     {
         public ConstantDistribution(int constant) : base(constant, 0)
         {
-            this.constant = constant;
-        }
-        public ConstantDistribution(double constant) : base(constant, 0)
-        {
-            this.constant = constant;
+            Constant = constant;
         }
 
-        private double constant { get; }
+        public ConstantDistribution(double constant) : base(constant, 0)
+        {
+            Constant = constant;
+        }
+
+        public double Constant { get; }
 
         public override double Next()
         {
-            return constant;
+            return Constant;
         }
     }
 }
