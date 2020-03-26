@@ -18,8 +18,8 @@ namespace CSSL.Utilities.Statistics
         public override void Collect(double value, double weight)
         {
             count++;
-            sumx += value;
-            sumxx += value * value;
+            sumx += weight * value;
+            sumxx += weight * value * value;
             sumw += weight;
             if (value > max)
             {

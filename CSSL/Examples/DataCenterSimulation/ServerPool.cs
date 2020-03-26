@@ -18,7 +18,7 @@ namespace CSSL.Examples.DataCenterSimulation
 
         public static int NrJobsDispatched;
 
-        public int GetNrJobs => NrJobsDispatched;
+        public int GetNrJobsDispatched => NrJobsDispatched;
         
         private ServerPoolQueue queue { get; set; }
 

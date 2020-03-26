@@ -72,7 +72,7 @@ namespace CSSL.Modeling
         public static double lengthOfReplication;
 
         /// <summary>
-        /// Length of replication in seconds in simulation clock time.
+        /// Length of replication (including warm-up) in seconds in simulation clock time.
         /// </summary>
         public double LengthOfReplication
         {

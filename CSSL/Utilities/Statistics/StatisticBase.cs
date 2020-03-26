@@ -60,7 +60,7 @@ namespace CSSL.Utilities.Statistics
 
         public double Variance()
         {
-            return sumxx / sumw + sumx / sumw * sumx / sumw;
+            return sumxx / sumw - sumx / sumw * sumx / sumw;
         }
     }
 }

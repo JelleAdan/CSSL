@@ -28,7 +28,7 @@ namespace CSSL.Reporting
 
         private void BuildSummary()
         {
-            summary.Add($"Simulation report for { simulation.Name}\n");
+            summary.Add($"\nSIMULATION REPORT FOR { simulation.Name}\n");
 
             summary.Add("EXPERIMENT");
             summary.Add($"Maximum number of replications: {experiment.NumberOfReplications}");
