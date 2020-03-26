@@ -11,11 +11,10 @@ namespace CSSL.Examples.WaferFab
 {
     public class WorkCenter : SchedulingElementBase
     {
-        public WorkCenter(ModelElementBase parent, string name, Distribution serviceTimeDistribution, List<LotStep> lotSteps, DispatcherBase dispatcher) : base(parent, name)
+        public WorkCenter(ModelElementBase parent, string name, Distribution serviceTimeDistribution, List<LotStep> lotSteps) : base(parent, name)
         {
             LotSteps = lotSteps;
             ServiceTimeDistribution = serviceTimeDistribution;
-            this.dispatcher = dispatcher;
             LotStepInService = null;
 
             foreach(LotStep lotStep in lotSteps)
@@ -26,7 +25,7 @@ namespace CSSL.Examples.WaferFab
 
         public Distribution ServiceTimeDistribution { get; }
 
-        private DispatcherBase dispatcher { get; }
+        private DispatcherBase dispatcher { get; set; }
 
         public List<LotStep> LotSteps { get; set; }
 
@@ -37,6 +36,19 @@ namespace CSSL.Examples.WaferFab
         public Dictionary<LotStep, CSSLQueue<Lot>> Queues { get; set; }
 
         public int TotalQueueLength { get; private set; }
+
+        public void SetDispatcher(DispatcherBase dispatcher)
+        {
+            this.dispatcher = dispatcher;
+        }
+
+        public void ConnectLotSteps()
+        {
+            foreach(LotStep lot in LotSteps)
+            {
+                lot.SetWorkCenter(this);
+            }
+        }
 
         public void HandleArrival(Lot lot)
         {

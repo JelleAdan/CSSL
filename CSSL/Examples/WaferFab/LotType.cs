@@ -6,11 +6,11 @@ namespace CSSL.Examples.WaferFab
 {
     public enum LotType
     {
-        TRENCH2,
-        TRENCH3WB,
-        TRENCH3LF,
-        TRENCH4,
-        TRENCH6WB,
-        TRENCH6LF
+        Trench2,
+        Trench3WB,
+        Trench3LF,
+        Trench4,
+        Trench6WB,
+        Trench6LF
     }
 }

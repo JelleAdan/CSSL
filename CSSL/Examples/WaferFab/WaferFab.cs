@@ -7,16 +7,22 @@ namespace CSSL.Examples.WaferFab
 {
     public class WaferFab : ModelElementBase
     {
-        public LotGenerator LotGenerator { get; set; }
+        public LotGenerator LotGenerator { get; private set; }
 
-        public List<WorkCenter> WorkCenters { get; private set; }
+        public Dictionary<string, WorkCenter> WorkCenters { get; private set; }
 
-        public Dictionary<LotType, Sequence> Sequences { get; set; }
+        public Dictionary<LotType, Sequence> Sequences { get; private set; }
+
+        public Dictionary<string, LotStep> LotSteps { get; set; }
 
         public Dictionary<LotType, int> LotStarts { get; set; }
 
         public WaferFab(ModelElementBase parent, string name) : base(parent, name)
         {
+            WorkCenters = new Dictionary<string, WorkCenter>();
+            Sequences = new Dictionary<LotType, Sequence>();
+            LotSteps = new Dictionary<string, LotStep>();
+            LotStarts = new Dictionary<LotType, int>();
         }
 
         public void SetLotGenerator(LotGenerator lotGenerator)
@@ -24,9 +30,9 @@ namespace CSSL.Examples.WaferFab
             LotGenerator = lotGenerator;
         }
 
-        public void AddWorkCenter(WorkCenter workCenter)
+        public void AddWorkCenter(string name, WorkCenter workCenter)
         {
-            WorkCenters.Add(workCenter);
+            WorkCenters.Add(name, workCenter);
         }
 
         public void AddSequence(LotType lotType, Sequence sequence)

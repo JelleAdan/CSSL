@@ -7,9 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSSL", "CSSL\CSSL.csproj", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataCenter", "DataCenter\DataCenter.csproj", "{460EFFC3-CE86-4294-BF06-B55AF1977BCB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WaferFab", "WaferFab\WaferFab.csproj", "{B58AF6A8-E98C-41C8-98DC-C59C0CE420ED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WaferFabSim", "WaferFab\WaferFabSim.csproj", "{B58AF6A8-E98C-41C8-98DC-C59C0CE420ED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LineSim", "LineSim\LineSim.csproj", "{267CB093-5289-43C4-88F3-8F47761094F3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LineSim", "LineSim\LineSim.csproj", "{267CB093-5289-43C4-88F3-8F47761094F3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

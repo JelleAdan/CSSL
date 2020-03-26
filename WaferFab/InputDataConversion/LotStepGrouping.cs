@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace WaferFab.DataConversion
+namespace WaferFabSim.DataConversion
 {
     public static class LotStepGrouping
     {
