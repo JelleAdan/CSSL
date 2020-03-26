@@ -25,17 +25,6 @@ namespace CSSL.Modeling
             OutputDirectory = outputDirectory;
         }
 
-        public Simulation(string name, string outputDirectory, Executive executive)
-        {
-            Name = name;
-            MyExecutive = executive;
-            MyModel = new Model(name + "_Model", this);
-            MyExperiment = new Experiment(name + "_Experiment", outputDirectory);
-            MyObservers = new Observers();
-            replicationExecutionProcess = new ReplicationExecutionProcess(this);
-            OutputDirectory = outputDirectory;
-        }
-
         public Executive MyExecutive { get; }
 
         public Model MyModel { get; }

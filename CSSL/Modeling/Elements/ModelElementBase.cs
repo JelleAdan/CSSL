@@ -73,20 +73,22 @@ namespace CSSL.Modeling.Elements
         /// <summary>
         /// Retrieves the simulation.
         /// </summary>
-        public Simulation GetSimulation => MyModel.MySimulation;
+        private Simulation GetSimulation => MyModel.MySimulation;
 
         /// <summary>
-        /// Retrieves the current elapsed simulation clock time.
+        /// Retrieves the current elapsed time.
         /// </summary>
-        /// <returns></returns>
-        public double GetTime => GetExecutive.Time;
+        protected double GetTime => GetExecutive.Time;
 
-        public double GetPreviousEventTime => GetExecutive.PreviousEventTime;
+        /// <summary>
+        /// Retrieves the time at which the previous event was executed.
+        /// </summary>
+        protected double GetPreviousEventTime => GetExecutive.PreviousEventTime;
 
         /// <summary>
         /// Retrieves the current elapsed wall clock time.
         /// </summary>
-        public double GetWallClockTime => GetExecutive.WallClockTime;
+        protected double GetWallClockTime => GetExecutive.WallClockTime;
 
         /// <summary>
         /// 
@@ -134,7 +136,7 @@ namespace CSSL.Modeling.Elements
         /// <summary>
         /// The observer state of the model element.
         /// </summary>
-        public ModelElementObserverState ObserverState { get; private set; }
+        internal ModelElementObserverState ObserverState { get; private set; }
 
         /// <summary>
         /// This method contains logic to be performed prior to an experiment. 

@@ -17,7 +17,7 @@ namespace CSSL.Modeling.Elements
 
         public override double LengthOfWarmUp => MySimulation.MyExperiment.LengthOfWarmUp;
 
-        public override Model MyModel => this;
+        protected override Model MyModel => this;
 
         protected override void DoBeforeExperiment()
         {

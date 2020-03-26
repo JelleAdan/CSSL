@@ -19,35 +19,33 @@ namespace CSSL.Modeling
 
         private ICalendar calendar;
 
+        public void SetCalendar(ICalendar calendar)
+        {
+            this.calendar = calendar;
+        }
+
         private EventExecutionProcess eventExecutionProcess;
 
-        public Executive(Simulation simulation)
+        internal Executive(Simulation simulation) 
         {
             MySimulation = simulation;
             calendar = new SimpleCalendar();
             eventExecutionProcess = new EventExecutionProcess(this);
         }
 
-        public Executive(Simulation simulation, ICalendar calendar)
-        {
-            MySimulation = simulation;
-            this.calendar = calendar;
-            eventExecutionProcess = new EventExecutionProcess(this);
-        }
+        internal Simulation MySimulation { get; set; }
 
-        public Simulation MySimulation { get; }
-
-        public void TryInitialize()
+        internal void TryInitialize()
         {
             eventExecutionProcess.TryInitialize();
         }
 
-        public void TryRunAll()
+        internal void TryRunAll()
         {
             eventExecutionProcess.TryRunAll();
         }
 
-        public void Execute(CSSLEvent e)
+        internal void Execute(CSSLEvent e)
         {
             PreviousEventTime = Time;
             Time = e.Time;
@@ -69,7 +67,7 @@ namespace CSSL.Modeling
         {
             private Executive executive;
 
-            public EventExecutionProcess(Executive executive)
+            internal EventExecutionProcess(Executive executive)
             {
                 this.executive = executive;
             }
