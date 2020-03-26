@@ -45,6 +45,7 @@ namespace CSSL.Observer
         internal void StrictlyDoAfterReplication()
         {
             DoAfterReplication();
+            Writer.Dispose();
         }
 
         protected virtual void DoAfterReplication()
@@ -101,7 +102,6 @@ namespace CSSL.Observer
 
         public void Dispose()
         {
-            Writer.Dispose();
         }
 
     }

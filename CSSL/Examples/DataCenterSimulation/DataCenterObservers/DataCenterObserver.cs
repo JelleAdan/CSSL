@@ -19,15 +19,14 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
 
         private double simulationTime;
 
-
         protected sealed override void OnInitialized(ModelElementBase modelElement)
         {
-            DataCenter dataCenter = (DataCenter)modelElement.Parent;
+            DataCenter dataCenter = (DataCenter)modelElement;
             totalJobCount = dataCenter.Dispatcher.TotalNrJobsInSystem;
             wallClockTime = dataCenter.Dispatcher.GetWallClockTime;
             simulationTime = dataCenter.Dispatcher.GetTime;
 
-            Writer.WriteLine("Simulation Time\tWall Clock Time\tJob Count");
+            Writer.WriteLine($"Simulation Time,Wall Clock Time,Job Count");
         }
 
         protected override void OnWarmUp(ModelElementBase modelElement)
@@ -36,7 +35,7 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
 
         protected sealed override void OnUpdate(ModelElementBase modelElement)
         {
-            DataCenter dataCenter = (DataCenter)modelElement.Parent;
+            DataCenter dataCenter = (DataCenter)modelElement;
             totalJobCount = dataCenter.Dispatcher.TotalNrJobsInSystem;
             wallClockTime = dataCenter.Dispatcher.GetWallClockTime;
             simulationTime = dataCenter.Dispatcher.GetTime;

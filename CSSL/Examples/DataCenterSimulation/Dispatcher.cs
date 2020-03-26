@@ -14,6 +14,7 @@ namespace CSSL.Examples.DataCenterSimulation
     {
         public Dispatcher(ModelElementBase parent, string name, Distribution serviceTimeDistribution, double serviceTimeThreshold, List<ServerPool> serverPools, double dispatchTime) : base(parent, name)
         {
+            dataCenter = (DataCenter)parent;
             Queue = new CSSLQueue<Job>(this, name + "_Queue");
             this.serviceTimeDistribution = serviceTimeDistribution;
             this.serviceTimeThreshold = serviceTimeThreshold;
@@ -25,6 +26,7 @@ namespace CSSL.Examples.DataCenterSimulation
 
         public Dispatcher(ModelElementBase parent, string name, Distribution serviceTimeDistribution, double serviceTimeThreshold, List<ServerPool> serverPools, double dispatchTime, int nrServerPools) : base(parent, name)
         {
+            dataCenter = (DataCenter)parent;
             Queue = new CSSLQueue<Job>(this, name + "_Queue");
             this.serviceTimeDistribution = serviceTimeDistribution;
             this.serviceTimeThreshold = serviceTimeThreshold;
@@ -40,6 +42,8 @@ namespace CSSL.Examples.DataCenterSimulation
 
         public int TotalNrJobsInSystem => QueueLength + serverPools.Sum(x => x.JobCount);
 
+        private DataCenter dataCenter { get; set; }
+
         private Distribution serviceTimeDistribution;
 
         private double serviceTimeThreshold;
@@ -54,6 +58,8 @@ namespace CSSL.Examples.DataCenterSimulation
 
         public void HandleArrival(Job job)
         {
+            dataCenter.HandleArrival();
+
             NotifyObservers(this);
 
             Queue.EnqueueLast(job);
