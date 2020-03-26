@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CSSL.Modeling.Elements
 {
-    public abstract class ModelElementBase : IIdentity, IName, IObservable<object>
+    public abstract class ModelElementBase : IIdentity, IName, IObservable<object>, IGetTime
     {
         /// <summary>
         /// Incremented to store the total number of created model elements.
@@ -62,7 +62,7 @@ namespace CSSL.Modeling.Elements
         /// <summary>
         /// A reference to the overall model, the highest container for all model elements.
         /// </summary>
-        public virtual Model MyModel { get; private set; }
+        protected virtual Model MyModel { get; private set; }
 
         /// <summary>
         /// Retrieves the executive.
@@ -78,17 +78,17 @@ namespace CSSL.Modeling.Elements
         /// <summary>
         /// Retrieves the current elapsed time.
         /// </summary>
-        protected double GetTime => GetExecutive.Time;
+        public double GetTime => GetExecutive.Time;
 
         /// <summary>
         /// Retrieves the time at which the previous event was executed.
         /// </summary>
-        protected double GetPreviousEventTime => GetExecutive.PreviousEventTime;
+        public double GetPreviousEventTime => GetExecutive.PreviousEventTime;
 
         /// <summary>
         /// Retrieves the current elapsed wall clock time.
         /// </summary>
-        protected double GetWallClockTime => GetExecutive.WallClockTime;
+        public double GetWallClockTime => GetExecutive.WallClockTime;
 
         /// <summary>
         /// All children modelElements.
@@ -131,7 +131,7 @@ namespace CSSL.Modeling.Elements
         /// <summary>
         /// Returns true if the model element contains any child model elements.
         /// </summary>
-        public bool HasChildren => modelElements.Any();
+        protected bool HasChildren => modelElements.Any();
 
         /// <summary>
         /// The observer state of the model element.
@@ -143,7 +143,7 @@ namespace CSSL.Modeling.Elements
         /// It is called once before the first replication. This method ensures that each contained model element has its StrictlyDoBeforeExperiment method called.
         /// It also calls the DoBeforeExperiment method which contains optional logic. 
         /// </summary>
-        public void StrictlyDoBeforeExperiment()
+        internal void StrictlyDoBeforeExperiment()
         {
             ObserverState = ModelElementObserverState.BEFORE_EXPERIMENT;
             NotifyObservers(this);
@@ -171,7 +171,7 @@ namespace CSSL.Modeling.Elements
         /// It is called once after the first replication. This method ensures that each contained model element has its StrictlyDoAfterExperiment method called.
         /// It also calls the DoBeforeExperiment method which contains optional logic. 
         /// </summary>
-        public void StrictlyDoAfterExperiment()
+        internal void StrictlyDoAfterExperiment()
         {
             ObserverState = ModelElementObserverState.AFTER_EXPERIMENT;
             NotifyObservers(this);
@@ -267,7 +267,7 @@ namespace CSSL.Modeling.Elements
         /// The warm-up length of the model element, the default warm-up length is zero.
         /// A warm-up length of zero implies that the model element allowes its parent to call its warm-up action. 
         /// </summary>
-        public virtual double LengthOfWarmUp => Parent.LengthOfWarmUp;
+        private double LengthOfWarmUp => GetSimulation.MyExperiment.LengthOfWarmUp;
 
         private void HandleEndWarmUp(CSSLEvent e)
         {

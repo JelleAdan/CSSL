@@ -13,7 +13,7 @@ namespace CSSL.Observer
     /// A base class for all CSSL observers
     /// </summary>
     /// <typeparam name="T">The observable object that is passed for notification information.</typeparam>
-    public abstract class ObserverBase : IIdentity, IName, IObserver<object>, IDisposable
+    public abstract class ObserverBase : IIdentity, IName, IObserver<object>, IDisposable, IGetTime
     {
         /// <summary>
         /// Incremented to store the total number of observers.
@@ -29,7 +29,17 @@ namespace CSSL.Observer
             cancellations = new List<Unsubscriber>();
         }
 
-        public readonly Simulation MySimulation;
+        public int Id { get; }
+
+        public string Name { get; }
+
+        public double GetTime => MySimulation.MyExecutive.Time;
+
+        public double GetPreviousEventTime => MySimulation.MyExecutive.PreviousEventTime;
+
+        public double GetWallClockTime => MySimulation.MyExecutive.WallClockTime;
+
+        protected readonly Simulation MySimulation;
 
         internal void StrictlyDoBeforeReplication()
         {
@@ -84,10 +94,6 @@ namespace CSSL.Observer
         {
             cancellations.Where(x => x.observable == observable).First().Dispose();
         }
-
-        public int Id { get; }
-
-        public string Name { get; }
 
         /// <summary>
         /// On purpose not an abstract method to prevent obligatory implementation in derived classes. 
