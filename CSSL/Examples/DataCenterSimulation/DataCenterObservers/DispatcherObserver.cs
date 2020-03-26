@@ -37,7 +37,7 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
         protected override void OnInitialized(ModelElementBase modelElement)
         {
             queueLength.UpdateValue(queueLength.Value);
-            //Writer.WriteLine($"Current Simulation Time,Current queue length");
+            Writer.WriteLine($"Current Simulation Time,Current queue length");
         }
 
         protected override void OnUpdate(ModelElementBase modelElement)
@@ -46,7 +46,7 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
             queueLength.UpdateValue(dispatcher.QueueLength);
             queueLengthStatistic.Collect(queueLength.Value, queueLength.Weight);
 
-            //Writer.WriteLine($"{dispatcher.GetTime},{queueLength.Value}");
+            Writer.WriteLine($"{dispatcher.GetTime},{queueLength.Value}");
         }
 
         protected override void OnReplicationEnd(ModelElementBase modelElement)

@@ -117,8 +117,8 @@ namespace CSSL.Modeling
             simulation.MyObservers.StrictlyDoBeforeReplication();
             simulation.MyModel.StrictlyDoBeforeReplication();
             simulation.MyExecutive.TryRunAll();
-            simulation.MyObservers.StrictlyDoAfterReplication();
             simulation.MyModel.StrictlyDoAfterReplication();
+            simulation.MyObservers.StrictlyDoAfterReplication();
         }
     }
 }

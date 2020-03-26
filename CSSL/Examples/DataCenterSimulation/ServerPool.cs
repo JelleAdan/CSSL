@@ -13,6 +13,7 @@ namespace CSSL.Examples.DataCenterSimulation
     {
         public ServerPool(ModelElementBase parent, string name) : base(parent, name)
         {
+            dataCenter = (DataCenter)parent;
             queue = new ServerPoolQueue(this, name + "_Queue");
         }
 
@@ -20,12 +21,16 @@ namespace CSSL.Examples.DataCenterSimulation
 
         public int GetNrJobsDispatched => NrJobsDispatched;
         
+        private DataCenter dataCenter { get; set; }
+
         private ServerPoolQueue queue { get; set; }
 
         public int JobCount => queue.Length;
 
         private void HandleDeparture(CSSLEvent e)
         {
+            dataCenter.HandleDeparture();
+
             NotifyObservers(this);
 
             Job job = queue.DequeueFirst();

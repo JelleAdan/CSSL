@@ -38,5 +38,16 @@ namespace CSSL.Examples.DataCenterSimulation
             }
             ServerPools.Add(serverPool);
         }
+
+        public void HandleArrival()
+        {
+            NotifyObservers(this);
+        }
+
+        public void HandleDeparture()
+        {
+            NotifyObservers(this);
+        }
+
     }
 }

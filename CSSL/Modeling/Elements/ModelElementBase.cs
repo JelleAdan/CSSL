@@ -89,7 +89,7 @@ namespace CSSL.Modeling.Elements
         public double GetWallClockTime => GetExecutive.WallClockTime;
 
         /// <summary>
-        /// 
+        /// All children modelElements.
         /// </summary>
         private List<ModelElementBase> modelElements;
 
@@ -272,12 +272,6 @@ namespace CSSL.Modeling.Elements
             ObserverState = ModelElementObserverState.INITIALIZED;
             NotifyObservers(this);
             ObserverState = ModelElementObserverState.UPDATE;
-
-            // Trigger the warm-up action in all children that allow.
-            foreach (ModelElementBase modelElement in modelElements.Where(x => x.LengthOfWarmUp > 0))
-            {
-                modelElement.HandleEndWarmUp(e);
-            }
         }
 
         private List<IObserver<object>> observers;
@@ -287,7 +281,6 @@ namespace CSSL.Modeling.Elements
             // Check if observer is permitted.
             try
             {
-                //ModelElementObserverBase modelElementObserver = (ModelElementObserverBase)observer;
                 ModelElementObserverBase modelElementObserver = (ModelElementObserverBase)observer;
             }
             catch
