@@ -22,6 +22,12 @@ namespace DataCenterSimulation
             int numberServerpools = 10;
             int numberServerpoolsToChooseFrom = 10;
 
+            // The experiment part...
+
+            sim.MyExperiment.NumberOfReplications = 3;
+            sim.MyExperiment.LengthOfReplication = 20;
+            sim.MyExperiment.LengthOfWarmUp = 2;
+
             // The model part...
 
             DataCenter dataCenter = new DataCenter(sim.MyModel, "DataCenter");
@@ -37,24 +43,20 @@ namespace DataCenterSimulation
             JobGenerator jobGenerator = new JobGenerator(dataCenter, "JobGenerator", new ExponentialDistribution(lambda), dispatcher);
             dataCenter.SetJobGenerator(jobGenerator);
 
-            // The experiment part...
 
-            sim.MyExperiment.NumberOfReplications = 3;
-            sim.MyExperiment.LengthOfReplication = 20;
-            sim.MyExperiment.LengthOfWarmUp = 2;
 
             // The observer part...
 
             DispatcherObserver dispatcherObserver = new DispatcherObserver(sim);
-            dispatcherObserver.Subscribe(dispatcher);
+            dispatcher.Subscribe(dispatcherObserver);
 
             DataCenterObserver dataCenterObserver = new DataCenterObserver(sim);
-            dataCenterObserver.Subscribe(dataCenter);
+            dataCenter.Subscribe(dataCenterObserver);
 
             foreach (ServerPool serverpool in dataCenter.ServerPools)
             {
                 ServerPoolObserver serverpoolObserver = new ServerPoolObserver(sim);
-                serverpoolObserver.Subscribe(serverpool);
+                serverpool.Subscribe(serverpoolObserver);
             }
 
             // Run...
