@@ -40,7 +40,7 @@ namespace DataCenterSimulation
             // The experiment part...
 
             sim.MyExperiment.NumberOfReplications = 3;
-            sim.MyExperiment.LengthOfReplication = 3;
+            sim.MyExperiment.LengthOfReplication = 20;
             sim.MyExperiment.LengthOfWarmUp = 2;
 
             // The observer part...
@@ -49,7 +49,7 @@ namespace DataCenterSimulation
             dispatcherObserver.Subscribe(dispatcher);
 
             DataCenterObserver dataCenterObserver = new DataCenterObserver(sim);
-            dataCenterObserver.Subscribe(dataCenter.Dispatcher);
+            dataCenterObserver.Subscribe(dataCenter);
 
             foreach (ServerPool serverpool in dataCenter.ServerPools)
             {

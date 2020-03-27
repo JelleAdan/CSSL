@@ -15,7 +15,7 @@ namespace CSSL.Modeling
 
         public double Time { get; private set; }
 
-        public double WallClockTime => eventExecutionProcess.GetElapsedWallClockTimeSeconds;
+        public double WallClockTime => eventExecutionProcess.GetWallClockTime;
 
         private ICalendar calendar;
 

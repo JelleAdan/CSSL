@@ -24,8 +24,15 @@ namespace CSSL.Modeling
 
         public bool IsComputationalTimeExceeded => DateTime.Now.Subtract(beginWallClockTime).TotalMilliseconds > maxWallClockTime * 1000;
 
-        public double GetElapsedWallClockTimeSeconds => endWallClockTime != default(DateTime) ? endWallClockTime.Subtract(beginWallClockTime).TotalSeconds : DateTime.Now.Subtract(beginWallClockTime).TotalSeconds;
-        public TimeSpan GetElapsedWallClockTime => endWallClockTime != default(DateTime) ? endWallClockTime.Subtract(beginWallClockTime) : DateTime.Now.Subtract(beginWallClockTime);
+        /// <summary>
+        /// Get elapsed wall clock time in seconds.
+        /// </summary>
+        public double GetWallClockTime => endWallClockTime != default(DateTime) ? endWallClockTime.Subtract(beginWallClockTime).TotalSeconds : DateTime.Now.Subtract(beginWallClockTime).TotalSeconds;
+
+        /// <summary>
+        /// Get elapsed wall clock time as a time span.
+        /// </summary>
+        public TimeSpan GetWallClockTimeSpan => endWallClockTime != default(DateTime) ? endWallClockTime.Subtract(beginWallClockTime) : DateTime.Now.Subtract(beginWallClockTime);
 
         public string Name => GetType().Name;
 

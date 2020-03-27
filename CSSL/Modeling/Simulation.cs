@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace CSSL.Modeling
 {
-    public class Simulation : IDisposable, IName
+    public class Simulation : IDisposable, IName, IGetTime
     {
         public Simulation(string name, string outputDirectory)
         {
@@ -41,9 +41,14 @@ namespace CSSL.Modeling
 
         public string GetEndStateIndicator => replicationExecutionProcess.MyEndStateIndicator.ToString();
 
-        public TimeSpan GetElapsedWallClockTime => replicationExecutionProcess.GetElapsedWallClockTime;
+        public double GetTime => MyExecutive.Time;
 
-        public double GetElapsedSimulationClockTime => MyExecutive.Time;
+        public double GetPreviousEventTime => MyExecutive.PreviousEventTime;
+
+        public double GetWallClockTime => MyExecutive.WallClockTime;
+
+        public TimeSpan GetWallClockTimeSpan => replicationExecutionProcess.GetWallClockTimeSpan;
+
 
         public void Run()
         {

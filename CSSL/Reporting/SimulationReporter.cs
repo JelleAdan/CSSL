@@ -40,7 +40,7 @@ namespace CSSL.Reporting
             summary.Add("EXECUTION SUMMARY");
             summary.Add($"Number of replications: {experiment.GetCurrentReplicationNumber()}");
             summary.Add($"Stopped in state: {simulation.GetEndStateIndicator}");
-            TimeSpan time = simulation.GetElapsedWallClockTime;
+            TimeSpan time = simulation.GetWallClockTimeSpan;
             summary.Add($"Total computational time:{time.Days}d:{time.Hours}h:{time.Minutes}m:{time.Seconds}s:{time.Milliseconds}ms");
         }
 
