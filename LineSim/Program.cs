@@ -4,6 +4,7 @@ using CSSL.Calendar;
 using CSSL.Examples.AssemblyLine;
 using CSSL.Examples.AssemblyLine.Observers;
 using CSSL.Modeling;
+using CSSL.Modeling.CSSLQueue;
 using CSSL.Utilities.Distributions;
 using System;
 

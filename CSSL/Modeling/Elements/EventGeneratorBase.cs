@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CSSL.Modeling.Elements
 {
-    public abstract class EventGeneratorBase: SchedulingElementBase, IEventGenerator
+    public abstract class EventGeneratorBase : SchedulingElementBase, IEventGenerator
     {
         private Distribution interEventTimeDistribution;
 
@@ -37,7 +37,6 @@ namespace CSSL.Modeling.Elements
 
         protected override void DoBeforeReplication()
         {
-            // Schedule first event.
             ScheduleEvent(NextEventTime(), HandleGeneration);
         }
     }
