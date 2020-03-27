@@ -18,7 +18,7 @@ namespace CSSL.Calendar
             {
                 fes.Add(e);
             }
-            else // TO DO: Make this binary insertion to improve performance
+            else
             {
                 for (int i = 0; i <= fes.Count; i++)
                 {

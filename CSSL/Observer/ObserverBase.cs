@@ -70,7 +70,7 @@ namespace CSSL.Observer
         /// Subscribes the observer to an observable.
         /// </summary>
         /// <param name="observable">The model element to observe.</param>
-        public void Subscribe(IObservable<object> observable)
+        internal void Subscribe(IObservable<object> observable)
         {
             cancellations.Add((Unsubscriber)observable.Subscribe(this));
         }

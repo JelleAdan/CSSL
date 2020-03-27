@@ -7,8 +7,6 @@ namespace CSSL.Examples.WaferFab
 {
     public class Lot : CSSLQueueObject<Lot>
     {
-        private static int lotCount;
-
         public readonly LotType Type;
 
         public Sequence Sequence { get; }
@@ -42,7 +40,7 @@ namespace CSSL.Examples.WaferFab
             }
         }
 
-        public Lot(double creationTime, Sequence sequence) : base(creationTime, lotCount++)
+        public Lot(double creationTime, Sequence sequence) : base(creationTime)
         {
             CurrentStepCount = -1;
 

@@ -11,23 +11,28 @@ namespace CSSL.Modeling.CSSLQueue
     /// <summary>
     /// The CSSLQueueObject serves as a class for objects that need to be placed in a CSSLQueue. A CSSLQueueObject can be in one and only one CSSLQueue at the time. 
     /// </summary>
-    /// <typeparam name="T">Refers to its own type. E.g. when a class "job" extends CSSLQueueObject then T is "job".</typeparam>
-    public class CSSLQueueObject<T> : IIdentity, IComparable<T> where T : CSSLQueueObject<T>
+    /// <typeparam name="T">Refers to its own type, e.g. when a class "job" extends CSSLQueueObject then T is "job".</typeparam>
+    public abstract class CSSLQueueObject<T> : IIdentity, IComparable<T> where T : CSSLQueueObject<T>
     {
+        /// <summary>
+        /// Incremented to store the total number of created queue objects.
+        /// </summary>
+        private static int queueObjectCounter;
+
         /// <summary>
         /// The simulation time at which the CSSLQueueObject was created.
         /// </summary>
         public double CreationTime { get; }
 
+        public CSSLQueueObject()
+        {
+            Id = queueObjectCounter++;
+        }
+
         public CSSLQueueObject(double creationTime)
         {
             CreationTime = creationTime;
-        }
-
-        public CSSLQueueObject(double creationTime, int id)
-        {
-            CreationTime = creationTime;
-            Id = id;
+            Id = queueObjectCounter++;
         }
 
         /// <summary>

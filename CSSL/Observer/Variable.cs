@@ -47,7 +47,7 @@ namespace CSSL.Observer
             PreviousValue = Value;
             Value = value;
             PreviousTimeOfUpdate = TimeOfUpdate;
-            TimeOfUpdate = observer.MySimulation.GetElapsedSimulationClockTime;
+            TimeOfUpdate = observer.GetTime;
         }
 
         public void Reset()

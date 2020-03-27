@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace CSSL.Modeling.CSSLQueue
 {
     /// <summary>
-    /// If you derive a class from this one, it should contain emptying the queue logic in the DoBeforeReplication() method.
+    /// 
     /// </summary>
     /// <typeparam name="T">The class of the items which will be in the queue.</typeparam>
     public class CSSLQueue<T> : ModelElementBase where T : CSSLQueueObject<T>

@@ -11,19 +11,19 @@ namespace CSSL.Modeling.Elements
     {
         public int Id { get; }
 
-        public delegate void CSSLEventAction(CSSLEvent csslevent);
+        internal double Time { get; }
 
-        public double Time { get; }
+        public delegate void CSSLEventAction(CSSLEvent csslevent);
 
         private CSSLEventAction action { get; }
 
-        public CSSLEvent(double time, CSSLEventAction action)
+        internal CSSLEvent(double time, CSSLEventAction action)
         {
             Time = time;
             this.action = action;
         }
 
-        public void Execute()
+        internal void Execute()
         {
             action.Invoke(this);
         }

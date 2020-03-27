@@ -9,9 +9,7 @@ namespace CSSL.Examples.DataCenterSimulation
 {
     public class Job : CSSLQueueObject<Job>
     {
-        static int jobCount;
-
-        public Job(double creationTime) : base(creationTime, jobCount++)
+        public Job(double creationTime) : base(creationTime)
         {
         }
 
