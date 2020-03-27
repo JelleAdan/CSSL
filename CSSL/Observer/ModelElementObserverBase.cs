@@ -40,12 +40,12 @@ namespace CSSL.Observer
                     OnUpdate(modelElement);
                     break;
                 case ModelElementObserverState.REPLICATION_END:
-                    StrictlyOnReplicationEnd();
                     OnReplicationEnd(modelElement);
+                    StrictlyOnReplicationEnd();
                     break;
                 case ModelElementObserverState.EXPERIMENT_END:
-                    StrictlyOnExperimentEnd();
                     OnExperimentEnd(modelElement);
+                    StrictlyOnExperimentEnd();
                     break;
             }
         }

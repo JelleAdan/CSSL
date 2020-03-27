@@ -43,8 +43,6 @@ namespace DataCenterSimulation
             JobGenerator jobGenerator = new JobGenerator(dataCenter, "JobGenerator", new ExponentialDistribution(lambda), dispatcher);
             dataCenter.SetJobGenerator(jobGenerator);
 
-
-
             // The observer part...
 
             DispatcherObserver dispatcherObserver = new DispatcherObserver(sim);

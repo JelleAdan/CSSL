@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CSSL.Modeling
 {
-    public abstract class IterativeProcess<T> : IProcess
+    internal abstract class IterativeProcess<T> : IProcess
     {
         public enum EndStateIndicator
         {
