@@ -44,9 +44,9 @@ namespace CSSL.Examples.AssemblyLine
             }
         }
 
-        protected override void DoBeforeExperiment()
+        protected override void OnExperimentStart()
         {
-            base.DoBeforeExperiment();
+            base.OnExperimentStart();
 
             for (int i = 0; i < Length; i++)
             {
@@ -61,9 +61,9 @@ namespace CSSL.Examples.AssemblyLine
             }
         }
 
-        protected override void DoBeforeReplication()
+        protected override void OnReplicationStart()
         {
-            base.DoBeforeReplication();
+            base.OnReplicationStart();
 
             Machines[0].ActualSpeed = Machines[0].MaxSpeed;
 

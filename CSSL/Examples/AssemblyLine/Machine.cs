@@ -50,9 +50,9 @@ namespace CSSL.Examples.AssemblyLine
 
         public double EventTime { get; set; }
 
-        protected override void DoBeforeReplication()
+        protected override void OnReplicationStart()
         {
-            base.DoBeforeReplication();
+            base.OnReplicationStart();
 
             State = MachineState.Up;
             EventTime = upTimeDistribution.Next();

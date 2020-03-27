@@ -20,12 +20,40 @@ namespace CSSL.Observer
         /// </summary>
         private static int observerCounter;
 
+        protected void StrictlyOnExperimentStart()
+        {
+
+        }
+
+        protected void StrictlyOnReplicationStart()
+        {
+            Writer = new StreamWriter(Path.Combine(MySimulation.MyExperiment.ReplicationOutputDirectory, Name + ".txt"));
+        }
+
+        protected void StrictlyOnReplicationEnd()
+        {
+            Writer.Dispose();
+        }
+
+        protected void StrictlyOnExperimentEnd()
+        {
+
+        }
+
+        //protected abstract void OnExperimentStart();
+
+        //protected abstract void OnReplicationStart();
+
+        //protected abstract void OnReplicationEnd();
+
+        //protected abstract void OnExperimentEnd();
+
         public ObserverBase(Simulation mySimulation)
         {
             Id = observerCounter++;
             Name = GetType().Name + "_" + Id;
             MySimulation = mySimulation;
-            mySimulation.MyObservers.Add(this);
+            //mySimulation.MyObservers.Add(this);
             cancellations = new List<Unsubscriber>();
         }
 
@@ -109,6 +137,5 @@ namespace CSSL.Observer
         public void Dispose()
         {
         }
-
     }
 }

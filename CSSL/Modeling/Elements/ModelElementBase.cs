@@ -140,21 +140,21 @@ namespace CSSL.Modeling.Elements
 
         /// <summary>
         /// This method contains logic to be performed prior to an experiment. 
-        /// It is called once before the first replication. This method ensures that each contained model element has its StrictlyDoBeforeExperiment method called.
-        /// It also calls the DoBeforeExperiment method which contains optional logic. 
+        /// It is called once before the first replication. This method ensures that each contained model element has its StrictlyOnExperimentStart method called.
+        /// It also calls the OnExperimentStart method which contains optional logic. 
         /// </summary>
-        internal void StrictlyDoBeforeExperiment()
+        internal void StrictlyOnExperimentStart()
         {
-            ObserverState = ModelElementObserverState.BEFORE_EXPERIMENT;
+            ObserverState = ModelElementObserverState.EXPERIMENT_START;
             NotifyObservers(this);
 
-            DoBeforeExperiment();
+            OnExperimentStart();
 
             if (modelElements.Any())
             {
                 foreach (ModelElementBase modelElement in modelElements)
                 {
-                    modelElement.StrictlyDoBeforeExperiment();
+                    modelElement.StrictlyOnExperimentStart();
                 }
             }
         }
@@ -162,27 +162,27 @@ namespace CSSL.Modeling.Elements
         /// <summary>
         /// This method should be overridden by derived classes that need logic to be performed prior to an experiment. 
         /// </summary>
-        protected virtual void DoBeforeExperiment()
+        protected virtual void OnExperimentStart()
         {
         }
 
         /// <summary>
         /// This method contains logic to be performed after an experiment. 
-        /// It is called once after the first replication. This method ensures that each contained model element has its StrictlyDoAfterExperiment method called.
-        /// It also calls the DoBeforeExperiment method which contains optional logic. 
+        /// It is called once after the first replication. This method ensures that each contained model element has its StrictlyOnExperimentEnd method called.
+        /// It also calls the OnExperimentEnd method which contains optional logic. 
         /// </summary>
-        internal void StrictlyDoAfterExperiment()
+        internal void StrictlyOnExperimentEnd()
         {
-            ObserverState = ModelElementObserverState.AFTER_EXPERIMENT;
+            ObserverState = ModelElementObserverState.EXPERIMENT_END;
             NotifyObservers(this);
 
-            DoAfterExperiment();
+            OnExperimentEnd();
 
             if (modelElements.Any())
             {
                 foreach (ModelElementBase modelElement in modelElements)
                 {
-                    modelElement.StrictlyDoBeforeExperiment();
+                    modelElement.StrictlyOnExperimentEnd();
                 }
             }
         }
@@ -190,7 +190,7 @@ namespace CSSL.Modeling.Elements
         /// <summary>
         /// This method should be overridden by derived classes that need logic to be performed after an experiment. 
         /// </summary>
-        protected virtual void DoAfterExperiment()
+        protected virtual void OnExperimentEnd()
         {
         }
 
@@ -199,9 +199,9 @@ namespace CSSL.Modeling.Elements
         /// It is called once before every replication. This method ensures that each contained model element has its StrictlyDoBeforeReplication method called.
         /// It also calls the DoBeforeReplication method which contains optional logic.
         /// </summary>
-        internal void StrictlyDoBeforeReplication()
+        internal void StrictlyOnReplicationStart()
         {
-            ObserverState = ModelElementObserverState.BEFORE_REPLICATION;
+            ObserverState = ModelElementObserverState.REPLICATION_START;
             NotifyObservers(this);
 
             if (LengthOfWarmUp > 0)
@@ -217,13 +217,13 @@ namespace CSSL.Modeling.Elements
                 ObserverState = ModelElementObserverState.UPDATE;
             }
 
-            DoBeforeReplication();
+            OnReplicationStart();
 
             if (modelElements.Any())
             {
                 foreach (ModelElementBase modelElement in modelElements)
                 {
-                    modelElement.StrictlyDoBeforeReplication();
+                    modelElement.StrictlyOnReplicationStart();
                 }
             }
         }
@@ -231,7 +231,7 @@ namespace CSSL.Modeling.Elements
         /// <summary>
         /// This method should be overridden by derived classes that need additional logic to be performed prior to a replication. 
         /// </summary>
-        protected virtual void DoBeforeReplication()
+        protected virtual void OnReplicationStart()
         {
         }
 
@@ -240,18 +240,18 @@ namespace CSSL.Modeling.Elements
         /// It is called once after every replication. This method ensures that each contained model element has its StrictlyDoAfterReplication method called.
         /// It also calls the DoAfterReplication method which contains optional logic.
         /// </summary>
-        internal void StrictlyDoAfterReplication()
+        internal void StrictlyOnReplicatioEnd()
         {
-            ObserverState = ModelElementObserverState.AFTER_REPLICATION;
+            ObserverState = ModelElementObserverState.REPLICATION_END;
             NotifyObservers(this);
 
-            DoAfterReplication();
+            OnReplicationEnd();
 
             if (modelElements.Any())
             {
                 foreach (ModelElementBase modelElement in modelElements)
                 {
-                    modelElement.StrictlyDoAfterReplication();
+                    modelElement.StrictlyOnReplicatioEnd();
                 }
             }
         }
@@ -259,7 +259,7 @@ namespace CSSL.Modeling.Elements
         /// <summary>
         /// This method should be overridden by derived classes that need additional logic to be performed after a replication. 
         /// </summary>
-        protected virtual void DoAfterReplication()
+        protected virtual void OnReplicationEnd()
         {
         }
 

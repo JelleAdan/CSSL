@@ -20,7 +20,6 @@ namespace CSSL.Modeling
             MyExecutive = new Executive(this);
             MyModel = new Model(name + "_Model", this);
             MyExperiment = new Experiment(name + "_Experiment", outputDirectory);
-            MyObservers = new Observers();
             replicationExecutionProcess = new ReplicationExecutionProcess(this);
             OutputDirectory = outputDirectory;
         }
@@ -30,8 +29,6 @@ namespace CSSL.Modeling
         public Model MyModel { get; }
 
         public Experiment MyExperiment { get; }
-
-        internal Observers MyObservers { get; }
 
         private ReplicationExecutionProcess replicationExecutionProcess { get; }
 
@@ -69,7 +66,6 @@ namespace CSSL.Modeling
 
         public void Dispose()
         {
-            MyObservers.Dispose();
         }
 
         public SimulationReporter MakeSimulationReporter()
@@ -96,7 +92,7 @@ namespace CSSL.Modeling
             base.DoInitialize();
             simulation.MyExperiment.ResetCurrentReplicationNumber();
             simulation.MyExperiment.CreateExperimentOutputDirectory();
-            simulation.MyModel.StrictlyDoBeforeExperiment();
+            simulation.MyModel.StrictlyOnExperimentStart();
         }
 
         protected sealed override int NextIteration()
@@ -108,11 +104,9 @@ namespace CSSL.Modeling
         {
             NextIteration();
             simulation.MyExecutive.TryInitialize();
-            simulation.MyObservers.StrictlyDoBeforeReplication();
-            simulation.MyModel.StrictlyDoBeforeReplication();
+            simulation.MyModel.StrictlyOnReplicationStart();
             simulation.MyExecutive.TryRunAll();
-            simulation.MyModel.StrictlyDoAfterReplication();
-            simulation.MyObservers.StrictlyDoAfterReplication();
+            simulation.MyModel.StrictlyOnReplicatioEnd();
         }
     }
 }

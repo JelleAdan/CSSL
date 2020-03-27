@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CSSL.Utilities.Statistics
 {
-    class Statistic : StatisticBase
+    public class Statistic : StatisticBase
     {
         public Statistic(string name) : base(name)
         {

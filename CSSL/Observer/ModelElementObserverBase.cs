@@ -16,16 +16,18 @@ namespace CSSL.Observer
         {
         }
 
-        public override void OnNext(object info)
+        public sealed override void OnNext(object info)
         {
             ModelElementBase modelElement = (ModelElementBase)info;
 
             switch (modelElement.ObserverState)
             {
-                case ModelElementObserverState.BEFORE_EXPERIMENT:
+                case ModelElementObserverState.EXPERIMENT_START:
+                    StrictlyOnExperimentStart();
                     OnExperimentStart(modelElement);
                     break;
-                case ModelElementObserverState.BEFORE_REPLICATION:
+                case ModelElementObserverState.REPLICATION_START:
+                    StrictlyOnReplicationStart();
                     OnReplicationStart(modelElement);
                     break;
                 case ModelElementObserverState.WARMUP:
@@ -37,10 +39,12 @@ namespace CSSL.Observer
                 case ModelElementObserverState.UPDATE:
                     OnUpdate(modelElement);
                     break;
-                case ModelElementObserverState.AFTER_REPLICATION:
+                case ModelElementObserverState.REPLICATION_END:
+                    StrictlyOnReplicationEnd();
                     OnReplicationEnd(modelElement);
                     break;
-                case ModelElementObserverState.AFTER_EXPERIMENT:
+                case ModelElementObserverState.EXPERIMENT_END:
+                    StrictlyOnExperimentEnd();
                     OnExperimentEnd(modelElement);
                     break;
             }

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CSSL.Utilities.Statistics
 {
-    class WeightedStatistic : StatisticBase
+    public class WeightedStatistic : StatisticBase
     {
         public WeightedStatistic(string name) : base(name)
         {

@@ -42,9 +42,9 @@ namespace CSSL.Examples.AssemblyLine
 
         public double EventTime { get; set; }
 
-        protected override void DoBeforeReplication()
+        protected override void OnReplicationStart()
         {
-            base.DoBeforeReplication();
+            base.OnReplicationStart();
 
             if (NetSpeed > 0)
             {

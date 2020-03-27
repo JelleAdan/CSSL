@@ -17,7 +17,7 @@ namespace CSSL.Modeling.Elements
 
         protected override Model MyModel => this;
 
-        protected override void DoBeforeExperiment()
+        protected override void OnExperimentStart()
         {
             if (!HasChildren)
             {

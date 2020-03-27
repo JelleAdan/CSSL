@@ -64,7 +64,7 @@ namespace CSSL.Modeling.CSSLQueue
             return item;
         }
 
-        protected override void DoBeforeReplication()
+        protected override void OnReplicationStart()
         {
             items.Clear();
         }

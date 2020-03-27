@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CSSL.Utilities.Statistics
 {
-    internal abstract class StatisticBase : CollectorBase, IStatistic
+    public abstract class StatisticBase : CollectorBase, IStatistic
     {
         public StatisticBase(string name) : base(name)
         {

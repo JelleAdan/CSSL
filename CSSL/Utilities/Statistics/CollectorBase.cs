@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CSSL.Utilities.Statistics
 {
-    internal abstract class CollectorBase : IIdentity, IName, ICollector
+    public abstract class CollectorBase : IIdentity, IName, ICollector
     {
         /// <summary>
         /// Incremented to store the total number of created collectors.

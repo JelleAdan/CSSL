@@ -6,12 +6,12 @@ namespace CSSL.Observer
 {
     public enum ModelElementObserverState
     {
-        BEFORE_EXPERIMENT,
-        BEFORE_REPLICATION,
+        EXPERIMENT_START,
+        REPLICATION_START,
         WARMUP,
         INITIALIZED,
         UPDATE,
-        AFTER_REPLICATION,
-        AFTER_EXPERIMENT
+        REPLICATION_END,
+        EXPERIMENT_END
     }
 }

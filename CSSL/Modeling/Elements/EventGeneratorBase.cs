@@ -35,7 +35,7 @@ namespace CSSL.Modeling.Elements
 
         protected abstract void HandleGeneration(CSSLEvent e);
 
-        protected override void DoBeforeReplication()
+        protected override void OnReplicationStart()
         {
             ScheduleEvent(NextEventTime(), HandleGeneration);
         }
