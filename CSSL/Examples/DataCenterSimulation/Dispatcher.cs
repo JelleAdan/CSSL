@@ -78,16 +78,18 @@ namespace CSSL.Examples.DataCenterSimulation
 
             job.ServiceTime = serviceTimeDistribution.Next();
 
-            if (job.ServiceTime > serviceTimeThreshold)
-            {
-                Job job2 = SplitJobs(job);
-                SendToServerPool(job);
-                SendToServerPool(job2);
-            }
-            else
-            {
-                SendToServerPool(job);
-            }
+            //if (job.ServiceTime > serviceTimeThreshold)
+            //{
+            //    Job job2 = SplitJobs(job);
+            //    SendToServerPool(job);
+            //    SendToServerPool(job2);
+            //}
+            //else
+            //{
+            //    SendToServerPool(job);
+            //}
+
+            SendToServerPool(job);
 
             // Schedule next dispatch event, if queue is nonempty
             if (QueueLength > 0)
@@ -98,7 +100,9 @@ namespace CSSL.Examples.DataCenterSimulation
 
         private void SendToServerPool(Job job)
         {
-            ServerPool serverPool = ChooseServerpool();
+            //ServerPool serverPool = ChooseServerpool();
+
+            ServerPool serverPool = serverPools.First(); 
 
             double departureTime = GetTime + job.ServiceTime;
 
@@ -107,40 +111,41 @@ namespace CSSL.Examples.DataCenterSimulation
             serverPool.HandleArrival(job);
         }
 
-        private Job SplitJobs(Job job)
-        {
-            double serviceTime1 = job.ServiceTime * rnd.NextDouble();
-            double serviceTime2 = job.ServiceTime - serviceTime1;
+        //private Job SplitJobs(Job job)
+        //{
+        //    double serviceTime1 = job.ServiceTime * rnd.NextDouble();
+        //    double serviceTime2 = job.ServiceTime - serviceTime1;
 
-            Job job2 = new Job(job.CreationTime);
+        //    Job job2 = new Job(job.CreationTime);
 
-            job.ServiceTime = serviceTime1;
-            job2.ServiceTime = serviceTime2;
+        //    job.ServiceTime = serviceTime1;
+        //    job2.ServiceTime = serviceTime2;
 
-            job.DepartureTime = GetTime + serviceTime1;
-            job2.DepartureTime = GetTime + serviceTime2;
+        //    job.DepartureTime = GetTime + serviceTime1;
+        //    job2.DepartureTime = GetTime + serviceTime2;
 
-            return job2;
-        }
+        //    return job2;
+        //}
 
-        private ServerPool ChooseServerpool()
-        {
-            List<ServerPool> selection = new List<ServerPool>();
+        //private ServerPool ChooseServerpool()
+        //{
+        //    List<ServerPool> selection = new List<ServerPool>();
 
-            double p = (double)nrServerPoolsToChooseFrom / serverPools.Count;
+        //    double p = (double)nrServerPoolsToChooseFrom / serverPools.Count;
 
-            for (int i = 0; i < serverPools.Count; i++)
-            {
-                if (rnd.NextDouble() < p)
-                {
-                    selection.Add(serverPools[i]);
-                    if(selection.Count == nrServerPoolsToChooseFrom) { break; }
-                }
+        //    for (int i = 0; i < serverPools.Count; i++)
+        //    {
+        //        if (rnd.NextDouble() < p)
+        //        {
+        //            selection.Add(serverPools[i]);
+        //            if(selection.Count == nrServerPoolsToChooseFrom) { break; }
+        //        }
 
-                p = ((double)nrServerPoolsToChooseFrom - selection.Count) / (serverPools.Count - i - 1);
-            }
+        //        p = ((double)nrServerPoolsToChooseFrom - selection.Count) / (serverPools.Count - i - 1);
+        //    }
 
-            return selection.OrderBy(x => x.JobCount).First();
-        }
+        //    return selection.OrderBy(x => x.JobCount).First();
+        //}
+
     }
 }

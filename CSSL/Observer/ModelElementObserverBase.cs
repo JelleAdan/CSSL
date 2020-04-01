@@ -16,6 +16,10 @@ namespace CSSL.Observer
         {
         }
 
+        public ModelElementObserverBase(Simulation mySimulation, string name) : base(mySimulation, name)
+        {
+        }
+
         public sealed override void OnNext(object info)
         {
             ModelElementBase modelElement = (ModelElementBase)info;

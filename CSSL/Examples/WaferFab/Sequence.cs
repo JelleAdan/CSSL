@@ -6,6 +6,18 @@ namespace CSSL.Examples.WaferFab
 {
     public class Sequence
     {
+        public Sequence(LotType type, List<LotStep> lotSteps)
+        {
+            Type = type;
+            this.lotSteps = lotSteps;
+        }
+
+        public Sequence(LotType type)
+        {
+            Type = type;
+            lotSteps = new List<LotStep>();
+        }
+
         private List<LotStep> lotSteps { get; set; }
 
         public LotType Type { get; }
@@ -54,10 +66,6 @@ namespace CSSL.Examples.WaferFab
             lotSteps.Add(lotstep);
         }
 
-        public Sequence(LotType type)
-        {
-            Type = type;
-            lotSteps = new List<LotStep>();
-        }
+
     }
 }

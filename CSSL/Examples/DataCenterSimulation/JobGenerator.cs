@@ -28,7 +28,6 @@ namespace CSSL.Examples.DataCenterSimulation
 
             // Send to dispatcher.
             dispatcher.HandleArrival(job);
-
         }
     }
 }

@@ -40,20 +40,19 @@ namespace CSSL.Observer
 
         }
 
-        //protected abstract void OnExperimentStart();
-
-        //protected abstract void OnReplicationStart();
-
-        //protected abstract void OnReplicationEnd();
-
-        //protected abstract void OnExperimentEnd();
-
         public ObserverBase(Simulation mySimulation)
         {
             Id = observerCounter++;
             Name = GetType().Name + "_" + Id;
             MySimulation = mySimulation;
-            //mySimulation.MyObservers.Add(this);
+            cancellations = new List<Unsubscriber>();
+        }
+
+        public ObserverBase(Simulation mySimulation, string name)
+        {
+            Id = observerCounter++;
+            Name = name + "_" + Id;
+            MySimulation = mySimulation;
             cancellations = new List<Unsubscriber>();
         }
 
