@@ -129,7 +129,7 @@ namespace CSSL.Modeling
 
         protected void DoRunAll()
         {
-            SetState(runningState);
+            //SetState(runningState);
 
             if (HasNext)
             {
