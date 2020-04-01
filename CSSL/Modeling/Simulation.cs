@@ -74,7 +74,7 @@ namespace CSSL.Modeling
         }
     }
 
-    public class ReplicationExecutionProcess : IterativeProcess<int>
+    internal class ReplicationExecutionProcess : IterativeProcess<int>
     {
         private Simulation simulation;
 

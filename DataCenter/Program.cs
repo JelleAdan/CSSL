@@ -26,6 +26,7 @@ namespace DataCenterSimulation
 
             sim.MyExperiment.NumberOfReplications = 3;
             sim.MyExperiment.LengthOfReplication = 20;
+            sim.MyExperiment.LengthOfExperimentWallClock = 10;
             sim.MyExperiment.LengthOfWarmUp = 2;
 
             // The model part...
@@ -42,8 +43,6 @@ namespace DataCenterSimulation
 
             JobGenerator jobGenerator = new JobGenerator(dataCenter, "JobGenerator", new ExponentialDistribution(lambda), dispatcher);
             dataCenter.SetJobGenerator(jobGenerator);
-
-
 
             // The observer part...
 

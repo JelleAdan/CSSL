@@ -10,8 +10,11 @@ namespace CSSL.Examples.WaferFab.Observers
 {
     public class SeperateQueuesObserver : ModelElementObserverBase
     {
-        public SeperateQueuesObserver(Simulation mySimulation, WorkCenter workCenter) : base(mySimulation)
+        public SeperateQueuesObserver(Simulation mySimulation, WorkCenter workCenter, string name) : base(mySimulation, name)
         {
+            queueLengths = new Dictionary<LotStep, Variable<int>>();
+            queueLengthsStatistic = new Dictionary<LotStep, WeightedStatistic>();
+
             foreach (LotStep step in workCenter.LotSteps)
             {
                 queueLengths.Add(step, new Variable<int>(this));
@@ -29,7 +32,7 @@ namespace CSSL.Examples.WaferFab.Observers
 
             foreach (LotStep step in workCenter.LotSteps)
             {
-                Writer.Write(queueLengths[step] + "\t");
+                Writer.Write(queueLengths[step].Value + "\t");
             }
             Writer.Write("\n");
         }
@@ -40,7 +43,7 @@ namespace CSSL.Examples.WaferFab.Observers
 
             foreach (LotStep step in workCenter.LotSteps)
             {
-                Console.Write(queueLengths[step] + "\t");
+                Console.Write(queueLengths[step].Value + "\t");
             }
             Console.Write("\n");
         }
@@ -54,6 +57,7 @@ namespace CSSL.Examples.WaferFab.Observers
             queueLengthsStatistic[step].Collect(queueLengths[step].PreviousValue, queueLengths[step].Weight);
 
             writeToFile(workCenter);
+            //writeToConsole(workCenter);
         }
 
         protected override void OnWarmUp(ModelElementBase modelElement)
@@ -62,21 +66,21 @@ namespace CSSL.Examples.WaferFab.Observers
 
         protected override void OnInitialized(ModelElementBase modelElement)
         {
-            Writer.Write("Simulation Time\tComputational Time\t");
-            Console.Write("Simulation Time\tComputational Time\t");
+            //Writer.Write("Simulation Time\tComputational Time\t");
+            //Console.Write("Simulation Time\tComputational Time\t");
 
-            WorkCenter workCenter = (WorkCenter)modelElement;
+            //WorkCenter workCenter = (WorkCenter)modelElement;
 
-            foreach (LotStep step in workCenter.LotSteps)
-            {
-                queueLengths[step].UpdateValue(workCenter.Queues[step].Length);
+            //foreach (LotStep step in workCenter.LotSteps)
+            //{
+            //    queueLengths[step].UpdateValue(workCenter.Queues[step].Length);
 
-                Writer.Write(step.Name + "\t");
-                Console.Write(step.Name + "\t");
-            }
+            //    Writer.Write(step.Name + "\t");
+            //    Console.Write(step.Name + "\t");
+            //}
 
-            Writer.Write("\n");
-            Console.Write("\n");
+            //Writer.Write("\n");
+            //Console.Write("\n");
         }
 
         protected override void OnReplicationStart(ModelElementBase modelElement)

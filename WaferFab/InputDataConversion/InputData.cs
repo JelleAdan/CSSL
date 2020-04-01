@@ -15,6 +15,7 @@ namespace WaferFabSim.InputDataConversion
             LotStarts = new Dictionary<LotType, int>();
             WorkCentersData = new Dictionary<string, int>();
             lotStepsData = new List<Tuple<int, string, string>>();
+            LotSteps = new Dictionary<string, LotStep>();
             SequencesData = new Dictionary<LotType, List<LotStep>>();
             LotStepsPerWorkStation = new Dictionary<string, List<LotStep>>();
 
@@ -95,7 +96,7 @@ namespace WaferFabSim.InputDataConversion
                 {
                     string[] values = reader.ReadLine().Split(',');
 
-                    if (row != 1)
+                    if (row != 1 && values[0] != "")
                     {
                         lotStepsData.Add(new Tuple<int, string, string>(Convert.ToInt32(values[0]), values[1], values[2]));
 
@@ -115,8 +116,6 @@ namespace WaferFabSim.InputDataConversion
         {
             using (var reader = new StreamReader(Path.Combine(directory, "Sequences.csv")))
             {
-                int row = 1;
-
                 var header = reader.ReadLine().Split(',');
 
                 LotType[] lotTypes = header.Select(x => (LotType)Enum.Parse(typeof(LotType), x)).ToArray();

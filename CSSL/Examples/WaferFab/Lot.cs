@@ -11,7 +11,7 @@ namespace CSSL.Examples.WaferFab
 
         public Sequence Sequence { get; }
 
-        public int CurrentStepCount { get; set; }
+        public int CurrentStepCount { get; private set; }
 
         public double EndTime { get; private set; }
 

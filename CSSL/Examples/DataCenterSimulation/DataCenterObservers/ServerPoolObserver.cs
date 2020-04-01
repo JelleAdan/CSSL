@@ -47,7 +47,8 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
             ServerPool serverPool = (ServerPool)modelElement;
 
             nrOfJobs.UpdateValue(serverPool.JobCount);
-            nrOfJobsStatistic.Collect(nrOfJobs.Value, nrOfJobs.Weight);
+
+            
 
             Writer.WriteLine($"{serverPool.GetTime}',{nrOfJobsStatistic.Average()},{nrOfJobsStatistic.StandardDeviation()}");
         }
@@ -58,6 +59,7 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
 
         protected override void OnExperimentEnd(ModelElementBase modelElement)
         {
+
         }
 
         public override void OnError(Exception error)

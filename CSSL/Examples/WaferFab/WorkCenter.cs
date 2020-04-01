@@ -16,11 +16,14 @@ namespace CSSL.Examples.WaferFab
             LotSteps = lotSteps;
             ServiceTimeDistribution = serviceTimeDistribution;
             LotStepInService = null;
+            Queues = new Dictionary<LotStep, CSSLQueue<Lot>>();
 
-            foreach(LotStep lotStep in lotSteps)
+            foreach (LotStep lotStep in lotSteps)
             {
                 Queues.Add(lotStep, new CSSLQueue<Lot>(this, name + "_" + lotStep.Name + "_Queue"));
             }
+
+            SetWorkStationInLotSteps();
         }
 
         public Distribution ServiceTimeDistribution { get; }
@@ -42,11 +45,11 @@ namespace CSSL.Examples.WaferFab
             this.dispatcher = dispatcher;
         }
 
-        public void ConnectLotSteps()
+        public void SetWorkStationInLotSteps()
         {
-            foreach(LotStep lot in LotSteps)
+            foreach (LotStep step in LotSteps)
             {
-                lot.SetWorkCenter(this);
+                step.SetWorkCenter(this);
             }
         }
 
@@ -63,9 +66,11 @@ namespace CSSL.Examples.WaferFab
 
         public void HandleDeparture(CSSLEvent e)
         {
+
             if (LotStepInService == null)
             {
-                throw new Exception($"Tried to send lot from {Name}, but there is no type (LotType) in service.");
+                Console.WriteLine(GetTime);
+                throw new Exception($"Tried to send lot from {Name}, but there is no lot in service.");
             }
             else
             {
@@ -75,6 +80,7 @@ namespace CSSL.Examples.WaferFab
 
                 dispatcher.HandleDeparture();
             }
+
         }
     }
 }
