@@ -48,14 +48,6 @@ namespace CSSL.Observer
             cancellations = new List<Unsubscriber>();
         }
 
-        public ObserverBase(Simulation mySimulation, string name)
-        {
-            Id = observerCounter++;
-            Name = name + "_" + Id;
-            MySimulation = mySimulation;
-            cancellations = new List<Unsubscriber>();
-        }
-
         public int Id { get; }
 
         public string Name { get; }
@@ -67,27 +59,6 @@ namespace CSSL.Observer
         public double GetWallClockTime => MySimulation.MyExecutive.WallClockTime;
 
         protected readonly Simulation MySimulation;
-
-        internal void StrictlyDoBeforeReplication()
-        {
-            Writer = new StreamWriter(Path.Combine(MySimulation.MyExperiment.ReplicationOutputDirectory, Name + ".txt"));
-
-            DoBeforeReplication();
-        }
-
-        protected virtual void DoBeforeReplication()
-        {
-        }
-
-        internal void StrictlyDoAfterReplication()
-        {
-            DoAfterReplication();
-            Writer.Dispose();
-        }
-
-        protected virtual void DoAfterReplication()
-        {
-        }
 
         protected StreamWriter Writer { get; private set; }
 
