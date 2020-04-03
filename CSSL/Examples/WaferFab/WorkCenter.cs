@@ -33,6 +33,11 @@ namespace CSSL.Examples.WaferFab
         public List<LotStep> LotSteps { get; set; }
 
         public Lot LastArrivedLot { get; set; }
+        
+        /// <summary>
+        /// Flag for observers to indicate whether NotifyObservers is triggered by arrival or departure event. True = arrival, false = departure.
+        /// </summary>
+        public bool IsArrivalFlag { get; set; }
 
         public LotStep LotStepInService { get; set; }
 
@@ -57,6 +62,8 @@ namespace CSSL.Examples.WaferFab
         {
             LastArrivedLot = lot;
 
+            IsArrivalFlag = true;
+
             NotifyObservers(this);
 
             TotalQueueLength++;
@@ -74,6 +81,8 @@ namespace CSSL.Examples.WaferFab
             }
             else
             {
+                IsArrivalFlag = false;
+
                 NotifyObservers(this);
 
                 TotalQueueLength--;

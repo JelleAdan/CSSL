@@ -7,7 +7,7 @@ namespace CSSL.Examples.WaferFab
 {
     public class Lot : CSSLQueueObject<Lot>
     {
-        public readonly LotType Type;
+        public readonly LotType LotType;
 
         public Sequence Sequence { get; }
 
@@ -44,7 +44,7 @@ namespace CSSL.Examples.WaferFab
         {
             CurrentStepCount = -1;
 
-            Type = sequence.Type;
+            LotType = sequence.Type;
 
             Sequence = sequence;
         } 

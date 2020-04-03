@@ -64,6 +64,25 @@ namespace CSSL.Modeling.CSSLQueue
             return item;
         }
 
+        /// <summary>
+        /// Retrieves first item from the queue, but does not remove it from the queue.
+        /// </summary>
+        /// <returns></returns>
+        public T PeekFirst()
+        {
+            return items.First();
+        }
+
+        /// <summary>
+        /// Retrieves item from the queue at specified position, but does not remove it from the queue.
+        /// </summary>
+        /// <param name="index">Position o the item in the queue.</param>
+        /// <returns></returns>
+        public T PeekAt(int index)
+        {
+            return items[index];
+        }
+
         protected override void OnReplicationStart()
         {
             items.Clear();

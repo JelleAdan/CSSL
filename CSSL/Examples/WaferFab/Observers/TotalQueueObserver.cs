@@ -26,7 +26,7 @@ namespace CSSL.Examples.WaferFab.Observers
             queueLength.UpdateValue(workCenter.TotalQueueLength);
             queueLengthStatistic.Collect(queueLength.PreviousValue, queueLength.Weight);
 
-            //Writer.WriteLine(workCenter.GetTime + "\t" + workCenter.GetWallClockTime + "\t" + queueLength.Value);
+            Writer.WriteLine(workCenter.GetTime + "\t" + workCenter.GetWallClockTime + "\t" + queueLength.Value);
         }
 
         protected override void OnWarmUp(ModelElementBase modelElement)
@@ -35,7 +35,7 @@ namespace CSSL.Examples.WaferFab.Observers
 
         protected override void OnInitialized(ModelElementBase modelElement)
         {
-            //Writer.WriteLine("Simulation Time\tComputational Time\tQueue Length");
+            Writer.WriteLine("Simulation Time\tComputational Time\tQueue Length");
 
             WorkCenter workCenter = (WorkCenter)modelElement;
             queueLength.UpdateValue(workCenter.TotalQueueLength);
