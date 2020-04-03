@@ -26,7 +26,7 @@ namespace CSSL.Modeling
 
         private EventExecutionProcess eventExecutionProcess;
 
-        internal Executive(Simulation simulation) 
+        internal Executive(Simulation simulation)
         {
             MySimulation = simulation;
             calendar = new SimpleCalendar();
@@ -47,6 +47,10 @@ namespace CSSL.Modeling
 
         internal void Execute(CSSLEvent e)
         {
+            if (e.Time < Time)
+            {
+                throw new Exception("Attempted to execute an event in the past.");
+            }
             PreviousEventTime = Time;
             Time = e.Time;
             e.Execute();
@@ -63,6 +67,12 @@ namespace CSSL.Modeling
             calendar.Add(e);
         }
 
+        internal void ScheduleEndEvent(double time)
+        {
+            CSSLEvent e = new CSSLEvent(time, HandleEndEvent);
+            calendar.Add(e);
+        }
+
         private class EventExecutionProcess : IterativeProcess<CSSLEvent>
         {
             private Executive executive;
@@ -72,21 +82,14 @@ namespace CSSL.Modeling
                 this.executive = executive;
             }
 
-            protected override double maxWallClockTime
-            {
-                get
-                {
-                    double maxCompTimePerReplication = executive.MySimulation.MyExperiment.LengthOfReplicationWallClock;
-
-                    return maxCompTimePerReplication == double.PositiveInfinity ? executive.MySimulation.MyExperiment.LengthOfExperimentWallClock : maxCompTimePerReplication;
-                }
-            }
+            protected override double maxWallClockTime => executive.MySimulation.MyExperiment.LengthOfReplicationWallClock;
 
             protected override bool HasNext => executive.calendar.HasNext();
 
             protected sealed override void DoInitialize()
             {
                 base.DoInitialize();
+
                 executive.calendar.CancelAll();
                 executive.PreviousEventTime = 0;
                 executive.Time = 0;

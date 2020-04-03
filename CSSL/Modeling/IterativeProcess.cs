@@ -16,13 +16,13 @@ namespace CSSL.Modeling
             COMPUTATIONAL_TIME_EXCEEDED
         }
 
-        protected virtual double maxWallClockTime => throw new NotImplementedException();
+        protected virtual double maxWallClockTime => double.PositiveInfinity;
 
         private DateTime beginWallClockTime;
 
         private DateTime endWallClockTime;
 
-        public bool IsComputationalTimeExceeded => DateTime.Now.Subtract(beginWallClockTime).TotalMilliseconds > maxWallClockTime * 1000;
+        public bool IsComputationalTimeExceeded => DateTime.Now.Subtract(beginWallClockTime).TotalSeconds > maxWallClockTime; 
 
         /// <summary>
         /// Get elapsed wall clock time in seconds.
@@ -59,6 +59,7 @@ namespace CSSL.Modeling
         internal protected bool StopFlag { get; protected set; }
 
         internal protected bool IsDoneFlag { get; protected set; }
+        internal protected bool IsReplicationLimit { get; protected set; }
 
         private void SetState(ProcessState processState)
         {
@@ -129,7 +130,7 @@ namespace CSSL.Modeling
 
         protected void DoRunAll()
         {
-            //SetState(runningState);
+            //SetState(runningState); // TODO
 
             if (HasNext)
             {

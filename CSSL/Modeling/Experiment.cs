@@ -123,14 +123,8 @@ namespace CSSL.Modeling
             }
         }
 
-        /// <summary>
-        /// The current number of finished replications for this experiment.
-        /// </summary>
         private int currentReplicationNumber;
 
-        /// <summary>
-        /// Resets the current replication number to zero. 
-        /// </summary>
         internal void ResetCurrentReplicationNumber()
         {
             currentReplicationNumber = 0;
@@ -138,17 +132,14 @@ namespace CSSL.Modeling
 
         internal bool HasMoreReplications => currentReplicationNumber < numberOfReplications;
 
-        /// <summary>
-        /// Increments the current replication number by one.
-        /// </summary>
         internal int IncrementCurrentReplicationNumber()
         {
-            Console.WriteLine($"Replication number: {currentReplicationNumber}");
+            Console.WriteLine($"Replication number: {currentReplicationNumber}"); // TODO
 
             return currentReplicationNumber++;
         }
 
-        public int GetCurrentReplicationNumber()
+        internal int GetCurrentReplicationNumber()
         {
             return currentReplicationNumber;
         }
