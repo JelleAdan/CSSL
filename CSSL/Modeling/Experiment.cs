@@ -26,7 +26,7 @@ namespace CSSL.Modeling
             NumberOfReplications = numberOfReplications;
             LengthOfWarmUp = lengthOfWarmUp;
             LengthOfReplicationWallClock = lengthOfReplicationWallClock;
-            LengthOfReplication = LengthOfReplication;
+            LengthOfReplication = lengthOfReplication;
         }
 
         public string Name { get; }

@@ -29,7 +29,7 @@ namespace WaferFabSim
 
             // Experiment settings
             sim.MyExperiment.NumberOfReplications = 3;
-            sim.MyExperiment.LengthOfReplication = 60*60*60;
+            sim.MyExperiment.LengthOfReplication = 1 * 24 * 60 * 60; // 1 = number of days
             sim.MyExperiment.LengthOfWarmUp = 2;
 
             // Build the model
@@ -80,5 +80,10 @@ namespace WaferFabSim
             reporter.PrintSummaryToConsole();
 
         }
+    }
+
+    internal interface Test
+    {
+
     }
 }

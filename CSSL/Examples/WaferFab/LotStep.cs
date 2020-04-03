@@ -25,5 +25,9 @@ namespace CSSL.Examples.WaferFab
             Id = lotStepCount++;
             Name = name;
         }
+
+        public LotStep()
+        {
+        }
     }
 }

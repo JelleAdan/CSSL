@@ -51,36 +51,74 @@ namespace CSSL.Examples.WaferFab.Observers
         protected override void OnUpdate(ModelElementBase modelElement)
         {
             WorkCenter workCenter = (WorkCenter)modelElement;
-            LotStep step = workCenter.LastArrivedLot.GetCurrentStep;
 
-            queueLengths[step].UpdateValue(workCenter.Queues[step].Length);
-            queueLengthsStatistic[step].Collect(queueLengths[step].PreviousValue, queueLengths[step].Weight);
+            try
+            {
+                LotStep step = new LotStep();
 
-            writeToFile(workCenter);
-            //writeToConsole(workCenter);
+                // Check whether this OnUpdate is triggered by Arrival or Departure event
+                if (workCenter.IsArrivalFlag)
+                {
+                    step = workCenter.LastArrivedLot.GetCurrentStep;
+                    //Console.WriteLine($"{GetTime} {this.Name} triggered by arrival of {step.Name} of lot {workCenter.LastArrivedLot.Id}.");
+                }
+
+                else
+                {
+                    step = workCenter.LotStepInService;
+                    //Console.WriteLine($"{GetTime} {this.Name} triggered by departure of {step.Name} of lot {workCenter.Queues[step].PeekFirst().Id}");
+                }
+
+                queueLengths[step].UpdateValue(workCenter.Queues[step].Length);
+                queueLengthsStatistic[step].Collect(queueLengths[step].PreviousValue, queueLengths[step].Weight);
+
+                writeToFile(workCenter);
+                //writeToConsole(workCenter);
+            }
+            catch
+            {
+                Lot lot = workCenter.LastArrivedLot;
+
+                throw new Exception($"{workCenter.Name} has lot {lot.LotType.ToString()} in {lot.GetCurrentStep.Name}, should be in {lot.GetCurrentWorkCenter.Name}");
+            }
         }
 
         protected override void OnWarmUp(ModelElementBase modelElement)
         {
         }
 
+        private void headerToFile(WorkCenter workCenter)
+        {
+            Writer.Write("Simulation Time\tComputational Time\t");
+
+            foreach (LotStep step in workCenter.LotSteps)
+            {
+                queueLengths[step].UpdateValue(workCenter.Queues[step].Length);
+
+                Writer.Write(step.Name + "\t");
+            }
+            Writer.Write("\n");
+        }
+
+        private void headerToConsole(WorkCenter workCenter)
+        {
+            Console.Write("Simulation Time\tComputational Time\t");
+
+            foreach (LotStep step in workCenter.LotSteps)
+            {
+                queueLengths[step].UpdateValue(workCenter.Queues[step].Length);
+
+                Console.Write(step.Name + "\t");
+            }
+            Console.Write("\n");
+        }
+
         protected override void OnInitialized(ModelElementBase modelElement)
         {
-            //Writer.Write("Simulation Time\tComputational Time\t");
-            //Console.Write("Simulation Time\tComputational Time\t");
+            WorkCenter workCenter = (WorkCenter)modelElement;
 
-            //WorkCenter workCenter = (WorkCenter)modelElement;
-
-            //foreach (LotStep step in workCenter.LotSteps)
-            //{
-            //    queueLengths[step].UpdateValue(workCenter.Queues[step].Length);
-
-            //    Writer.Write(step.Name + "\t");
-            //    Console.Write(step.Name + "\t");
-            //}
-
-            //Writer.Write("\n");
-            //Console.Write("\n");
+            //headerToConsole(workCenter);
+            headerToFile(workCenter);
         }
 
         protected override void OnReplicationStart(ModelElementBase modelElement)

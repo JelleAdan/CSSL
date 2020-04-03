@@ -13,7 +13,7 @@ namespace DataCenterSimulation
     {
         static void Main(string[] args)
         {
-            Simulation sim = new Simulation("DataCenterSimulation", @"C:\CSSL");
+            Simulation sim = new Simulation("SomeSimulation", @"C:\CSSL");
 
             // Parameters...
 
@@ -25,8 +25,7 @@ namespace DataCenterSimulation
             // The experiment part...
 
             sim.MyExperiment.NumberOfReplications = 3;
-            sim.MyExperiment.LengthOfReplication = 20;
-            sim.MyExperiment.LengthOfExperimentWallClock = 10;
+            sim.MyExperiment.LengthOfReplication = 10;
             sim.MyExperiment.LengthOfWarmUp = 2;
 
             // The model part...
