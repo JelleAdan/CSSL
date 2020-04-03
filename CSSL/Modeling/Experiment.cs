@@ -19,14 +19,14 @@ namespace CSSL.Modeling
         /// <param name="lengthOfWarmUp">The warm up time of a replication in simulation clock time.</param>
         /// <param name="lengthOfReplicationWallClock">The maximum wall clock time per replication in seconds.</param>
         /// <param name="lengthOfReplication">The maximum simulation clock time per replication in seconds.</param>
-        public Experiment(string name, string outputDirectory, int numberOfReplications = 1, double lengthOfWarmUp = 0.0, double lengthOfReplicationWallClock = double.PositiveInfinity, double lengthOfReplication = double.PositiveInfinity, bool fixSeed = false)
+        public Experiment(string name, string outputDirectory, int numberOfReplications = 1, double lengthOfWarmUp = 0.0, double lengthOfReplicationWallClock = double.PositiveInfinity, double lengthOfReplication = double.PositiveInfinity)
         {
             Name = name;
             this.outputDirectory = outputDirectory;
             NumberOfReplications = numberOfReplications;
             LengthOfWarmUp = lengthOfWarmUp;
             LengthOfReplicationWallClock = lengthOfReplicationWallClock;
-            LengthOfReplication = LengthOfReplication;
+            LengthOfReplication = lengthOfReplication;
         }
 
         public string Name { get; }
@@ -105,7 +105,7 @@ namespace CSSL.Modeling
 
         private int currentReplicationNumber;
 
-        internal void ResetCurrentReplicationNumber()
+        private void ResetCurrentReplicationNumber()
         {
             currentReplicationNumber = 0;
         }
@@ -128,7 +128,7 @@ namespace CSSL.Modeling
 
         internal string ExperimentOutputDirectory;
 
-        internal void CreateExperimentOutputDirectory()
+        private void CreateExperimentOutputDirectory()
         {
             ExperimentOutputDirectory = Path.Combine(outputDirectory, Name);
             if (Directory.Exists(ExperimentOutputDirectory))
@@ -145,7 +145,7 @@ namespace CSSL.Modeling
 
         internal string ReplicationOutputDirectory;
 
-        internal void CreateReplicationOutputDirectory()
+        private void CreateReplicationOutputDirectory()
         {
             ReplicationOutputDirectory = Path.Combine(ExperimentOutputDirectory, $"rep_{currentReplicationNumber}");
 
@@ -153,6 +153,21 @@ namespace CSSL.Modeling
             {
                 Directory.CreateDirectory(ReplicationOutputDirectory);
             }
+        }
+
+        private void CheckReplicationLengths()
+        {
+            if (lengthOfReplication == double.PositiveInfinity && lengthOfReplicationWallClock == double.PositiveInfinity)
+            {
+                throw new Exception("The experiment has an infinite horizon. Specify LengthOfReplication or LengthOfReplicationWallClock.");
+            }
+        }
+
+        internal void StrictlyOnExperimentStart()
+        {
+            CheckReplicationLengths();
+            ResetCurrentReplicationNumber();
+            CreateExperimentOutputDirectory();
         }
     }
 }

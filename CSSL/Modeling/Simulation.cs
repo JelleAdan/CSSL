@@ -46,7 +46,6 @@ namespace CSSL.Modeling
 
         public TimeSpan GetWallClockTimeSpan => replicationExecutionProcess.GetWallClockTimeSpan;
 
-
         public void Run()
         {
             try
@@ -88,8 +87,7 @@ namespace CSSL.Modeling
         protected sealed override void DoInitialize()
         {
             base.DoInitialize();
-            simulation.MyExperiment.ResetCurrentReplicationNumber();
-            simulation.MyExperiment.CreateExperimentOutputDirectory();
+            simulation.MyExperiment.StrictlyOnExperimentStart();
             simulation.MyModel.StrictlyOnExperimentStart();
         }
 
