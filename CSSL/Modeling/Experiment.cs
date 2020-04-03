@@ -18,16 +18,14 @@ namespace CSSL.Modeling
         /// <param name="numberOfReplications">The number of replications.</param>
         /// <param name="lengthOfWarmUp">The warm up time of a replication in simulation clock time.</param>
         /// <param name="lengthOfReplicationWallClock">The maximum wall clock time per replication in seconds.</param>
-        /// <param name="lengthOfExperimentWallClock">The maximum total wall clock time in seconds.</param>
         /// <param name="lengthOfReplication">The maximum simulation clock time per replication in seconds.</param>
-        public Experiment(string name, string outputDirectory, int numberOfReplications = 1, double lengthOfWarmUp = 0.0, double lengthOfReplicationWallClock = double.PositiveInfinity, double lengthOfExperimentWallClock = double.PositiveInfinity, double lengthOfReplication = double.PositiveInfinity, bool fixSeed = false)
+        public Experiment(string name, string outputDirectory, int numberOfReplications = 1, double lengthOfWarmUp = 0.0, double lengthOfReplicationWallClock = double.PositiveInfinity, double lengthOfReplication = double.PositiveInfinity, bool fixSeed = false)
         {
             Name = name;
             this.outputDirectory = outputDirectory;
             NumberOfReplications = numberOfReplications;
             LengthOfWarmUp = lengthOfWarmUp;
             LengthOfReplicationWallClock = lengthOfReplicationWallClock;
-            LengthOfExperimentWallClock = lengthOfExperimentWallClock;
             LengthOfReplication = LengthOfReplication;
         }
 
@@ -102,24 +100,6 @@ namespace CSSL.Modeling
                     throw new ArgumentOutOfRangeException($"{nameof(value)} must be positive.");
                 }
                 lengthOfReplicationWallClock = value;
-            }
-        }
-
-        private double lengthOfExperimentWallClock;
-
-        /// <summary>
-        /// A threshold on the maximum computational wall clock time of the experiment.
-        /// </summary>
-        public double LengthOfExperimentWallClock
-        {
-            get { return lengthOfExperimentWallClock; }
-            set
-            {
-                if (value < 0)
-                {
-                    throw new ArgumentOutOfRangeException($"{nameof(value)} must be positive.");
-                }
-                lengthOfExperimentWallClock = value;
             }
         }
 
