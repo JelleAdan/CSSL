@@ -301,9 +301,12 @@ namespace CSSL.Modeling.Elements
 
         protected void NotifyObservers(object info)
         {
-            foreach (ObserverBase observer in observers)
+            if (Settings.Output)
             {
-                observer.OnNext(info);
+                foreach (ObserverBase observer in observers)
+                {
+                    observer.OnNext(info);
+                }
             }
         }
     }

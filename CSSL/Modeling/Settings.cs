@@ -9,5 +9,7 @@ namespace CSSL.Modeling
         public static bool FixSeed { get; set; }
 
         public static bool Verbose { get; set; }
+
+        public static bool Output { get; set; }
     }
 }

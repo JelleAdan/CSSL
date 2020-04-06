@@ -65,6 +65,17 @@ namespace CSSL.Modeling.CSSLQueue
         }
 
         /// <summary>
+        /// Retrieves and removes the specified item from the queue.
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public T Dequeue(T item)
+        {
+            items.Remove(item);
+            return item;
+        }
+
+        /// <summary>
         /// Retrieves first item from the queue, but does not remove it from the queue.
         /// </summary>
         /// <returns></returns>
@@ -76,7 +87,7 @@ namespace CSSL.Modeling.CSSLQueue
         /// <summary>
         /// Retrieves item from the queue at specified position, but does not remove it from the queue.
         /// </summary>
-        /// <param name="index">Position o the item in the queue.</param>
+        /// <param name="index">Position of the item in the queue.</param>
         /// <returns></returns>
         public T PeekAt(int index)
         {

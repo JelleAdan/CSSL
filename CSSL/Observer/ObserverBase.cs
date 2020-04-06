@@ -43,7 +43,15 @@ namespace CSSL.Observer
         public ObserverBase(Simulation mySimulation)
         {
             Id = observerCounter++;
-            Name = GetType().Name + "_" + Id;
+            Name = $"{Id}_{GetType().Name}";
+            MySimulation = mySimulation;
+            cancellations = new List<Unsubscriber>();
+        }
+
+        public ObserverBase(Simulation mySimulation, string name)
+        {
+            Id = observerCounter++;
+            Name = $"{Id}_{name}";
             MySimulation = mySimulation;
             cancellations = new List<Unsubscriber>();
         }

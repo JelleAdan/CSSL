@@ -93,7 +93,7 @@ namespace CSSL.Modeling
                 executive.calendar.CancelAll();
                 executive.PreviousEventTime = 0;
                 executive.Time = 0;
-                executive.MySimulation.MyExperiment.CreateReplicationOutputDirectory();
+                executive.MySimulation.MyExperiment.StrictlyOnReplicationStart();
 
                 if (executive.MySimulation.MyExperiment.LengthOfReplication != double.PositiveInfinity)
                 {

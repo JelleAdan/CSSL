@@ -126,32 +126,38 @@ namespace CSSL.Modeling
 
         private string outputDirectory;
 
-        internal string ExperimentOutputDirectory;
+        internal string ExperimentOutputDirectory { get; private set; }
 
         private void CreateExperimentOutputDirectory()
         {
-            ExperimentOutputDirectory = Path.Combine(outputDirectory, Name);
-            if (Directory.Exists(ExperimentOutputDirectory))
+            if (Settings.Output)
             {
-                int counter = 1;
-                while (Directory.Exists(ExperimentOutputDirectory + $"_{counter}"))
+                ExperimentOutputDirectory = Path.Combine(outputDirectory, Name);
+                if (Directory.Exists(ExperimentOutputDirectory))
                 {
-                    counter++;
+                    int counter = 1;
+                    while (Directory.Exists(ExperimentOutputDirectory + $"_{counter}"))
+                    {
+                        counter++;
+                    }
+                    ExperimentOutputDirectory = ExperimentOutputDirectory + $"_{counter}";
                 }
-                ExperimentOutputDirectory = ExperimentOutputDirectory + $"_{counter}";
+                Directory.CreateDirectory(ExperimentOutputDirectory)
             }
-            Directory.CreateDirectory(ExperimentOutputDirectory);
         }
 
-        internal string ReplicationOutputDirectory;
+        internal string ReplicationOutputDirectory { get; private set; }
 
         private void CreateReplicationOutputDirectory()
         {
-            ReplicationOutputDirectory = Path.Combine(ExperimentOutputDirectory, $"rep_{currentReplicationNumber}");
-
-            if (!Directory.Exists(ReplicationOutputDirectory))
+            if (Settings.Output)
             {
-                Directory.CreateDirectory(ReplicationOutputDirectory);
+                ReplicationOutputDirectory = Path.Combine(ExperimentOutputDirectory, $"rep_{currentReplicationNumber}");
+
+                if (!Directory.Exists(ReplicationOutputDirectory))
+                {
+                    Directory.CreateDirectory(ReplicationOutputDirectory);
+                }
             }
         }
 
@@ -168,6 +174,68 @@ namespace CSSL.Modeling
             CheckReplicationLengths();
             ResetCurrentReplicationNumber();
             CreateExperimentOutputDirectory();
+        }
+
+        internal void StrictlyOnReplicationStart()
+        {
+            CreateReplicationOutputDirectory();
+        }
+
+        private class ExperimentReporter
+        {
+            private readonly Simulation simulation;
+            private readonly Experiment experiment;
+            private List<string> summary { get; set; }
+
+            public SimulationReporter()
+            {
+                this.simulation = simulation ?? throw new ArgumentNullException("simulation", "Cannot make simulation reporter since simulation is null.")
+    ;
+                experiment = simulation.MyExperiment;
+                summary = new List<string>();
+            }
+
+            private void BuildSummary()
+            {
+                summary.Add($"\nSIMULATION REPORT FOR {simulation.Name}\n");
+
+                summary.Add("EXPERIMENT");
+                summary.Add($"Maximum number of replications: {experiment.NumberOfReplications}");
+                summary.Add($"Maximum computational time per replication: {experiment.LengthOfReplicationWallClock} s");
+                summary.Add($"Length of warm-up in simulation clock time: {experiment.LengthOfWarmUp} s");
+                summary.Add($"Length of replication in simulation clock time: {experiment.LengthOfReplication} s");
+                summary.Add($"Length of replication in wall clock time: {experiment.LengthOfReplicationWallClock} s\n");
+
+                summary.Add("EXECUTION SUMMARY");
+                summary.Add($"Number of replications: {experiment.GetCurrentReplicationNumber()}");
+                summary.Add($"Stopped in state: {simulation.GetEndStateIndicator}");
+                TimeSpan time = simulation.GetWallClockTimeSpan;
+                summary.Add($"Total computational time:{time.Days}d:{time.Hours}h:{time.Minutes}m:{time.Seconds}s:{time.Milliseconds}ms");
+            }
+
+            internal void PrintSummaryToFile()
+            {
+                if (!summary.Any()) { BuildSummary(); }
+
+                using (StreamWriter writer = new StreamWriter(experiment.ExperimentOutputDirectory + @"\Summary.txt"))
+                {
+                    foreach (string line in summary)
+                    {
+                        writer.WriteLine(line);
+                    }
+                }
+            }
+
+            internal void PrintSummaryToConsole()
+            {
+                if (!summary.Any()) { BuildSummary(); }
+
+                foreach (string line in summary)
+                {
+                    Console.WriteLine(line);
+                }
+            }
+
         }
     }
 }
