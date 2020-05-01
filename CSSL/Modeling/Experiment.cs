@@ -142,7 +142,7 @@ namespace CSSL.Modeling
                     }
                     ExperimentOutputDirectory = ExperimentOutputDirectory + $"_{counter}";
                 }
-                Directory.CreateDirectory(ExperimentOutputDirectory)
+                Directory.CreateDirectory(ExperimentOutputDirectory);
             }
         }
 
