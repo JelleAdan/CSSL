@@ -10,7 +10,7 @@ namespace CSSL.Utilities.Distributions
         public ReenactmentDistribution(double[] records) : base(records.Average(), records.Variance())
         {
             Records = records;
-            Reset();
+            index = 0;
         }
 
         private int index;
@@ -27,11 +27,6 @@ namespace CSSL.Utilities.Distributions
             {
                 throw new Exception("Reenactment distribution records depleted.");
             }
-        }
-
-        public void Reset()
-        {
-            index = 0;
         }
     }
 }
