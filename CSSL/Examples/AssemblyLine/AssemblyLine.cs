@@ -89,6 +89,7 @@ namespace CSSL.Examples.AssemblyLine
             foreach (Buffer buffer in Buffers.Skip(1))
             {
                 buffer.Content += buffer.NetSpeed * (GetTime - GetPreviousEventTime);
+                buffer.Content = Math.Min(Math.Max(0, buffer.Content), buffer.Capacity);
             }
         }
 
