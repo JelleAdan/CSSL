@@ -44,7 +44,7 @@ namespace CSSL.Examples.AssemblyLine
 
         protected override void OnReplicationStart()
         {
-            base.OnReplicationStart();
+            Content = 0;
 
             if (NetSpeed > 0)
             {
@@ -75,6 +75,10 @@ namespace CSSL.Examples.AssemblyLine
             else if (NetSpeed > 0)
             {
                 State = BufferState.Full;
+            }
+            else
+            {
+                throw new Exception($"Event in buffer {Index} while net speed is 0.");
             }
 
             NetSpeed = 0;

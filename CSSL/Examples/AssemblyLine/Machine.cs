@@ -52,8 +52,6 @@ namespace CSSL.Examples.AssemblyLine
 
         protected override void OnReplicationStart()
         {
-            base.OnReplicationStart();
-
             State = MachineState.Up;
             EventTime = upTimeDistribution.Next();
         }
@@ -89,6 +87,12 @@ namespace CSSL.Examples.AssemblyLine
                         b.EventTime = double.MaxValue;
 
                         m = Machines[i - 1];
+
+                        // Check
+                        if (m.State != MachineState.Up)
+                        {
+                            throw new Exception("Not possible.");
+                        }
 
                         m.ActualSpeed = 0;
 
@@ -130,6 +134,12 @@ namespace CSSL.Examples.AssemblyLine
                         b.EventTime = double.MaxValue;
 
                         m = Machines[i + 1];
+
+                        // Check
+                        if (m.State != MachineState.Up)
+                        {
+                            throw new Exception("Not possible.");
+                        }
 
                         m.ActualSpeed = 0;
 
@@ -241,7 +251,7 @@ namespace CSSL.Examples.AssemblyLine
                         {
                             m = Machines[i + 1];
 
-                            m.ActualSpeed = Math.Min(m.MaxSpeed, Machines[i].ActualSpeed);
+                            m.ActualSpeed = Math.Min(Machines[i].ActualSpeed, m.MaxSpeed);
 
                             m.State = MachineState.Up;
 

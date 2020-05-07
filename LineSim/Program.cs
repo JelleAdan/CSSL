@@ -23,17 +23,25 @@ namespace LineSim
 
             AssemblyLine assemblyLine = new AssemblyLine(sim.MyModel, "AssemblyLine", 3);
 
-            assemblyLine.AddMachine(0, 5, new NormalDistribution(5, 1), new NormalDistribution(5, 1));
-            assemblyLine.AddMachine(1, 2, new NormalDistribution(5, 1), new NormalDistribution(5, 1));
-            assemblyLine.AddMachine(2, 3, new NormalDistribution(5, 1), new NormalDistribution(5, 1));
+            double[] machine1Uptimes = new double[2] { 2, 3 };
+            double[] machine1Downtimes = new double[3] { 1, 2, 3 };
+            assemblyLine.AddMachine(0, 1500, new EmpericalDistribution(machine1Uptimes), new EmpericalDistribution(machine1Downtimes));
 
-            assemblyLine.AddBuffer(1, 1);
-            assemblyLine.AddBuffer(2, 10);
+            double[] machine2Uptimes = new double[2] { 20, 30 };
+            double[] machine2Downtimes = new double[2] { 1, 2 };
+            assemblyLine.AddMachine(1, 4, new EmpericalDistribution(machine2Uptimes), new EmpericalDistribution(machine2Downtimes));
+
+            double[] machine3Uptimes = new double[2] { 2, 3 };
+            double[] machine3Downtimes = new double[3] { 1, 2, 3 };
+            assemblyLine.AddMachine(2, 1200, new EmpericalDistribution(machine3Uptimes), new EmpericalDistribution(machine3Downtimes));
+
+            assemblyLine.AddBuffer(1, 10); // Position, capacity
+            assemblyLine.AddBuffer(2, 1);
 
             AssemblyLineObserver observer = new AssemblyLineObserver(sim);
             assemblyLine.Subscribe(observer);
 
-            sim.MyExperiment.LengthOfReplication = 1E5;
+            sim.MyExperiment.LengthOfReplication = 1E6;
             sim.MyExperiment.NumberOfReplications = 2;
 
             sim.Run();

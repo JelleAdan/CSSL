@@ -63,15 +63,11 @@ namespace CSSL.Examples.AssemblyLine
 
         protected override void OnReplicationStart()
         {
-            base.OnReplicationStart();
-
             Machines[0].ActualSpeed = Machines[0].MaxSpeed;
 
             for (int i = 1; i < Length; i++)
             {
                 Machines[i].ActualSpeed = Math.Min(Machines[i].MaxSpeed, Machines[i - 1].ActualSpeed);
-
-                Buffers[i].Content = 0;
 
                 Buffers[i].NetSpeed = Machines[i - 1].ActualSpeed - Machines[i].ActualSpeed;
             }
@@ -89,7 +85,11 @@ namespace CSSL.Examples.AssemblyLine
             foreach (Buffer buffer in Buffers.Skip(1))
             {
                 buffer.Content += buffer.NetSpeed * (GetTime - GetPreviousEventTime);
-                buffer.Content = Math.Min(Math.Max(0, buffer.Content), buffer.Capacity);
+                //if (buffer.Content < 0 || buffer.Content > buffer.Capacity)
+                //{
+                //    Console.WriteLine(buffer.Content);
+                //    buffer.Content = Math.Min(Math.Max(0, buffer.Content), buffer.Capacity);
+                //}
             }
         }
 

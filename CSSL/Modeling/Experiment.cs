@@ -187,7 +187,7 @@ namespace CSSL.Modeling
             private readonly Experiment experiment;
             private List<string> summary { get; set; }
 
-            public SimulationReporter()
+            public ExperimentReporter()
             {
                 this.simulation = simulation ?? throw new ArgumentNullException("simulation", "Cannot make simulation reporter since simulation is null.")
     ;
