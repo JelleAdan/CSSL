@@ -33,11 +33,12 @@ namespace CSSL.Observer
         protected void StrictlyOnReplicationEnd()
         {
             Writer.Dispose();
+            Writer = new StreamWriter(Path.Combine(MySimulation.MyExperiment.ExperimentOutputDirectory, Name + ".txt"));
         }
 
         protected void StrictlyOnExperimentEnd()
         {
-
+            Writer.Dispose();
         }
 
         public ObserverBase(Simulation mySimulation)

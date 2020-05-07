@@ -38,6 +38,11 @@ namespace CSSL.Utilities.Statistics
             return sumx / sumw;
         }
 
+        public double ConfidenceInterval95()
+        {
+            return 1.96 * StandardDeviation() / Math.Sqrt(count);
+        }
+
         public int Count()
         {
             return count;
@@ -56,6 +61,11 @@ namespace CSSL.Utilities.Statistics
         public double StandardDeviation()
         {
             return Math.Sqrt(Variance());
+        }
+
+        public double Sum()
+        {
+            return sumx;
         }
 
         public double Variance()
