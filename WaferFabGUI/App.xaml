@@ -1,0 +1,40 @@
+﻿<Application x:Class="WaferFabGUI.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:WaferFabGUI">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Olive.xaml" />
+                <ResourceDictionary>
+                    <local:Bootstrapper x:Key="Bootstrapper" />
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style x:Key="DescriptionHeaderStyle" TargetType="Label">
+                <Setter Property="FontSize" Value="22" />
+                <Setter Property="HorizontalAlignment" Value="Center" />
+            </Style>
+
+            <Color x:Key="MahApps.Colors.Highlight">#036f7b</Color>
+
+            <Color x:Key="MahApps.Colors.AccentBase">#036f7b</Color>
+
+            <!--  80%  -->
+            <Color x:Key="MahApps.Colors.Accent">#358b95</Color>
+
+            <!--  60%  -->
+            <Color x:Key="MahApps.Colors.Accent2">#67a8af</Color>
+
+            <!--  40%  -->
+            <Color x:Key="MahApps.Colors.Accent3">#9ac5ca</Color>
+
+            <!--  20%  -->
+            <Color x:Key="MahApps.Colors.Accent4">#cce2e4</Color>
+        </ResourceDictionary>
+
+    </Application.Resources>
+</Application>
+

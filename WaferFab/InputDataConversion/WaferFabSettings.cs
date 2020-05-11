@@ -7,13 +7,13 @@ using System.Text;
 
 namespace WaferFabSim.InputDataConversion
 {
-    public class InputData
+    public class WaferFabSettings
     {
-        public InputData(string directory)
+        public WaferFabSettings(string directory)
         {
             this.directory = directory;
-            LotStarts = new Dictionary<LotType, int>();
-            WorkCentersData = new Dictionary<string, int>();
+            LotStartQtys = new Dictionary<LotType, int>();
+            WorkCentersData = new Dictionary<string, double>();
             lotStepsData = new List<Tuple<int, string, string>>();
             LotSteps = new Dictionary<string, LotStep>();
             SequencesData = new Dictionary<LotType, List<LotStep>>();
@@ -29,11 +29,13 @@ namespace WaferFabSim.InputDataConversion
 
         private string directory { get; set; }
 
-        public int LotStartsFrequency { get; private set; }
+        public double sampleInterval { get; set; }
 
-        public Dictionary<LotType, int> LotStarts { get; private set; }
+        public int LotStartsFrequency { get; set; }
 
-        public Dictionary<string, int> WorkCentersData { get; private set; }
+        public Dictionary<LotType, int> LotStartQtys { get; private set; }
+
+        public Dictionary<string, double> WorkCentersData { get; private set; }
 
         private List<Tuple<int, string, string>> lotStepsData { get; set; }
 
@@ -59,7 +61,7 @@ namespace WaferFabSim.InputDataConversion
                     }
                     else
                     {
-                        LotStarts.Add((LotType)Enum.Parse(typeof(LotType), values[0]), Convert.ToInt32(values[1]));
+                        LotStartQtys.Add((LotType)Enum.Parse(typeof(LotType), values[0]), Convert.ToInt32(values[1]));
                     }
 
                     row++;
@@ -79,7 +81,7 @@ namespace WaferFabSim.InputDataConversion
 
                     if (row != 1)
                     {
-                        WorkCentersData.Add(values[0], Convert.ToInt32(values[1]));
+                        WorkCentersData.Add(values[0], Convert.ToDouble(values[1]));
                     }
                     row++;
                 }
