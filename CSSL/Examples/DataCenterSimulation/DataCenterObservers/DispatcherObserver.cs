@@ -4,6 +4,7 @@ using CSSL.Observer;
 using CSSL.Utilities.Statistics;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
@@ -47,6 +48,8 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
             queueLengthStatistic.Collect(queueLength.Value, queueLength.Weight);
 
             Writer.WriteLine($"{dispatcher.GetTime},{queueLength.Value}");
+
+            
         }
 
         protected override void OnReplicationEnd(ModelElementBase modelElement)

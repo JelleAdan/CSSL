@@ -66,7 +66,7 @@ namespace CSSL.Examples.AssemblyLine.Observers
 
             // Accumulate the total production
 
-            Machine lastMachine = assemblyLine.Machines[assemblyLine.Machines.Length - 1];
+            Machine lastMachine = assemblyLine.Machines[assemblyLine.Length - 1];
 
             if (lastMachine.State == MachineState.Up)
             {
@@ -87,12 +87,11 @@ namespace CSSL.Examples.AssemblyLine.Observers
         {
             AssemblyLine assemblyLine = (AssemblyLine)modelElement;
 
-            Console.WriteLine($"Total production is {totalProduction}");
+            Console.WriteLine($"Throughput is {totalProduction / assemblyLine.GetTime}");
 
             foreach (Buffer buffer in assemblyLine.Buffers.Skip(1))
             {
-                double fractionFilled = bufferContentStatistics[buffer.Index].Average() / buffer.Capacity * 100;
-                Console.WriteLine($"{buffer.Name} {fractionFilled}");
+                Console.WriteLine($"Mean content {buffer.Name}: {bufferContentStatistics[buffer.Index].Average()}");
             }
         }
 

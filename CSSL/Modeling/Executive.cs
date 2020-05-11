@@ -63,14 +63,17 @@ namespace CSSL.Modeling
 
         internal void ScheduleEvent(double time, CSSLEventAction action)
         {
+            if (time < Time)
+            {
+                throw new Exception("Attempted to schedule an event in the past.");
+            }
             CSSLEvent e = new CSSLEvent(time, action);
             calendar.Add(e);
         }
 
         internal void ScheduleEndEvent(double time)
         {
-            CSSLEvent e = new CSSLEvent(time, HandleEndEvent);
-            calendar.Add(e);
+            ScheduleEvent(time, HandleEndEvent);
         }
 
         private class EventExecutionProcess : IterativeProcess<CSSLEvent>

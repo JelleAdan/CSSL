@@ -104,5 +104,11 @@ namespace CSSL.Modeling
             simulation.MyExecutive.TryRunAll();
             simulation.MyModel.StrictlyOnReplicatioEnd();
         }
+
+        protected sealed override void DoEnd()
+        {
+            base.DoEnd();
+            simulation.MyModel.StrictlyOnExperimentEnd();
+        }
     }
 }
