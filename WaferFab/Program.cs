@@ -25,18 +25,38 @@ namespace WaferFabSim
             Simulation sim = new Simulation("WaferFab", outputDir);
 
             // Load data
-            InputData inputData = new InputData(inputDir + "CSVs");
+            WaferFabSettings waferFabSettings = new WaferFabSettings(inputDir + "CSVs");
+
+            waferFabSettings.sampleInterval = 10 * 60; // 10 minutes
 
             // Experiment settings
             sim.MyExperiment.NumberOfReplications = 3;
-            sim.MyExperiment.LengthOfReplication = 1; // 1 = number of days
-            sim.MyExperiment.LengthOfWarmUp = 2;
+            sim.MyExperiment.LengthOfReplication = 2 * 24 * 60 * 60; // 2 = number of days
+            sim.MyExperiment.LengthOfWarmUp = 8 * 60 * 60;
 
+            Settings.Output = true;
+
+            // Build the model and add observers
+            sim = AddModelAndObservers(sim, waferFabSettings);
+
+            // Run the simulation
+            sim.Run();
+
+            // Report summary
+            SimulationReporter reporter = sim.MakeSimulationReporter();
+
+            reporter.PrintSummaryToFile();
+            reporter.PrintSummaryToConsole();
+
+        }
+
+        public static Simulation AddModelAndObservers(Simulation sim, WaferFabSettings inputData)
+        {
             // Build the model
-            WaferFab waferFab = new WaferFab(sim.MyModel, "WaferFab");
+            WaferFab waferFab = new WaferFab(sim.MyModel, "WaferFab", new ConstantDistribution(inputData.sampleInterval));
 
             //// LotStarts
-            waferFab.LotStarts = inputData.LotStarts;
+            waferFab.LotStarts = inputData.LotStartQtys;
 
             //// LotSteps
             waferFab.LotSteps = inputData.LotSteps;
@@ -61,6 +81,9 @@ namespace WaferFabSim
             waferFab.SetLotGenerator(new LotGenerator(waferFab, "LotGenerator", new ConstantDistribution(inputData.LotStartsFrequency * 60 * 60)));
 
             // Add observers
+            WaferFabObserver waferFabObserver = new WaferFabObserver(sim, "WaferFabObserver", waferFab);
+            waferFab.Subscribe(waferFabObserver);
+
             foreach (var wc in waferFab.WorkCenters)
             {
                 TotalQueueObserver totalQueueObs = new TotalQueueObserver(sim, wc.Key + "_TotalQueueObserver");
@@ -70,20 +93,7 @@ namespace WaferFabSim
                 wc.Value.Subscribe(seperateQueueObs);
             }
 
-            // Run the simulation
-            sim.Run();
-
-            // Report summary
-            SimulationReporter reporter = sim.MakeSimulationReporter();
-
-            reporter.PrintSummaryToFile();
-            reporter.PrintSummaryToConsole();
-
+            return sim;
         }
-    }
-
-    internal interface Test
-    {
-
     }
 }

@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <StartupObject></StartupObject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="MatchingIcon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Caliburn.Micro.Core" Version="4.0.105-alpha" />
+    <PackageReference Include="Caliburn.Micro" Version="4.0.105-alpha" />
+    <PackageReference Include="MahApps.Metro" Version="2.0.0-alpha0748" />
+    <PackageReference Include="MahApps.Metro.IconPacks" Version="4.0.0" />
+    <PackageReference Include="OxyPlot.Wpf" Version="2.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="MatchingIcon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CSSL\CSSL.csproj" />
+    <ProjectReference Include="..\WaferFab\WaferFabSim.csproj" />
+  </ItemGroup>
+
+</Project>

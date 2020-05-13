@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.902
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30002.166
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSSL", "CSSL\CSSL.csproj", "{97690EC6-7979-4F2E-82C0-BCAF1E7FF916}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WaferFabSim", "WaferFab\WaferFabSim.csproj", "{B58AF6A8-E98C-41C8-98DC-C59C0CE420ED}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LineSim", "LineSim\LineSim.csproj", "{267CB093-5289-43C4-88F3-8F47761094F3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WaferFabGUI", "WaferFabGUI\WaferFabGUI.csproj", "{84C80EFF-73E0-4387-AD82-5FF6E82FEF08}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{267CB093-5289-43C4-88F3-8F47761094F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{267CB093-5289-43C4-88F3-8F47761094F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{267CB093-5289-43C4-88F3-8F47761094F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84C80EFF-73E0-4387-AD82-5FF6E82FEF08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84C80EFF-73E0-4387-AD82-5FF6E82FEF08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84C80EFF-73E0-4387-AD82-5FF6E82FEF08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84C80EFF-73E0-4387-AD82-5FF6E82FEF08}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

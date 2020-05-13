@@ -1,0 +1,489 @@
+﻿<Controls:MetroWindow x:Class="WaferFabGUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WaferFabGUI"
+        xmlns:oxy="http://oxyplot.org/wpf"
+        mc:Ignorable="d"
+        xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+        Dialog:DialogParticipation.Register="{Binding}"
+        Title="Waferfab simulation" Height="850" Width="1200"
+        ScrollViewer.CanContentScroll="True" 
+        ScrollViewer.VerticalScrollBarVisibility="Auto">
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="20" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="20" />
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="20"/>
+
+        </Grid.ColumnDefinitions>
+
+
+        <!--Column 1-->
+        <!--Button Controls-->
+        <StackPanel Grid.Row="0" Grid.Column="1" Grid.RowSpan="3">
+            <Label Content="Controls" Style="{DynamicResource DescriptionHeaderStyle}"
+                   Margin="0,0,0,20"/>
+            <Button Content="Browse"
+                    Command="{Binding BrowseCommand}" 
+                    Style="{StaticResource MahApps.Styles.Button.AccentedSquare}"
+                    Margin="0,0,0,20"></Button>
+            <Button Content="Import Data"
+                    Command="{Binding LoadDataCommand}" 
+                    Style="{StaticResource MahApps.Styles.Button.AccentedSquare}"
+                    Margin="0,0,0,20"></Button>
+            <TextBlock Margin="0,0,0,5" HorizontalAlignment="Center" FontFamily="Segoe UI Semibold">
+                algorithm
+            </TextBlock>
+            <ComboBox Margin="0,0,0,20" HorizontalContentAlignment="Center"
+                      FontFamily="Segoe UI Semibold"
+                      Name="TestBox">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding FirstName}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            
+            <ComboBox Margin="0,0,0,20" HorizontalContentAlignment="Center"
+                      FontFamily="Segoe UI Semibold"
+                      Name="Algorithms"
+                      ItemsSource="{Binding Algorithms}"
+                      SelectedItem="{Binding AlgorithhmSelected}">
+            </ComboBox>
+
+            <Controls:ToggleSwitch 
+                                   Margin="0,0,0,20" FontSize="12"/>
+            <Button Content="Run algoritm"
+                    Command="{Binding RunAlgorithmCommand}"
+                    Style="{StaticResource MahApps.Styles.Button.AccentedSquare}"
+                    Margin="0,0,0,20"/>
+
+            <Button Content="clear all"
+                    Command="{Binding ClearAllCommand}"
+                    Style="{StaticResource MahApps.Styles.Button.AccentedSquare}"
+                    Margin="0,0,0,20"/>
+
+            <Label Content="Performance" Style="{DynamicResource DescriptionHeaderStyle}"
+                   Margin="0,20,0,0"/>
+
+            <Label Content="gain" Style="{DynamicResource DescriptionHeaderStyle}"
+                   Margin="0,-10,0,20"/>
+
+            <WrapPanel HorizontalAlignment="Center">
+                <TextBlock FontFamily="Segoe UI Semibold"
+                           VerticalAlignment="Center"
+                           Text="DTW:    "/>
+                <TextBlock FontFamily="Segoe UI Semibold"
+                           Text="{Binding OverallocDiff, StringFormat=N2}"
+                           VerticalAlignment="Center"
+                           FontSize="18" Foreground="{Binding PerfColour}">
+                </TextBlock>
+                <TextBlock FontFamily="Segoe UI Semibold"
+                           VerticalAlignment="Center"
+                           Text=" %"/>
+            </WrapPanel>
+        </StackPanel>
+
+
+        <!--Column 3-->
+        <!--Input Output Tabs-->
+        <Controls:MetroAnimatedSingleRowTabControl Grid.Row="0" Grid.Column="3"
+                                                   x:Name="LowerTabControl" >
+
+            <!--Input tab-->
+            <TabItem Header="Input">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!--Planned Orders-->
+                    <Expander
+                        Grid.Column="0"
+                        Grid.Row="0"
+                        IsExpanded="False"
+                        Header="Planned Orders"
+                        Margin="0,20,0,20"
+                        MaxHeight="300">
+
+                        <DataGrid ItemsSource="{Binding PlannedOrCons}" AutoGenerateColumns="False"
+                          ScrollViewer.CanContentScroll="True" 
+                          ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                  IsReadOnly="True">
+                            <DataGrid.Columns>
+                                <DataGridCheckBoxColumn ElementStyle="{DynamicResource MetroDataGridCheckBox}"
+                                        EditingElementStyle="{DynamicResource MetroDataGridCheckBox}"
+                                        Header="Selected"
+                                        Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=IsSelected, Mode=OneWay}"
+                                        />
+                                <DataGridTextColumn Header="Order ID" Binding="{Binding ID}" />
+                                <DataGridTextColumn Header="Product 12NC" Binding="{Binding FG12NC}" />
+                                <DataGridTextColumn Header="Description" Binding="{Binding FGDescription}" />
+                                <DataGridTextColumn Header="FG Qty" Binding="{Binding ReqFGQty}" >
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Right" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="Req wafer 1" Binding="{Binding Wafer12NC_1}">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Right" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="Die Qty 1" Binding="{Binding ReqDieQty_1}" >
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Right" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="Req wafer 2" Binding="{Binding Wafer12NC_2}">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Right" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="Die Qty 2" Binding="{Binding ReqDieQty_2}" >
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Right" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="Due date" Binding="{Binding DueDate, StringFormat=d}">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Right" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Expander>
+
+                    <!--Wafers-->
+                    <Expander
+                    Grid.Column="0"
+                    Grid.Row="1"
+                    IsExpanded="False"
+                    Header="Wafers"
+                    MaxHeight="300">
+
+                        <DataGrid ItemsSource="{Binding Wafers}" AutoGenerateColumns="False"
+                          ScrollViewer.CanContentScroll="True" 
+                          ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                  IsReadOnly="True">
+                            <DataGrid.Columns>
+                                <DataGridCheckBoxColumn ElementStyle="{DynamicResource MetroDataGridCheckBox}"
+                                            EditingElementStyle="{DynamicResource MetroDataGridCheckBox}"
+                                            Header="Selected"
+                                            Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=IsSelected, Mode=OneWay}"
+                                            />
+                                <DataGridTextColumn Header="Wafer ID" Binding="{Binding idBatch}" />
+                                <DataGridTextColumn Header="12 NC" Binding="{Binding Wafer12NC}" >
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Right" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="Description" Binding="{Binding MatDescription}" >
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Right" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="Die Qty" Binding="{Binding AvailQty}">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Right" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="Expiration date" Binding="{Binding ExpirationDate, StringFormat=d}">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Right" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Expander>
+                </Grid>
+
+            </TabItem>
+
+            <!--Output tab-->
+            <TabItem Header="Output">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="10" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="10" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!--SAP Process Orders-->
+                    <Expander Grid.Column="0" Grid.Row="0"                    
+                    IsExpanded="False"
+                    Header="SAP Process Orders"
+                    MinWidth="400"
+                    MaxHeight="350">
+                        <DataGrid ItemsSource="{Binding ProcessOr}" AutoGenerateColumns="False"
+                          ScrollViewer.CanContentScroll="True" 
+                          ScrollViewer.VerticalScrollBarVisibility="Auto"
+                          MaxHeight="500"
+                          IsReadOnly="True">
+                            <DataGrid.Columns>
+                                <DataGridCheckBoxColumn 
+                                    ElementStyle="{DynamicResource MetroDataGridCheckBox}"
+                                    EditingElementStyle="{DynamicResource MetroDataGridCheckBox}"
+                                    Header="Selected"
+                                    Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow},
+                                    Path=IsSelected, Mode=OneWay}"/>
+                                <DataGridTextColumn Header="Process Order ID" Binding="{Binding ID}" />
+                                <DataGridTextColumn Header="Product 12 NC" Binding="{Binding FG12NC}" />
+                                <DataGridTextColumn Header="Tot Produced FG qty" Binding="{Binding Stats.TotFG}">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Right" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="Req FG" Binding="{Binding Stats.FGTO}">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Right" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="Overprod FG" Binding="{Binding Stats.FGTW}">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Right" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="Scrap FG" Binding="{Binding Stats.FGTS}">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Right" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                            </DataGrid.Columns>
+
+                            <!--Detail view-->
+                            <DataGrid.RowDetailsTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Vertical" >
+
+                                        <!--Fulfilled Planned orders-->
+                                        <Expander Margin="0,10,0,0"
+                                            Header="Fulfilled planned orders"
+                                            IsExpanded="False">
+                                            <DataGrid
+                                                ItemsSource="{Binding PlannedOrdersAllocated}"
+                                                AutoGenerateColumns="True"
+                                                ScrollViewer.CanContentScroll="True"
+                                                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                                MaxHeight="100">
+                                            </DataGrid>
+                                        </Expander>
+
+                                        <!--Used Wafers-->
+                                        <Expander
+                                            Header="Used Wafers"
+                                            IsExpanded="False"
+                                            Margin="0,10,0,0">
+                                            <DataGrid
+                                                ItemsSource="{Binding UsedWafers}"
+                                                AutoGenerateColumns="True"
+                                                ScrollViewer.CanContentScroll="True"
+                                                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                                MaxHeight="100">
+                                            </DataGrid>
+                                        </Expander>
+
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGrid.RowDetailsTemplate>
+
+                        </DataGrid>
+                    </Expander>
+
+                    <!--Pie chart SAP-->
+                    <Expander Grid.Row="0" Grid.Column="2"
+                              Header="SAP Allocation Result"
+                              Height="auto">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <StackPanel  HorizontalAlignment="Right"
+                                           Grid.Column="0" 
+                                           Grid.Row="0">
+                                <WrapPanel HorizontalAlignment="Right">
+                                    <TextBlock FontFamily="Segoe UI Semibold"
+                                           Text="Die-To-Order: " />
+                                    <TextBlock FontFamily="Segoe UI Semibold"
+                                           Text="{Binding FGTO_SAP}" />
+                                </WrapPanel>
+
+                                <WrapPanel HorizontalAlignment="Right">
+                                    <TextBlock FontFamily="Segoe UI Semibold"
+                                           Text="Die-To-Warehouse:   " />
+                                    <TextBlock FontFamily="Segoe UI Semibold"
+                                           Text="{Binding FGTW_SAP}" />
+                                </WrapPanel>
+                            </StackPanel>
+
+
+                            <oxy:PlotView Grid.Column="0" 
+                                          Grid.Row="1"
+                                          Model="{Binding SAPPieChart}"/>
+
+                        </Grid>
+
+                    </Expander>
+
+                    <!--Orders per 12 NC own alloc-->
+                    <Expander Grid.Column="0" Grid.Row="2"
+                              MinWidth="400"
+                              Header="Allocation Result"
+                              MaxHeight="350">
+                        <DataGrid 
+                            ItemsSource="{Binding ProposedOrders}"
+                            AutoGenerateColumns="false"
+                            ScrollViewer.CanContentScroll="True" 
+                            ScrollViewer.VerticalScrollBarVisibility="Auto"
+                            MaxHeight="500"
+                            IsReadOnly="True">
+                            <DataGrid.Columns>
+                                <DataGridCheckBoxColumn 
+                                    ElementStyle="{DynamicResource MetroDataGridCheckBox}"
+                                    EditingElementStyle="{DynamicResource MetroDataGridCheckBox}"
+                                    Header="Selected"
+                                    Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow},
+                                    Path=IsSelected, Mode=OneWay}"/>
+                                <DataGridTextColumn Header="Nr of planned orders" Binding="{Binding PlannedOrders.Count}" />
+                                <DataGridTextColumn Header="Nr of wafers" Binding="{Binding Wafers.Count}" />
+                            </DataGrid.Columns>
+
+                            <!--Detail view-->
+                            <DataGrid.RowDetailsTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Vertical" >
+
+                                        <!--Fulfilled Planned orders-->
+                                        <Expander Margin="0,10,0,0"
+                                            Header="Fulfilled planned orders"
+                                            IsExpanded="False">
+                                            <DataGrid
+                                                ItemsSource="{Binding PlannedOrders}"
+                                                AutoGenerateColumns="True"
+                                                ScrollViewer.CanContentScroll="True"
+                                                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                                MaxHeight="100">
+                                            </DataGrid>
+                                        </Expander>
+
+                                        <!--Used Wafers-->
+                                        <Expander
+                                            Header="Used Wafers"
+                                            IsExpanded="False"
+                                            Margin="0,10,0,0">
+                                            <DataGrid
+                                                ItemsSource="{Binding Wafers}"
+                                                AutoGenerateColumns="True"
+                                                ScrollViewer.CanContentScroll="True"
+                                                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                                MaxHeight="100">
+                                            </DataGrid>
+                                        </Expander>
+
+                                    </StackPanel>
+
+
+                                </DataTemplate>
+                            </DataGrid.RowDetailsTemplate>
+
+                        </DataGrid>
+                    </Expander>
+
+                    <!--Pie chart Own Allocation -->
+                    <Expander Grid.Row="2" Grid.Column="2"
+                              Height="auto"
+                              Header="Virtual Matching Lab Allocation Result">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <StackPanel  HorizontalAlignment="Right"
+                                           Grid.Column="0" 
+                                           Grid.Row="0">
+                                <WrapPanel HorizontalAlignment="Right">
+                                    <TextBlock FontFamily="Segoe UI Semibold"
+                                           Text="Die-To-Order: " />
+                                    <TextBlock FontFamily="Segoe UI Semibold"
+                                           Text="{Binding FGTO}" />
+                                </WrapPanel>
+
+                                <WrapPanel HorizontalAlignment="Right">
+                                    <TextBlock FontFamily="Segoe UI Semibold"
+                                           Text="Die-To-Warehouse:   " />
+                                    <TextBlock FontFamily="Segoe UI Semibold"
+                                           Text="{Binding FGTW}" />
+                                </WrapPanel>
+                            </StackPanel>
+
+
+                            <oxy:PlotView Grid.Column="0" 
+                                          Grid.Row="1"
+                                          Model="{Binding OwnPieChart}"/>
+                        </Grid>
+                    </Expander>
+
+
+                </Grid>
+            </TabItem>
+
+        </Controls:MetroAnimatedSingleRowTabControl>
+
+
+    </Grid>
+</Controls:MetroWindow>

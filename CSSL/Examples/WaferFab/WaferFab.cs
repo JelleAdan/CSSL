@@ -1,11 +1,12 @@
 ﻿using CSSL.Modeling.Elements;
+using CSSL.Utilities.Distributions;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace CSSL.Examples.WaferFab
 {
-    public class WaferFab : ModelElementBase
+    public class WaferFab : EventGeneratorBase
     {
         public LotGenerator LotGenerator { get; private set; }
 
@@ -17,7 +18,7 @@ namespace CSSL.Examples.WaferFab
 
         public Dictionary<LotType, int> LotStarts { get; set; }
 
-        public WaferFab(ModelElementBase parent, string name) : base(parent, name)
+        public WaferFab(ModelElementBase parent, string name, ConstantDistribution samplingDistribution) : base(parent, name, samplingDistribution)
         {
             WorkCenters = new Dictionary<string, WorkCenter>();
             Sequences = new Dictionary<LotType, Sequence>();
@@ -45,5 +46,15 @@ namespace CSSL.Examples.WaferFab
             LotStarts.Add(lotType, quantity);
         }
 
+        /// <summary>
+        /// This is created to read out data on a sampled interval.
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void HandleGeneration(CSSLEvent e)
+        {
+            NotifyObservers(this);
+
+            ScheduleEvent(NextEventTime(), HandleGeneration);
+        }
     }
 }
