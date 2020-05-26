@@ -1,4 +1,5 @@
 ﻿using MahApps.Metro.Controls;
+using MahApps.Metro.Controls.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using WaferFabGUI.ViewModels;
 
 namespace WaferFabGUI.Views
 {
@@ -20,13 +22,8 @@ namespace WaferFabGUI.Views
     {
         public ShellView()
         {
-            InitializeComponent();
+            //InitializeComponent();
+            //DataContext = new ShellViewModel(DialogCoordinator.Instance);
         }
-
-        private void SingleSnapshot_Toggled(object sender, RoutedEventArgs e)
-        {
-
-        }
-
     }
 }

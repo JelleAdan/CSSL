@@ -20,6 +20,8 @@ namespace CSSL.Examples.WaferFab
 
         private List<LotStep> lotSteps { get; set; }
 
+        public int stepCount => lotSteps.Count;
+
         public LotType Type { get; }
 
         public bool HasNextStep(int currentStepCount)

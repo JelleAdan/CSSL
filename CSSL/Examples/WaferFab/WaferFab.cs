@@ -18,12 +18,15 @@ namespace CSSL.Examples.WaferFab
 
         public Dictionary<LotType, int> LotStarts { get; set; }
 
+        public List<Lot> InitialLots { get; set; }
+
         public WaferFab(ModelElementBase parent, string name, ConstantDistribution samplingDistribution) : base(parent, name, samplingDistribution)
         {
             WorkCenters = new Dictionary<string, WorkCenter>();
             Sequences = new Dictionary<LotType, Sequence>();
             LotSteps = new Dictionary<string, LotStep>();
             LotStarts = new Dictionary<LotType, int>();
+            InitialLots = new List<Lot>();
         }
 
         public void SetLotGenerator(LotGenerator lotGenerator)
@@ -55,6 +58,22 @@ namespace CSSL.Examples.WaferFab
             NotifyObservers(this);
 
             ScheduleEvent(NextEventTime(), HandleGeneration);
+        }
+
+        /// <summary>
+        /// This reads out the data on t = 0;
+        /// </summary>
+        /// <param name="e"></param>
+        private void HandleFirstSnapshot(CSSLEvent e)
+        {
+            NotifyObservers(this);
+        }
+
+        protected override void OnReplicationStart()
+        {
+            base.OnReplicationStart();
+
+            ScheduleEvent(0, HandleFirstSnapshot);
         }
     }
 }

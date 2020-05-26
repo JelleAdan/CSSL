@@ -32,6 +32,16 @@ namespace CSSL.Examples.WaferFab
 
         public List<LotStep> LotSteps { get; set; }
 
+        public List<Lot> InitialLots
+        {
+            get
+            {
+                WaferFab waferFab = (WaferFab)Parent;
+
+                return waferFab.InitialLots.Where(x => x.GetCurrentWorkCenter == this).ToList();
+            }
+        }
+
         public Lot LastArrivedLot { get; set; }
         
         /// <summary>
@@ -73,11 +83,9 @@ namespace CSSL.Examples.WaferFab
 
         public void HandleDeparture(CSSLEvent e)
         {
-
             if (LotStepInService == null)
             {
-                Console.WriteLine(GetTime);
-                throw new Exception($"Tried to send lot from {Name}, but there is no lot in service.");
+                dispatcher.HandleFirstDeparture();
             }
             else
             {
@@ -89,7 +97,23 @@ namespace CSSL.Examples.WaferFab
 
                 dispatcher.HandleDeparture();
             }
-
         }
+
+        protected override void OnReplicationStart()
+        {
+            LotStepInService = null;
+
+            // Initialize queues with deep copy of initial lots
+            if (InitialLots.Any())
+            {
+                List<Lot> initialLotsDeepCopy = InitialLots.ConvertAll(x => new Lot(x));
+
+                foreach(var lot in initialLotsDeepCopy)
+                {
+                    HandleArrival(lot);
+                }
+            }
+        }
+
     }
 }

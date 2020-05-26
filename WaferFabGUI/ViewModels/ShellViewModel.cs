@@ -3,19 +3,24 @@ using CSSL.Examples.WaferFab;
 using CSSL.Modeling;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
+using Microsoft.Win32;
 using OxyPlot;
+using OxyPlot.Axes;
 using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security;
+using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -26,6 +31,7 @@ using System.Xml.Serialization;
 using WaferFabGUI.Models;
 using WaferFabSim;
 using WaferFabSim.InputDataConversion;
+using WaferFabSim.SnapshotData;
 using Action = System.Action;
 
 namespace WaferFabGUI.ViewModels
@@ -34,104 +40,254 @@ namespace WaferFabGUI.ViewModels
     {
         public ShellViewModel()
         {
+            // Link relay commands
+            RunSimulationCommand = new RelayCommand(RunSimulationAsync, () => true);
+            ClearAllWIPDataCommand = new RelayCommand(ClearAllWIPData, () => CanClearWIPData);
+            ClearLastWIPDataCommand = new RelayCommand(ClearLastWIPData, () => CanClearWIPData);
+            PlayAnimationCommand = new RelayCommand(PlayAnimationAsync, () => (SnapshotsToAnimate != null && SnapshotsToAnimate.Any() && !isAnimationRunning) || AnimationPaused);
+            PauseAnimationCommand = new RelayCommand(PauseAnimation, () => isAnimationRunning && !AnimationPaused);
+            StopAnimationCommand = new RelayCommand(StopAnimation, () => isAnimationRunning);
+            LoadRealSnapshotsCommand = new RelayCommand(LoadRealSnapshotsAsync, () => true);
+
             // Initialize properties
             WorkCenters = new ObservableCollection<WorkCenterData>();
             LotStartQtys = new ObservableCollection<LotStartQty>();
             WIPBarChart = new PlotModel { Title = "WIP balance" };
-            inputDir = @"C:\Users\nx008314\OneDrive - Nexperia\Work\WaferFab\";
-            outputDir = @"C:\CSSLWaferFab\";
-            sim = new Simulation("WaferFab", outputDir);
             dialogCoordinator = DialogCoordinator.Instance;
+            inputDirectory = @"C:\Users\nx008314\OneDrive - Nexperia\Work\WaferFab\";
+            FPSAnimation = 5;
+            FPSMax = 5;
 
-            // Link relay commands
-            RunSimulationCommand = new RelayCommand(RunSimulation, () => true);
 
-            // Load data
-            waferFabSettings = new WaferFabSettings(inputDir + "CSVs");
-
-            // Initialize settings
-            NumberOfReplications = 3;
-            LengthOfReplication = 2 * 24;   // hours
-            LengthOfWarmUp = 8;             // hours
-            SampleInterval = 10;            // minutes
+            // Initialize Experiment Settings
+            experimentSettings = new ExperimentSettings();
+            experimentSettings.OutputDirectory = @"C:\CSSLWaferFab\";
+            experimentSettings.NumberOfReplications = 1;
+            experimentSettings.LengthOfReplication = 100 * 24 * 60 * 60;
+            experimentSettings.LengthOfWarmUp = 12 * 60 * 60;
             Settings.Output = true;
-            initializeSettings();
 
-            // Bar chart
-            IEnumerable<string> axisLabels = new List<string>() { "OD Photo", "OD Etch", "OD Test" };
+            // Initialize Waferfab Settings
+            waferFabSettings = new WaferFabSettings(inputDirectory + "CSVs");
+            initializeWaferFabSettings(waferFabSettings);
 
-            // A ColumnSeries requires a CategoryAxis on the x-axis.
-
-            WIPData = readWIPSnapshots(outputDir);
-
-            WIPBarChart.Axes.Add(new OxyPlot.Axes.CategoryAxis { ItemsSource = WIPData.First().LotSteps, Angle = 60 });
-
-            var series = new ColumnSeries();
-
-            foreach (var wip in WIPData.Last().WIPlevels)
-            {
-                series.Items.Add(new ColumnItem(wip));
-            }
-
-            WIPBarChart.Series.Add(series);
+            // Initialize bar chart
+            SimulationSnapshots = readWIPSnapshots(experimentSettings.OutputDirectory);
+            xAxisLotSteps = SimulationSnapshots.First().LotSteps;
+            xAxis = new CategoryAxis() { Angle = 60, ItemsSource = xAxisLotSteps };
+            WIPBarChart.Axes.Add(xAxis);
+            yAxis = new LinearAxis() { Minimum = 0 };
+            WIPBarChart.Axes.Add(yAxis);
         }
 
+        private Stopwatch stopwatch = new Stopwatch();
+        private LinearAxis yAxis;
+        private CategoryAxis xAxis;
+        private string[] xAxisLotSteps;
         private Simulation sim;
+        private ExperimentSettings experimentSettings;
         private WaferFabSettings waferFabSettings;
-        private string inputDir;
-        private string outputDir;
-        private bool _isMulitpleSnapshots;
+        private string inputDirectory;
+        private bool isAnimationRunning;
+        private bool _isRealData;
+        private bool _isMultipleSnapshots;
+        private bool _isStartStateSelected;
         private int _selectedReplication;
+        private int animationCounter;
         private ObservableCollection<WorkCenterData> _workCenters;
         private ObservableCollection<LotStartQty> _lotStartQtys;
-        private ObservableCollection<WIPSnapshot> _wipSnapshots;
+        private ObservableCollection<SimulationSnapshot> _simulationSnapshots;
+        private ObservableCollection<RealSnapshot> _realSnapshots;
         private PlotModel _wipBarChart;
-        private WIPSnapshot _wipDataSelected;
+        private WIPSnapshotBase _snapshotSelected;
+        private RealSnapshot _startState;
         private IDialogCoordinator dialogCoordinator;
+        private RealSnapshotReader realSnapshotReader;
 
-
-        public async void RunSimulation()
+        public bool AnimationPaused = false;
+        public bool AnimationResumed = false;
+        public bool AnimationStopped = false;
+        public bool CanClearWIPData => WIPBarChart.Series.Any();
+        public async void RunSimulationAsync()
         {
-            // To do: build await
-            ProgressDialogController controller = await dialogCoordinator.ShowProgressAsync(this, "Allocating wafers", "Running algorithm...");
+            ProgressDialogController controller = await dialogCoordinator.ShowProgressAsync(this, "Simulate", "Running the waferfab simulation");
             controller.SetIndeterminate();
 
-            // Build model
-            updateSettings();
-            sim = Program.AddModelAndObservers(sim, waferFabSettings);
+            // Build simulation model
+            sim = new Simulation("WaferFab", experimentSettings.OutputDirectory);
+            experimentSettings.UpdateSettingsInSimulation(sim);
+
+            // Build model (and initialize waferfab with real snapshot)
+            updateWaferFabSettings();
+
+            if (IsStartStateSelected)
+            {
+                sim = Program.AddModelAndObservers(sim, waferFabSettings, realSnapshotReader.AllRealLots.Where(x => x.SnapshotTime == StartState.Time).ToList());
+            }
+            else
+            {
+                sim = Program.AddModelAndObservers(sim, waferFabSettings, new List<RealLot>());
+            }
+
 
             // Run simulation
-            sim.Run();
+            await Task.Run(() => sim.Run());
 
-            // Read WIPSnapshots
-            WIPData = readWIPSnapshots(outputDir);
+            // Update WIP data
+            ClearAllWIPData();
+            SimulationSnapshots.Clear();
+            SimulationSnapshots = readWIPSnapshots(experimentSettings.OutputDirectory);
 
+            // Close...
             await controller.CloseAsync();
         }
         public void ClearLastWIPData()
         {
-            WIPBarChart.Series.RemoveAt(WIPBarChart.Series.Count);
+            WIPBarChart.Series.RemoveAt(WIPBarChart.Series.Count - 1);
             WIPBarChart.InvalidatePlot(true);
+            ClearAllWIPDataCommand.NotifyOfCanExecuteChange();
+            ClearLastWIPDataCommand.NotifyOfCanExecuteChange();
         }
         public void ClearAllWIPData()
         {
-            WIPBarChart.Series.RemoveAt(WIPBarChart.Series.Count);
+            WIPBarChart.Series.Clear();
             WIPBarChart.InvalidatePlot(true);
+            ClearAllWIPDataCommand.NotifyOfCanExecuteChange();
+            ClearLastWIPDataCommand.NotifyOfCanExecuteChange();
         }
-        private void initializeSettings()
+        public async void PlayAnimationAsync()
+        {
+            if (AnimationPaused)
+            {
+                resumeAnimation();
+            }
+            else
+            {
+                isAnimationRunning = true;
+                IsMultipleSnapshots = false;
+                updateCommandsCanExecute();
+
+                stopwatch.Start();
+
+                await Task.Run(() => playAnimation());
+
+                isAnimationRunning = false;
+                AnimationStopped = false;
+                updateCommandsCanExecute();
+            }
+        }
+        private void playAnimation()
+        {
+            double spf;
+            int counterInterval = 1;
+            animationCounter = 0;
+            int snapShotCount = SnapshotsToAnimate.Count();
+
+            if (FPSAnimation <= FPSMax)
+            {
+                spf = 1 / FPSAnimation;
+            }
+            else
+            {
+                spf = (double)1 / FPSMax;
+                counterInterval = Convert.ToInt32(FPSAnimation / FPSMax);
+            }
+
+            while (animationCounter < snapShotCount && !AnimationStopped)
+            {
+                stopwatch.Restart();
+
+                while (animationCounter < snapShotCount)
+                {
+                    if (AnimationPaused)
+                    {
+                        stopwatch.Stop();
+                    }
+
+                    if (AnimationResumed)
+                    {
+                        stopwatch.Start();
+                        AnimationResumed = false;
+                    }
+
+                    if (AnimationStopped)
+                    {
+                        stopwatch.Stop();
+                        break;
+                    }
+
+                    if (stopwatch.Elapsed.TotalSeconds > spf)
+                    {
+                        SnapshotSelected = SnapshotsToAnimate.ElementAt(animationCounter);
+                        animationCounter += counterInterval;
+                        break;
+                    }
+                }
+
+            }
+        }
+        private void resumeAnimation()
+        {
+            AnimationPaused = false;
+            AnimationResumed = true;
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                PlayAnimationCommand.NotifyOfCanExecuteChange();
+                PauseAnimationCommand.NotifyOfCanExecuteChange();
+            });
+        }
+        public void PauseAnimation()
+        {
+            AnimationPaused = true;
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                PlayAnimationCommand.NotifyOfCanExecuteChange();
+                PauseAnimationCommand.NotifyOfCanExecuteChange();
+            });
+        }
+        public void StopAnimation()
+        {
+            AnimationStopped = true;
+            AnimationPaused = false;
+            animationCounter = 0;
+        }
+        public async void LoadRealSnapshotsAsync()
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Multiselect = true;
+            openFileDialog.InitialDirectory = @"C:\Users\nx008314\OneDrive - Nexperia\Work\WaferFab";
+            try
+            {
+                if (openFileDialog.ShowDialog() == true)
+                {
+                    ProgressDialogController controller = await dialogCoordinator.ShowProgressAsync(this, "Loading", "Reading snapshot data...");
+                    controller.SetIndeterminate();
+
+                    realSnapshotReader = new RealSnapshotReader();
+                    await Task.Run(() => RealSnapshots = new ObservableCollection<RealSnapshot>(realSnapshotReader.Read(openFileDialog.FileName, 25)));
+
+                    await controller.CloseAsync();
+                }
+            }
+            catch
+            {
+                throw new Exception("Cannot read selected file");
+            }
+        }
+        private void initializeWaferFabSettings(WaferFabSettings settings)
         {
             // Initialize workcenters
-            foreach (var wc in waferFabSettings.WorkCentersData)
+            foreach (var wc in settings.WorkCentersData)
             {
                 WorkCenters.Add(new WorkCenterData(wc.Key, 1 / wc.Value));
             }
             // Initialize lotstarts
-            foreach (var lotStart in waferFabSettings.LotStartQtys)
+            foreach (var lotStart in settings.LotStartQtys)
             {
                 LotStartQtys.Add(new LotStartQty(lotStart.Key, lotStart.Value));
             }
         }
-        private void updateSettings()
+        private void updateWaferFabSettings()
         {
             foreach (var wc in WorkCenters)
             {
@@ -151,24 +307,56 @@ namespace WaferFabGUI.ViewModels
 
             var series = new ColumnSeries();
 
-            foreach (var wip in WIPDataSelected.WIPlevels)
+            foreach (var lotStep in xAxisLotSteps)
             {
-                series.Items.Add(new ColumnItem(wip));
+                if (SnapshotSelected.WIPlevels.ContainsKey(lotStep))                        // Remark: plots 0 if lotStep is unknown in data.
+                {
+                    series.Items.Add(new ColumnItem(SnapshotSelected.WIPlevels[lotStep]));
+                }
+                else
+                {
+                    series.Items.Add(new ColumnItem(0));
+                }
             }
 
-            WIPBarChart.Series.Add(series);
+            //WIPBarChart.Series.ElementAt(0);
 
+
+            WIPBarChart.Series.Add(series);
             WIPBarChart.InvalidatePlot(true);
+
+            if (!isAnimationRunning)
+            {
+                ClearAllWIPDataCommand.NotifyOfCanExecuteChange();
+                ClearLastWIPDataCommand.NotifyOfCanExecuteChange();
+            }
+        }
+        private void updateCommandsCanExecute()
+        {
+            ClearAllWIPDataCommand.NotifyOfCanExecuteChange();
+            ClearLastWIPDataCommand.NotifyOfCanExecuteChange();
+            PlayAnimationCommand.NotifyOfCanExecuteChange();
+            PauseAnimationCommand.NotifyOfCanExecuteChange();
+            StopAnimationCommand.NotifyOfCanExecuteChange();
         }
 
-
-        public ObservableCollection<WIPSnapshot> WIPData
+        public ObservableCollection<RealSnapshot> RealSnapshots
         {
-            get { return _wipSnapshots; }
+            get { return _realSnapshots; }
             set
             {
-                _wipSnapshots = value;
+                _realSnapshots = value;
                 NotifyOfPropertyChange();
+            }
+        }
+        public ObservableCollection<SimulationSnapshot> SimulationSnapshots
+        {
+            get { return _simulationSnapshots; }
+            set
+            {
+                _simulationSnapshots = value;
+                NotifyOfPropertyChange();
+                NotifyOfPropertyChange(nameof(SnapshotsToAnimate));
             }
         }
         public ObservableCollection<int> AllReplications
@@ -184,9 +372,19 @@ namespace WaferFabGUI.ViewModels
                 return allReps;
             }
         }
-        public List<WIPSnapshot> WIPDataPerReplication
+        public IEnumerable<WIPSnapshotBase> SnapshotsToAnimate
         {
-            get { return WIPData.Where(x => x.Replication == SelectedReplication).ToList(); }
+            get
+            {
+                if (IsRealData)
+                {
+                    return RealSnapshots;
+                }
+                else
+                {
+                    return SimulationSnapshots.Where(x => x.Replication == SelectedReplication);
+                }
+            }
         }
         public ObservableCollection<WorkCenterData> WorkCenters
         {
@@ -213,32 +411,49 @@ namespace WaferFabGUI.ViewModels
             }
         }
 
-        public WIPSnapshot WIPDataSelected
+        public WIPSnapshotBase SnapshotSelected
         {
-            get { return _wipDataSelected; }
+            get { return _snapshotSelected; }
             set
             {
-                _wipDataSelected = value;
+                _snapshotSelected = value;
                 NotifyOfPropertyChange();
-                plotSelectedWIPData();
+                if (value != null)
+                {
+                    plotSelectedWIPData();
+                }
             }
         }
-
+        public RealSnapshot StartState
+        {
+            get { return _startState; }
+            set
+            {
+                _startState = value;
+                NotifyOfPropertyChange();
+            }
+        }
         public PlotModel WIPBarChart
         {
             get { return _wipBarChart; }
-            set { _wipBarChart = value; }
+            set
+            {
+                _wipBarChart = value;
+
+            }
         }
+        public int FPSMax { get; set; } = 10;
         public int NumberOfReplications
         {
             get
             {
-                return sim.MyExperiment.NumberOfReplications;
+                return experimentSettings.NumberOfReplications;
             }
             set
             {
-                sim.MyExperiment.NumberOfReplications = value;
+                experimentSettings.NumberOfReplications = value;
                 NotifyOfPropertyChange();
+                NotifyOfPropertyChange(nameof(AllReplications));
             }
         }
         public int LotStartFrequency
@@ -256,19 +471,28 @@ namespace WaferFabGUI.ViewModels
             set
             {
                 _selectedReplication = value;
+                SnapshotSelected = null;
                 NotifyOfPropertyChange();
-                NotifyOfPropertyChange(nameof(WIPDataPerReplication));
+                NotifyOfPropertyChange(nameof(SnapshotsToAnimate));
+                PlayAnimationCommand.NotifyOfCanExecuteChange();
             }
         }
         public double LengthOfReplication   // In hours
         {
             get
             {
-                return sim.MyExperiment.LengthOfReplication / (60 * 60);
+                return experimentSettings.LengthOfReplication / (60 * 60);
             }
             set
             {
-                sim.MyExperiment.LengthOfReplication = value * 60 * 60;
+                if (value == -1)
+                {
+                    experimentSettings.LengthOfReplication = double.MaxValue;
+                }
+                else
+                {
+                    experimentSettings.LengthOfReplication = value * 60 * 60;
+                }
                 NotifyOfPropertyChange();
             }
         }
@@ -276,17 +500,17 @@ namespace WaferFabGUI.ViewModels
         {
             get
             {
-                return sim.MyExperiment.LengthOfReplicationWallClock >= double.MaxValue ? -1 : sim.MyExperiment.LengthOfReplicationWallClock;
+                return experimentSettings.LengthOfReplicationWallClock >= double.MaxValue ? -1 : experimentSettings.LengthOfReplicationWallClock;
             }
             set
             {
                 if (value == -1)
                 {
-                    sim.MyExperiment.LengthOfReplicationWallClock = double.MaxValue;
+                    experimentSettings.LengthOfReplicationWallClock = double.MaxValue;
                 }
                 else
                 {
-                    sim.MyExperiment.LengthOfReplicationWallClock = value;
+                    experimentSettings.LengthOfReplicationWallClock = value;
                 }
                 NotifyOfPropertyChange();
             }
@@ -295,11 +519,11 @@ namespace WaferFabGUI.ViewModels
         {
             get
             {
-                return sim.MyExperiment.LengthOfWarmUp / (60 * 60);
+                return experimentSettings.LengthOfWarmUp / (60 * 60);
             }
             set
             {
-                sim.MyExperiment.LengthOfWarmUp = value * 60 * 60;
+                experimentSettings.LengthOfWarmUp = value * 60 * 60;
                 NotifyOfPropertyChange();
             }
         }
@@ -307,30 +531,118 @@ namespace WaferFabGUI.ViewModels
         {
             get
             {
-                return waferFabSettings.sampleInterval / 60;
+                return waferFabSettings.SampleInterval / 60;
             }
             set
             {
-                waferFabSettings.sampleInterval = value * 60;
+                waferFabSettings.SampleInterval = value * 60;
                 NotifyOfPropertyChange();
+            }
+        }
+        public double yAxisMinimum
+        {
+            get
+            {
+                return yAxis.Minimum == double.NaN ? -1 : yAxis.Minimum;
+            }
+            set
+            {
+                if (value == -1)
+                {
+                    yAxis.Minimum = double.NaN;
+                }
+                else
+                {
+                    yAxis.Minimum = value;
+                }
+                WIPBarChart.InvalidatePlot(true);
+            }
+        }
+        public double yAxisMaximum
+        {
+            get
+            {
+                return yAxis.Maximum == double.NaN ? -1 : yAxis.Maximum;
+            }
+            set
+            {
+                if (value == -1)
+                {
+                    yAxis.Maximum = double.NaN;
+                }
+                else
+                {
+                    yAxis.Maximum = value;
+                }
+                WIPBarChart.InvalidatePlot(true);
+            }
+        }
+        private double _fpsAnimation;
+        public double FPSAnimation
+        {
+            get
+            {
+                return _fpsAnimation;
+            }
+            set
+            {
+                if (value <= FPSMax)
+                {
+                    _fpsAnimation = value;
+                }
+                else
+                {
+                    if (value > _fpsAnimation)
+                    {
+                        _fpsAnimation = Math.Ceiling(value / FPSMax) * FPSMax;
+                    }
+                    else
+                    {
+                        _fpsAnimation = Math.Floor(value / FPSMax) * FPSMax;
+                    }
+                }
+                NotifyOfPropertyChange();
+            }
+        }
+        public bool IsRealData
+        {
+            get { return _isRealData; }
+            set
+            {
+                _isRealData = value;
+                NotifyOfPropertyChange();
+                PlayAnimationCommand.NotifyOfCanExecuteChange();
             }
         }
         public bool IsMultipleSnapshots
         {
-            get { return _isMulitpleSnapshots; }
+            get { return _isMultipleSnapshots; }
             set
             {
-                _isMulitpleSnapshots = value;
+                _isMultipleSnapshots = value;
                 NotifyOfPropertyChange();
             }
         }
-
-        public RelayCommand RunSimulationCommand { get; }
-
-
-        private ObservableCollection<WIPSnapshot> readWIPSnapshots(string outputDir)
+        public bool IsStartStateSelected
         {
-            ObservableCollection<WIPSnapshot> wipSnapshots = new ObservableCollection<WIPSnapshot>();
+            get { return _isStartStateSelected; }
+            set
+            {
+                _isStartStateSelected = value;
+                NotifyOfPropertyChange();
+            }
+        }
+        public RelayCommand RunSimulationCommand { get; }
+        public RelayCommand ClearLastWIPDataCommand { get; }
+        public RelayCommand ClearAllWIPDataCommand { get; }
+        public RelayCommand PlayAnimationCommand { get; }
+        public RelayCommand PauseAnimationCommand { get; }
+        public RelayCommand StopAnimationCommand { get; }
+        public RelayCommand LoadRealSnapshotsCommand { get; }
+
+        private ObservableCollection<SimulationSnapshot> readWIPSnapshots(string outputDir)
+        {
+            ObservableCollection<SimulationSnapshot> wipSnapshots = new ObservableCollection<SimulationSnapshot>();
 
             // Get to experiment directory
             string experimentDir = Directory.GetDirectories(outputDir).OrderBy(x => Directory.GetCreationTime(x)).Last();
@@ -353,7 +665,7 @@ namespace WaferFabGUI.ViewModels
                     {
                         string data = reader.ReadLine();
 
-                        wipSnapshots.Add(new WIPSnapshot(replicationNumber, header, data));
+                        wipSnapshots.Add(new SimulationSnapshot(replicationNumber, header, data));
                     }
                 }
             }

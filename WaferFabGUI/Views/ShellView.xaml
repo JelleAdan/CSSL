@@ -55,7 +55,7 @@
 
                     <!--Row 2-->
                     <!--Experiment-->
-                    <Border Grid.Row="2" Grid.Column="0" BorderBrush="Black" BorderThickness="1" Margin="1,1,1,1" Padding="10" >
+                    <Border Grid.Row="2" Grid.Column="0" BorderBrush="Black" BorderThickness="1" Margin="1,1,1,1" Padding="10"  >
                         <ScrollViewer VerticalScrollBarVisibility="Auto"
                                       HorizontalScrollBarVisibility="Disabled">
                             <StackPanel>
@@ -130,7 +130,7 @@
                     </Border>
 
                     <!--Lot Starts-->
-                    <Border Grid.Row="2" Grid.Column="4" BorderBrush="Black" BorderThickness="1"
+                    <Border Grid.Row="2" Grid.Column="5" BorderBrush="Black" BorderThickness="1"
                             Margin="1,1,1,1" Padding="10">
                         <ScrollViewer VerticalScrollBarVisibility="Auto"
                                       HorizontalScrollBarVisibility="Disabled">
@@ -156,6 +156,28 @@
                                     Minimum="1" />
                                     <Label Content="hours"/>
                                 </StackPanel>
+                                
+                                <!--Initial Lots-->
+                                <Label Content="Initial lots" Margin="0,20,0,0"
+                                    HorizontalAlignment="Center"
+                                    Style="{DynamicResource DescriptionHeaderStyle}"/>
+                                <Controls:ToggleSwitch OffContent="Start with empty fab"
+                                                       OnContent="Initialize fab with snapshot of "
+                                   Margin="5,0,0,0" FontSize="12" ContentDirection="RightToLeft"
+                                   IsOn="{Binding IsStartStateSelected, Mode=TwoWay}" />
+                                <ComboBox
+                                ItemsSource="{Binding RealSnapshots}"
+                                SelectedItem="{Binding StartState}"
+                                Margin="5,0,5,10">  
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border BorderBrush="Gray" BorderThickness="1">
+                                                <Label HorizontalAlignment="Left" Margin="0,0,3,0"
+                                                   Content="{Binding Time}"/>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
                             </StackPanel>
                         </ScrollViewer>
                     </Border>
@@ -187,73 +209,173 @@
                         <RowDefinition Height="20"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="180" />
                         <ColumnDefinition Width="20"/>
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
                     <!--Column 0-->
-                    <!--Controls-->
-                    <StackPanel Grid.Row="0" Grid.Column="0">
-                        <Label Content="Controls" Style="{DynamicResource DescriptionHeaderStyle}"
-                            Margin="0,0,0,20" />
 
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Replication number" Margin="0,0,10,20"/>
-                            <ComboBox ItemsSource="{Binding AllReplications}"
+                    <ScrollViewer Grid.Row="0" Grid.Column="0">
+                        <StackPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Top">
+
+                            <!--Simulation Data-->
+                            <Label Content="Simulation data" Style="{DynamicResource DescriptionHeaderStyle}"
+                            Margin="0,30,0,10" />
+
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Replication number" VerticalAlignment="Center" Margin="0,0,10,20"/>
+                                <ComboBox ItemsSource="{Binding AllReplications}"
                                       SelectedItem="{Binding SelectedReplication}"
-                                      Margin="0,0,0,20"/>
-                        </StackPanel>
-                        <Controls:ToggleSwitch OffContent="Single snapshot" OnContent="Multiple snapshots"
-                                   Margin="0,0,0,20" FontSize="12"
-                                   IsOn="{Binding IsMultipleSnapshots, Mode=TwoWay}" />
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-                            <Label HorizontalAlignment="Left" Margin="0,0,3,0"
+                                      Margin="0,0,0,10"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+                                <Label HorizontalAlignment="Left" Margin="0,0,3,0"
                                                    Content="Sim. time"/>
-                            <Label HorizontalAlignment="Right"
+                                <Label HorizontalAlignment="Right"
                                                    Content="Wall clock time"
                                                    IsEnabled="False"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-                            <Label HorizontalAlignment="Left" Margin="0,0,3,0"
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+                                <Label HorizontalAlignment="Left" Margin="0,0,3,0"
                                                    Content="hh:mm:ss"/>
-                            <Label HorizontalAlignment="Right"
+                                <Label HorizontalAlignment="Right"
                                                    Content="s"
                                                    IsEnabled="False"/>
-                        </StackPanel>
-                        <ComboBox
-                            ItemsSource="{Binding WIPDataPerReplication}"
-                            SelectedItem="{Binding WIPDataSelected}"
-                            Margin="0,0,0,20"
+                            </StackPanel>
+                            <ComboBox
+                            ItemsSource="{Binding SnapshotsToAnimate}"
+                            SelectedItem="{Binding SnapshotSelected}"
+                            Margin="0,0,0,10"
                             IsEnabled="{Binding}">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <Border BorderBrush="Gray" BorderThickness="1">
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-                                            <Label HorizontalAlignment="Left" Margin="0,0,3,0"
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="Gray" BorderThickness="1">
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+                                                <Label HorizontalAlignment="Left" Margin="0,0,3,0"
                                                    Content="{Binding SimulationTimeTimeSpan}"/>
-                                            <Label HorizontalAlignment="Right"
+                                                <Label HorizontalAlignment="Right"
                                                    Content="{Binding WallClockTime}"
                                                    IsEnabled="False"/>
-                                        </StackPanel>
-                                    </Border>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                        <Button Content="clear last"
-                                Command="{Binding ClearLastWIPData}"
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+
+                            <!--Real data-->
+                            <Label Content="Real data" Style="{DynamicResource DescriptionHeaderStyle}"
+                            Margin="0,0,0,10" />
+                            <Button Content="load real data"
+                                Command="{Binding LoadRealSnapshotsCommand}"
                                 Style="{StaticResource MahApps.Styles.Button.AccentedSquare}"
-                                Margin="0,0,0,20"/>
-                        <Button Content="clear all"
-                                Command="{Binding ClearAllWIPData}"
+                                Margin="0,0,0,10"/>
+                            <Label Content="Snapshot time"/>
+                            <ComboBox
+                            ItemsSource="{Binding RealSnapshots}"
+                            SelectedItem="{Binding SnapshotSelected}"
+                            Margin="0,0,0,10">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="Gray" BorderThickness="1">
+                                            <Label HorizontalAlignment="Left" Margin="0,0,3,0"
+                                                   Content="{Binding Time}"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+
+                            <!--Plot-->
+                            <Label Content="Plot" HorizontalAlignment="Center"
+                               Style="{DynamicResource DescriptionHeaderStyle}"
+                               Margin="0,0,0,10"/>
+                            <Controls:ToggleSwitch OffContent="Single snapshot" OnContent="Multiple snapshots"
+                                   Margin="0,0,0,10" FontSize="12" ContentDirection="RightToLeft"
+                                   IsOn="{Binding IsMultipleSnapshots, Mode=TwoWay}" />
+                            <Button Content="clear last"
+                                Command="{Binding ClearLastWIPDataCommand}"
                                 Style="{StaticResource MahApps.Styles.Button.AccentedSquare}"
-                                Margin="0,0,0,20"/>
-                    </StackPanel>
+                                Margin="0,0,0,10"/>
+                            <Button Content="clear all"
+                                Command="{Binding ClearAllWIPDataCommand}"
+                                Style="{StaticResource MahApps.Styles.Button.AccentedSquare}"
+                                Margin="0,0,0,10"/>
+                            <Controls:ToggleSwitch OffContent="Simulation data" OnContent="Real data"
+                                   Margin="0,0,0,10" FontSize="12" ContentDirection="RightToLeft"
+                                   IsOn="{Binding IsRealData, Mode=TwoWay}" />
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="10"/>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="20"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="5"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="5"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Grid.Row ="0" Grid.Column="0"  Content="FPS"/>
+                                <Controls:NumericUpDown  Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="3"
+                                HorizontalAlignment="Stretch"
+                                    ButtonsAlignment="Right" Interval="1" 
+                                    Value="{Binding FPSAnimation}"
+                                    Minimum="0" />
+                                <Button Grid.Row="2" Grid.Column="0" 
+                                Command="{Binding PlayAnimationCommand}"
+                                Style="{StaticResource MahApps.Styles.Button.AccentedSquare}">
+                                    <iconPacks:PackIconMaterial Margin="3"
+                                Width="10" Height="10" Kind="Play" Foreground="White"/>
+                                </Button>
+                                <Button Grid.Row="2" Grid.Column="2"
+                                Command="{Binding PauseAnimationCommand}"
+                                Style="{StaticResource MahApps.Styles.Button.AccentedSquare}">
+                                    <iconPacks:PackIconMaterial Margin="3"
+                                Width="10" Height="10" Kind="Pause" Foreground="White"/>
+                                </Button>
+                                <Button Grid.Row="2" Grid.Column="4"
+                                Command="{Binding StopAnimationCommand}"
+                                Style="{StaticResource MahApps.Styles.Button.AccentedSquare}">
+                                    <iconPacks:PackIconMaterial Margin="3"
+                                Width="10" Height="10" Kind="Stop" Foreground="White"/>
+                                </Button>
+                            </Grid>
+
+                            <!--Y-axis-->
+                            <Label Content="Y-axis"  HorizontalAlignment="Center" 
+                               Style="{DynamicResource DescriptionHeaderStyle}"
+                                Margin="0,0,0,10"/>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Grid.Row="0" Grid.Column="0" Content="Maximum"/>
+                                <Controls:NumericUpDown  Grid.Row="0" Grid.Column="1"
+                                Margin="5,0,5,0" HorizontalAlignment="Stretch"
+                                    ButtonsAlignment="Right" Interval="10" 
+                                    Value="{Binding yAxisMaximum}"
+                                    Minimum="-1" />
+                                <Label Grid.Row="1" Grid.Column="0" Content="Minimum"/>
+                                <Controls:NumericUpDown Grid.Row="1" Grid.Column="1"
+                                Margin="5,0,5,0" HorizontalAlignment="Stretch"
+                                    ButtonsAlignment="Right" Interval="10" 
+                                    Value="{Binding yAxisMinimum}"
+                                    Minimum="-1" />
+                            </Grid>
+                        </StackPanel>
+                    </ScrollViewer>
 
                     <!--Column 2-->
                     <!--WIP plot-->
-                    <oxy:PlotView Grid.Row="0" Grid.Column="2" MinHeight="500"
-                                  Model="{Binding WIPBarChart, Mode=TwoWay}"/>
+                    <oxy:PlotView Grid.Row="0" Grid.RowSpan="4" Grid.Column="2" MinHeight="500"
+                                  Model="{Binding WIPBarChart}"/>
 
                 </Grid>
 

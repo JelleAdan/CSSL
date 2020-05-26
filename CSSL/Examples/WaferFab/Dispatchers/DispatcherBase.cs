@@ -17,5 +17,7 @@ namespace CSSL.Examples.WaferFab.Dispatchers
         public abstract void HandleArrival(Lot lot);
 
         public abstract void HandleDeparture();
+
+        public abstract void HandleFirstDeparture();
     }
 }

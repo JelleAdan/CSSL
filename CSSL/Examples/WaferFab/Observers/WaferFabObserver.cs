@@ -73,6 +73,7 @@ namespace CSSL.Examples.WaferFab.Observers
             }
 
             writeOutputToFile(waferFab);
+            //writeOutputToConsole(waferFab);
         }
 
         protected override void OnReplicationEnd(ModelElementBase modelElement)
@@ -104,6 +105,19 @@ namespace CSSL.Examples.WaferFab.Observers
                 Writer.Write(queueLengths[i].Value + ",");
             }
             Writer.Write("\n");
+        }
+
+        private void writeOutputToConsole(WaferFab waferFab)
+        {
+            Console.Write(waferFab.GetTime + "," + waferFab.GetWallClockTime + ",");
+
+            for (int i = 0; i < queueLengths.Length; i++)
+            {
+                var step = waferFab.LotSteps.Values.Where(x => x.Id == i).First();
+
+                Console.Write($"{step.Name} " + queueLengths[i].Value + ",");
+            }
+            Console.Write("\n");
         }
     }
 }

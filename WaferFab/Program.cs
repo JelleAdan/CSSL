@@ -11,6 +11,9 @@ using CSSL.Examples.WaferFab;
 using WaferFabSim.InputDataConversion;
 using CSSL.Examples.WaferFab.Dispatchers;
 using CSSL.Examples.WaferFab.Observers;
+using System.Threading.Tasks;
+using WaferFabSim.SnapshotData;
+using Microsoft.VisualBasic.CompilerServices;
 
 namespace WaferFabSim
 {
@@ -24,20 +27,20 @@ namespace WaferFabSim
 
             Simulation sim = new Simulation("WaferFab", outputDir);
 
-            // Load data
+            // Load WaferFab settings
             WaferFabSettings waferFabSettings = new WaferFabSettings(inputDir + "CSVs");
 
-            waferFabSettings.sampleInterval = 10 * 60; // 10 minutes
+            waferFabSettings.SampleInterval = 12 * 60 * 60; // 12 hours
 
             // Experiment settings
             sim.MyExperiment.NumberOfReplications = 3;
-            sim.MyExperiment.LengthOfReplication = 2 * 24 * 60 * 60; // 2 = number of days
+            sim.MyExperiment.LengthOfReplication = 20 * 24 * 60 * 60; // 2 = number of days
             sim.MyExperiment.LengthOfWarmUp = 8 * 60 * 60;
 
             Settings.Output = true;
 
             // Build the model and add observers
-            sim = AddModelAndObservers(sim, waferFabSettings);
+            sim = AddModelAndObservers(sim, waferFabSettings, new List<RealLot>());
 
             // Run the simulation
             sim.Run();
@@ -50,10 +53,10 @@ namespace WaferFabSim
 
         }
 
-        public static Simulation AddModelAndObservers(Simulation sim, WaferFabSettings inputData)
+        public static Simulation AddModelAndObservers(Simulation sim, WaferFabSettings inputData, List<RealLot> initialLots)
         {
             // Build the model
-            WaferFab waferFab = new WaferFab(sim.MyModel, "WaferFab", new ConstantDistribution(inputData.sampleInterval));
+            WaferFab waferFab = new WaferFab(sim.MyModel, "WaferFab", new ConstantDistribution(inputData.SampleInterval));
 
             //// LotStarts
             waferFab.LotStarts = inputData.LotStartQtys;
@@ -80,6 +83,12 @@ namespace WaferFabSim
             //// LotGenerator
             waferFab.SetLotGenerator(new LotGenerator(waferFab, "LotGenerator", new ConstantDistribution(inputData.LotStartsFrequency * 60 * 60)));
 
+            // Add intial lots
+            if (initialLots.Any() != default)
+            {
+                waferFab.InitialLots = initialLots.Select(x => x.ConvertToLot(0, waferFab.Sequences)).Where(x => x != null).ToList();
+            }
+
             // Add observers
             WaferFabObserver waferFabObserver = new WaferFabObserver(sim, "WaferFabObserver", waferFab);
             waferFab.Subscribe(waferFabObserver);
@@ -95,5 +104,6 @@ namespace WaferFabSim
 
             return sim;
         }
+
     }
 }

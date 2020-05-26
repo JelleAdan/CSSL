@@ -1,13 +1,11 @@
-﻿using CSSL.Modeling;
-using OxyPlot.Reporting;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace WaferFabGUI.Models
+namespace WaferFabSim.SnapshotData
 {
-    public class WIPSnapshot
+    public class SimulationSnapshot : WIPSnapshotBase
     {
         public int Replication { get; private set; }
 
@@ -17,11 +15,7 @@ namespace WaferFabGUI.Models
 
         public double WallClockTime { get; private set; }
 
-        public string[] LotSteps { get; private set; }
-
-        public int[] WIPlevels { get; private set; }
-
-        public WIPSnapshot(int replication, string headerLine, string dataLine)
+        public SimulationSnapshot(int replication, string headerLine, string dataLine)
         {
             var header = headerLine.Trim(',').Split(',');
 
@@ -41,10 +35,14 @@ namespace WaferFabGUI.Models
 
                 WallClockTime = Convert.ToDouble(data[1]);
 
-                WIPlevels = data.Skip(2).Select(x => int.Parse(x)).ToArray();
+                int[] WIPlevelsArray = data.Skip(2).Select(x => int.Parse(x)).ToArray();
+
+                for (int i = 0; i < LotSteps.Length; i++)
+                {
+                    WIPlevels.Add(LotSteps[i], WIPlevelsArray[i]);
+                }
 
             }
         }
-
     }
 }

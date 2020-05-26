@@ -15,7 +15,7 @@ namespace CSSL.Examples.WaferFab.Dispatchers
 
         public override void HandleArrival(Lot lot)
         {
-            Console.WriteLine($"{GetTime} Arrival \tlot {lot.Id} \t{lot.GetCurrentStep.Name} \t{wc.Name}");
+            //Console.WriteLine($"{GetTime} Arrival \tlot {lot.Id} \t{lot.GetCurrentStep.Name} \t{wc.Name}");
 
             wc.Queues[lot.GetCurrentStep].EnqueueLast(lot);
 
@@ -50,6 +50,14 @@ namespace CSSL.Examples.WaferFab.Dispatchers
             // Send to next workcenter. Caution: always put this after the schedule next departure event part.
             // Otherwise it causes problems when a lot has to visit the same workstation twice in a row.
             lot.SendToNextWorkCenter();
+        }
+
+        public override void HandleFirstDeparture()
+        {
+            // Choose biggest queue to service
+            wc.LotStepInService = wc.Queues.OrderByDescending(x => x.Value.Length).First().Key;
+
+            HandleDeparture();
         }
     }
 }

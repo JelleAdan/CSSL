@@ -11,6 +11,8 @@ namespace WaferFabSim.InputDataConversion
     {
         public WaferFabSettings(string directory)
         {
+            SampleInterval = 10 * 60;
+
             this.directory = directory;
             LotStartQtys = new Dictionary<LotType, int>();
             WorkCentersData = new Dictionary<string, double>();
@@ -29,7 +31,7 @@ namespace WaferFabSim.InputDataConversion
 
         private string directory { get; set; }
 
-        public double sampleInterval { get; set; }
+        public double SampleInterval { get; set; }
 
         public int LotStartsFrequency { get; set; }
 
