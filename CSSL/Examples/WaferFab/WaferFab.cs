@@ -12,20 +12,20 @@ namespace CSSL.Examples.WaferFab
 
         public Dictionary<string, WorkCenter> WorkCenters { get; private set; }
 
-        public Dictionary<LotType, Sequence> Sequences { get; private set; }
+        public Dictionary<string, Sequence> Sequences { get; private set; }
 
         public Dictionary<string, LotStep> LotSteps { get; set; }
 
-        public Dictionary<LotType, int> LotStarts { get; set; }
+        public Dictionary<string, int> LotStarts { get; set; }
 
         public List<Lot> InitialLots { get; set; }
 
         public WaferFab(ModelElementBase parent, string name, ConstantDistribution samplingDistribution) : base(parent, name, samplingDistribution)
         {
             WorkCenters = new Dictionary<string, WorkCenter>();
-            Sequences = new Dictionary<LotType, Sequence>();
+            Sequences = new Dictionary<string, Sequence>();
             LotSteps = new Dictionary<string, LotStep>();
-            LotStarts = new Dictionary<LotType, int>();
+            LotStarts = new Dictionary<string, int>();
             InitialLots = new List<Lot>();
         }
 
@@ -39,12 +39,12 @@ namespace CSSL.Examples.WaferFab
             WorkCenters.Add(name, workCenter);
         }
 
-        public void AddSequence(LotType lotType, Sequence sequence)
+        public void AddSequence(string lotType, Sequence sequence)
         {
             Sequences.Add(lotType, sequence);
         }
 
-        public void AddLotStart(LotType lotType, int quantity)
+        public void AddLotStart(string lotType, int quantity)
         {
             LotStarts.Add(lotType, quantity);
         }
@@ -66,7 +66,7 @@ namespace CSSL.Examples.WaferFab
         /// <param name="e"></param>
         private void HandleFirstSnapshot(CSSLEvent e)
         {
-            NotifyObservers(this);
+              NotifyObservers(this);
         }
 
         protected override void OnReplicationStart()

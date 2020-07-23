@@ -30,7 +30,7 @@
                                                    x:Name="LowerTabControl" >
 
             <!--Input tab-->
-            <TabItem Header="Input">
+            <TabItem Header="Simulation settings">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto" />
@@ -46,16 +46,19 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="20"/>
                         <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="20"/>
+                        <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
                     <!--Row 0-->
-                    <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5"
+                    <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="9"
                            Content="Settings"
                            Style="{DynamicResource DescriptionHeaderStyle}"/>
 
                     <!--Row 2-->
                     <!--Experiment-->
-                    <Border Grid.Row="2" Grid.Column="0" BorderBrush="Black" BorderThickness="1" Margin="1,1,1,1" Padding="10"  >
+                    <Border Grid.Row="2" Grid.Column="0" BorderBrush="Black"
+                            BorderThickness="1" Margin="1,1,1,1" Padding="10"  >
                         <ScrollViewer VerticalScrollBarVisibility="Auto"
                                       HorizontalScrollBarVisibility="Disabled">
                             <StackPanel>
@@ -100,63 +103,7 @@
                                 Interval="1"
                                 Value="{Binding SampleInterval}"
                                 Minimum="0" />
-                            </StackPanel>
-                        </ScrollViewer>
-                    </Border>
 
-                    <!--Processing Time-->
-                    <Border Grid.Row="2" Grid.Column="2" BorderBrush="Black" BorderThickness="1" 
-                            Margin="1,1,1,1" Padding="10">
-                        <ScrollViewer VerticalScrollBarVisibility="Auto"
-                                      HorizontalScrollBarVisibility="Disabled" CanContentScroll="True">
-                            <StackPanel>
-                                <Label Content="Processing time"
-                                    HorizontalAlignment="Center"
-                                    Style="{DynamicResource DescriptionHeaderStyle}"/>
-                                <DataGrid ItemsSource="{Binding WorkCenters}"
-                                          AutoGenerateColumns="False"
-                                          Style="{StaticResource MahApps.Styles.DataGrid.Azure}">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Lot type" Binding="{Binding Name}"
-                                                            IsReadOnly="True" />
-                                        <Controls:DataGridNumericUpDownColumn 
-                                            Header="Mean processing time per lot (s)"
-                                            Binding="{Binding MeanProcessingTime}"
-                                            Minimum="0"  ButtonsAlignment="Left" />
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                            </StackPanel>
-                        </ScrollViewer>
-                    </Border>
-
-                    <!--Lot Starts-->
-                    <Border Grid.Row="2" Grid.Column="5" BorderBrush="Black" BorderThickness="1"
-                            Margin="1,1,1,1" Padding="10">
-                        <ScrollViewer VerticalScrollBarVisibility="Auto"
-                                      HorizontalScrollBarVisibility="Disabled">
-                            <StackPanel>
-                                <Label Content="Lot starts"
-                                    HorizontalAlignment="Center"
-                                    Style="{DynamicResource DescriptionHeaderStyle}"/>
-                                <DataGrid ItemsSource="{Binding LotStartQtys}" AutoGenerateColumns="False" 
-                                      Style="{StaticResource MahApps.Styles.DataGrid.Azure}">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Lot type" Binding="{Binding LotType}"
-                                                        IsReadOnly="True" />
-                                        <Controls:DataGridNumericUpDownColumn Header="Quantity"
-                                          Binding="{Binding Quantity}"
-                                          Minimum="0"  ButtonsAlignment="Left" />
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                                <StackPanel Margin="0,10,0,0" Orientation="Horizontal" HorizontalAlignment="Left">
-                                    <Label Content="Start these every"/>
-                                    <Controls:NumericUpDown Margin="5,0,5,0"
-                                    ButtonsAlignment="Right" Interval="1" 
-                                    Value="{Binding LotStartFrequency}"
-                                    Minimum="1" />
-                                    <Label Content="hours"/>
-                                </StackPanel>
-                                
                                 <!--Initial Lots-->
                                 <Label Content="Initial lots" Margin="0,20,0,0"
                                     HorizontalAlignment="Center"
@@ -168,7 +115,7 @@
                                 <ComboBox
                                 ItemsSource="{Binding RealSnapshots}"
                                 SelectedItem="{Binding StartState}"
-                                Margin="5,0,5,10">  
+                                Margin="5,0,5,10">
                                     <ComboBox.ItemTemplate>
                                         <DataTemplate>
                                             <Border BorderBrush="Gray" BorderThickness="1">
@@ -182,8 +129,116 @@
                         </ScrollViewer>
                     </Border>
 
+                    <!--Processing Time-->
+                    <Border Grid.Row="2" Grid.Column="2" BorderBrush="Black" BorderThickness="1" 
+                            Margin="1,1,1,1" Padding="10">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Label Grid.Row="0" Grid.Column="0" Content="Processing time"
+                                    HorizontalAlignment="Center"
+                                    Style="{DynamicResource DescriptionHeaderStyle}"/>
+                            <DataGrid Grid.Row="1" Grid.Column="0" 
+                                      ItemsSource="{Binding WorkCenters}"
+                                      AutoGenerateColumns="False"
+                                      Style="{StaticResource MahApps.Styles.DataGrid.Azure}"
+                                      ScrollViewer.CanContentScroll="True"
+                                      ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Lot type" Binding="{Binding Name}"
+                                                            IsReadOnly="True" />
+                                    <Controls:DataGridNumericUpDownColumn 
+                                            Header="Mean processing time per lot (s)"
+                                            Binding="{Binding MeanProcessingTime}"
+                                            Minimum="0"  ButtonsAlignment="Left" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </Border>
+
+                    <!--Lot Starts-->
+                    <Border Grid.Row="2" Grid.Column="4" BorderBrush="Black" BorderThickness="1"
+                            Margin="1,1,1,1" Padding="10">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Label Grid.Row="0" Grid.Column="0" Content="Lot starts"
+                                    HorizontalAlignment="Center"
+                                    Style="{DynamicResource DescriptionHeaderStyle}"/>
+                            
+
+                            <DataGrid Grid.Row="1" Grid.Column="0"
+                                ItemsSource="{Binding LotStartQtys}" AutoGenerateColumns="False" 
+                                      Style="{StaticResource MahApps.Styles.DataGrid.Azure}"
+                                          ScrollViewer.CanContentScroll="True"
+                                          ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Lot type" Binding="{Binding LotType}"
+                                                        IsReadOnly="True" />
+                                    <Controls:DataGridNumericUpDownColumn Header="Quantity"
+                                          Binding="{Binding Quantity}"
+                                          Minimum="0"  ButtonsAlignment="Left" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <StackPanel Grid.Row="2" Grid.Column="0"
+                                Margin="0,10,0,10" Orientation="Horizontal" HorizontalAlignment="Left">
+                                <Label Content="Start these every"/>
+                                <Controls:NumericUpDown Margin="5,0,5,0"
+                                    ButtonsAlignment="Right" Interval="1" 
+                                    Value="{Binding LotStartFrequency}"
+                                    Minimum="1" />
+                                <Label Content="hours"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!--IRDs Selected-->
+                    <Border Grid.Row="2" Grid.Column="6" BorderBrush="Black" BorderThickness="1"
+                            Margin="1,1,1,1" Padding="10">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Label Grid.Row="0" Grid.Column="0"
+                                Content="IRDs selected"
+                                    HorizontalAlignment="Center"
+                                    Style="{DynamicResource DescriptionHeaderStyle}"/>
+                            <DataGrid Grid.Row="1" Grid.Column="0"
+                                    ItemsSource="{Binding XAxisLotSteps}" AutoGenerateColumns="False"
+                                    ScrollViewer.CanContentScroll="True"
+                                    ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                <DataGrid.Columns>
+                                    <DataGridCheckBoxColumn ElementStyle="{DynamicResource MahApps.Styles.CheckBox.DataGrid}"
+                                                                EditingElementStyle="{DynamicResource MahApps.Styles.CheckBox.DataGrid}"
+                                                                Header="Selected"
+                                                                Binding="{Binding Selected}"/>
+                                    <DataGridTextColumn Header="IRD Group" Binding="{Binding Name}"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </Border>
+
                     <!--Row 4-->
-                    <StackPanel Grid.Row="4" Grid.Column="2"
+                    <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="10"
                                 HorizontalAlignment="Center">
                         <Label Content="Simulate" Style="{DynamicResource DescriptionHeaderStyle}" />
                         <Button Width="60"
@@ -202,7 +257,7 @@
             </TabItem>
 
             <!--Output tab-->
-            <TabItem Header="Output" HorizontalAlignment="Left" Width="96">
+            <TabItem Header="WIP Balance" HorizontalAlignment="Left" >
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
@@ -383,6 +438,14 @@
 
         </Controls:MetroAnimatedSingleRowTabControl>
 
+        <!--<Controls:MetroWindow.Flyouts>
+            <Controls:FlyoutsControl>
+                <Controls:Flyout>
+                    
+                </Controls:Flyout>
+            </Controls:FlyoutsControl>
+        </Controls:MetroWindow.Flyouts>-->
+        
 
     </Grid>
 </Controls:MetroWindow>

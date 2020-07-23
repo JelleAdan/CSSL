@@ -22,8 +22,7 @@ namespace WaferFabGUI.Views
     {
         public ShellView()
         {
-            //InitializeComponent();
-            //DataContext = new ShellViewModel(DialogCoordinator.Instance);
+
         }
     }
 }

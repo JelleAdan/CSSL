@@ -1,5 +1,4 @@
 ﻿using CSSL.Modeling.CSSLQueue;
-using WaferFabSim.SnapshotData;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,7 +7,9 @@ namespace CSSL.Examples.WaferFab
 {
     public class Lot : CSSLQueueObject<Lot>
     {
-        public readonly LotType LotType;
+        public string ProductType => Sequence.ProductType;
+
+        public string ProductGroup => Sequence.ProductGroup;
 
         public Sequence Sequence { get; }
 
@@ -16,11 +17,11 @@ namespace CSSL.Examples.WaferFab
 
         public double EndTime { get; private set; }
 
-        public int? PlanDay { get; internal set; }
+        public int? PlanDay { get; set; }
 
-        public int ClipWeek { get; internal set; }
+        public int ClipWeek { get; set; }
 
-        public string LotID { get; internal set; }
+        public string LotID { get; set; }
 
         public WorkCenter GetCurrentWorkCenter => Sequence.GetCurrentWorkCenter(CurrentStepCount);
 
@@ -56,15 +57,12 @@ namespace CSSL.Examples.WaferFab
         {
             CurrentStepCount = -1;
 
-            LotType = sequence.Type;
-
             Sequence = sequence;
         }
 
 
         public Lot(Lot lotToDeepCopy)
         {
-            LotType = lotToDeepCopy.LotType;
             Sequence = lotToDeepCopy.Sequence;
             CurrentStepCount = lotToDeepCopy.CurrentStepCount;
             EndTime = lotToDeepCopy.EndTime;

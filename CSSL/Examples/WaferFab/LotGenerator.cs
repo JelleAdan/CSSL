@@ -21,7 +21,7 @@ namespace CSSL.Examples.WaferFab
             ScheduleEvent(NextEventTime(), HandleGeneration);
 
             // Create lots according to preset quantities in LotStarts and send all lots to first workstation
-            foreach(KeyValuePair<LotType, int> lotStart in waferFab.LotStarts)
+            foreach(KeyValuePair<string, int> lotStart in waferFab.LotStarts)
             {
                 Sequence sequence = waferFab.Sequences[lotStart.Key];
 

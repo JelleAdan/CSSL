@@ -5,6 +5,7 @@ using CSSL.Utilities.Statistics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 
 namespace CSSL.Examples.WaferFab.Observers
@@ -13,19 +14,24 @@ namespace CSSL.Examples.WaferFab.Observers
     {
         public WaferFabObserver(Simulation mySimulation, string name, WaferFab waferFab) : base(mySimulation, name)
         {
-            queueLengths = new Variable<int>[waferFab.LotSteps.Count()];
+            queueLengths = new Dictionary<LotStep, Variable<int>>();
             queueLengthsStatistics = new Dictionary<LotStep, WeightedStatistic>();
+
 
             foreach (LotStep step in waferFab.LotSteps.Values.OrderBy(x => x.Id))
             {
-                queueLengths[step.Id] = new Variable<int>(this);
+                queueLengths.Add(step, new Variable<int>(this));
                 queueLengthsStatistics.Add(step, new WeightedStatistic("QueueLength_" + step.Name));
             }
+
+            orderedLotSteps = waferFab.LotSteps.Values.OrderBy(x => x.Id).ToList();
         }
 
-        private Variable<int>[] queueLengths;
+        private Dictionary<LotStep, Variable<int>> queueLengths;
 
         private Dictionary<LotStep, WeightedStatistic> queueLengthsStatistics;
+
+        private List<LotStep> orderedLotSteps;
 
         public override void OnError(Exception error)
         {
@@ -40,7 +46,7 @@ namespace CSSL.Examples.WaferFab.Observers
         {
             WaferFab waferFab = (WaferFab)modelElement;
 
-            foreach (var queueLength in queueLengths)
+            foreach (var queueLength in queueLengths.Values)
             {
                 queueLength.Reset();
             }
@@ -67,8 +73,8 @@ namespace CSSL.Examples.WaferFab.Observers
             {
                 foreach (var step in workCenter.LotSteps)
                 {
-                    queueLengths[step.Id].UpdateValue(workCenter.Queues[step].Length);
-                    queueLengthsStatistics[step].Collect(queueLengths[step.Id].PreviousValue, queueLengths[step.Id].Weight);
+                    queueLengths[step].UpdateValue(workCenter.Queues[step].Length);
+                    queueLengthsStatistics[step].Collect(queueLengths[step].PreviousValue, queueLengths[step].Weight);
                 }
             }
 
@@ -100,9 +106,9 @@ namespace CSSL.Examples.WaferFab.Observers
         {
             Writer.Write(waferFab.GetTime + "," + waferFab.GetWallClockTime + ",");
 
-            for (int i = 0; i < queueLengths.Length; i++)
+            foreach (LotStep step in orderedLotSteps)
             {
-                Writer.Write(queueLengths[i].Value + ",");
+                Writer.Write(queueLengths[step].Value + ",");
             }
             Writer.Write("\n");
         }
@@ -111,11 +117,9 @@ namespace CSSL.Examples.WaferFab.Observers
         {
             Console.Write(waferFab.GetTime + "," + waferFab.GetWallClockTime + ",");
 
-            for (int i = 0; i < queueLengths.Length; i++)
+            foreach (LotStep step in orderedLotSteps)
             {
-                var step = waferFab.LotSteps.Values.Where(x => x.Id == i).First();
-
-                Console.Write($"{step.Name} " + queueLengths[i].Value + ",");
+                Console.Write($"{step.Name} " + queueLengths[step].Value + ",");
             }
             Console.Write("\n");
         }

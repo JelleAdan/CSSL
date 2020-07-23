@@ -5,11 +5,10 @@ using System.Text;
 
 namespace CSSL.Examples.WaferFab
 {
+    [Serializable]
     public class LotStep : IIdentity, IName
     {
         public WorkCenter WorkCenter { get; private set; }
-
-        static int lotStepCount;
 
         public int Id { get; }
 
@@ -20,9 +19,9 @@ namespace CSSL.Examples.WaferFab
             WorkCenter = workCenter;
         }
 
-        public LotStep(string name)
+        public LotStep(int id, string name)
         {
-            Id = lotStepCount++;
+            Id = id;
             Name = name;
         }
 

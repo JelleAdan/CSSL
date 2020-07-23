@@ -79,7 +79,7 @@ namespace CSSL.Examples.WaferFab.Observers
             {
                 Lot lot = workCenter.LastArrivedLot;
 
-                throw new Exception($"{workCenter.Name} has lot {lot.LotType.ToString()} in {lot.GetCurrentStep.Name}, should be in {lot.GetCurrentWorkCenter.Name}");
+                throw new Exception($"{workCenter.Name} has lot {lot.ProductType.ToString()} in {lot.GetCurrentStep.Name}, should be in {lot.GetCurrentWorkCenter.Name}");
             }
         }
 

@@ -5,6 +5,7 @@ using System.Text;
 
 namespace WaferFabSim.SnapshotData
 {
+    [Serializable]
     public class RealLot
     {
         public DateTime SnapshotTime { get; private set; }
@@ -50,69 +51,37 @@ namespace WaferFabSim.SnapshotData
             }
         }
 
-        public Lot ConvertToLot(double creationTime, Dictionary<LotType, Sequence> sequences)
+        public Lot ConvertToLot(double creationTime, Dictionary<string, Sequence> sequences)
         {
-            LotType type;
-            switch (Technology)
+            if (sequences.ContainsKey(DeviceType))
             {
-                case "TRENCH2":
+                Sequence sequence = sequences[DeviceType];
+
+                Lot lot = new Lot(creationTime, sequence);
+
+                lot.PlanDay = PlanDay;
+                lot.ClipWeek = ClipWeek;
+                lot.LotID = LotID;
+
+                for (int i = 0; i < lot.Sequence.stepCount; i++)
+                {
+                    if (lot.Sequence.GetCurrentStep(i).Name == IRDGroup)
                     {
-                        type = LotType.Trench2;
+                        lot.SetCurrentStepCount(i);
                         break;
                     }
-                case "TRENCH3 LF":
+                    if (i == lot.Sequence.stepCount - 1)
                     {
-                        type = LotType.Trench3LF;
-                        break;
+                        lot.SetCurrentStepCount(0);
+                        tmpCounter++;
                     }
-                case "TRENCH3":
-                    {
-                        type = LotType.Trench3WB;
-                        break;
-                    }
-                case "TRENCH4":
-                    {
-                        type = LotType.Trench4;
-                        break;
-                    }
-                case "TRENCH6 LF":
-                    {
-                        type = LotType.Trench6LF;
-                        break;
-                    }
-                case "TRENCH6":
-                    {
-                        type = LotType.Trench6WB;
-                        break;
-                    }
-                default:
-                    {
-                        return null;
-                    }
+                }
+                return lot;
             }
-
-            Lot lot = new Lot(creationTime, sequences[type]);
-
-            lot.PlanDay = PlanDay;
-            lot.ClipWeek = ClipWeek;
-            lot.LotID = LotID;
-
-            for (int i = 0; i < lot.Sequence.stepCount; i++)
+            else
             {
-                if (lot.Sequence.GetCurrentStep(i).Name == IRDGroup)
-                {
-                    lot.SetCurrentStepCount(i);
-                    break;
-                }
-                if (i == lot.Sequence.stepCount - 1)
-                {
-                    lot.SetCurrentStepCount(0);
-                    tmpCounter++;
-                }
-
+                throw new Exception($"Process plans does not contain {DeviceType}");
             }
-
-            return lot;
         }
     }
 }

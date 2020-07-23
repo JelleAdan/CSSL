@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace CSSL.Utilities.Distributions
 {
+    [Serializable]
     public class ExponentialDistribution : Distribution
     {
         public ExponentialDistribution(double rate) : base(1 / rate, 1 / rate / rate)

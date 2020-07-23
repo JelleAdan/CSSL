@@ -7,10 +7,10 @@ namespace WaferFabGUI.Models
 {
     public class LotStartQty
     {
-        public LotType LotType { get; set; }
+        public string LotType { get; set; }
         public int Quantity{ get; set; }
 
-        public LotStartQty(LotType lotType, int quantity)
+        public LotStartQty(string lotType, int quantity)
         {
             LotType = lotType;
             Quantity = quantity;

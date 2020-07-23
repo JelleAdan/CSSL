@@ -4,25 +4,31 @@ using System.Text;
 
 namespace CSSL.Examples.WaferFab
 {
+    [Serializable]
     public class Sequence
     {
-        public Sequence(LotType type, List<LotStep> lotSteps)
+        public Sequence(string productType, string productGroup, List<LotStep> lotSteps)
         {
-            Type = type;
+            ProductType = productType;
+            ProductGroup = productGroup;
             this.lotSteps = lotSteps;
         }
 
-        public Sequence(LotType type)
+        public Sequence(string productType, string productGroup)
         {
-            Type = type;
-            lotSteps = new List<LotStep>();
+            ProductType = productType;
+            ProductGroup = productGroup;
+            this.lotSteps = new List<LotStep>();
         }
 
+        public string ProductGroup { get; }
+
+        public string ProductType { get; 
+        }
         private List<LotStep> lotSteps { get; set; }
 
         public int stepCount => lotSteps.Count;
 
-        public LotType Type { get; }
 
         public bool HasNextStep(int currentStepCount)
         {

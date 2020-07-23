@@ -1,6 +1,7 @@
 ﻿using Caliburn.Micro;
 using CSSL.Examples.WaferFab;
 using CSSL.Modeling;
+using CSSL.Utilities.Distributions;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Win32;
@@ -30,6 +31,7 @@ using System.Windows.Navigation;
 using System.Xml.Serialization;
 using WaferFabGUI.Models;
 using WaferFabSim;
+using WaferFabSim.Import;
 using WaferFabSim.InputDataConversion;
 using WaferFabSim.SnapshotData;
 using Action = System.Action;
@@ -40,10 +42,19 @@ namespace WaferFabGUI.ViewModels
     {
         public ShellViewModel()
         {
+            string inputDir = @"C:\Users\nx008314\OneDrive - Nexperia\Work\WaferFab\";
+            string outputDir = @"C:\CSSLWaferFab\";
+
+
+            WaferFabSim = new ShellModel(inputDir, outputDir);
+            WaferFabSim.ReadSimulationResults();
+            WaferFabSim.PropertyChanged += ShellModel_PropertyChanged;
+
+
             // Link relay commands
             RunSimulationCommand = new RelayCommand(RunSimulationAsync, () => true);
-            ClearAllWIPDataCommand = new RelayCommand(ClearAllWIPData, () => CanClearWIPData);
-            ClearLastWIPDataCommand = new RelayCommand(ClearLastWIPData, () => CanClearWIPData);
+            ClearAllWIPDataCommand = new RelayCommand(ClearAllWIPPlots, () => CanClearWIPData);
+            ClearLastWIPDataCommand = new RelayCommand(ClearLastWIPPlot, () => CanClearWIPData);
             PlayAnimationCommand = new RelayCommand(PlayAnimationAsync, () => (SnapshotsToAnimate != null && SnapshotsToAnimate.Any() && !isAnimationRunning) || AnimationPaused);
             PauseAnimationCommand = new RelayCommand(PauseAnimation, () => isAnimationRunning && !AnimationPaused);
             StopAnimationCommand = new RelayCommand(StopAnimation, () => isAnimationRunning);
@@ -52,38 +63,47 @@ namespace WaferFabGUI.ViewModels
             // Initialize properties
             WorkCenters = new ObservableCollection<WorkCenterData>();
             LotStartQtys = new ObservableCollection<LotStartQty>();
+            XAxisLotSteps = new ObservableCollection<CheckBoxLotStep>();
             WIPBarChart = new PlotModel { Title = "WIP balance" };
             dialogCoordinator = DialogCoordinator.Instance;
             inputDirectory = @"C:\Users\nx008314\OneDrive - Nexperia\Work\WaferFab\";
             FPSAnimation = 5;
             FPSMax = 5;
-
+            waferThresholdQty = 25;
 
             // Initialize Experiment Settings
             experimentSettings = new ExperimentSettings();
-            experimentSettings.OutputDirectory = @"C:\CSSLWaferFab\";
             experimentSettings.NumberOfReplications = 1;
             experimentSettings.LengthOfReplication = 100 * 24 * 60 * 60;
             experimentSettings.LengthOfWarmUp = 12 * 60 * 60;
             Settings.Output = true;
 
             // Initialize Waferfab Settings
-            waferFabSettings = new WaferFabSettings(inputDirectory + "CSVs");
-            initializeWaferFabSettings(waferFabSettings);
+            waferFabReader = new AutoDataReader(inputDirectory + @"\Auto");
+            waferFabSettings = waferFabReader.ReadWaferFabSettings();
+            initializeGUIWaferFabSettings(waferFabSettings);
+
+            // TEMPORARY
+            var reader = new ManualDataReader(inputDirectory + @"\Manual");
+            var settings = reader.ReadWaferFabSettings();
 
             // Initialize bar chart
-            SimulationSnapshots = readWIPSnapshots(experimentSettings.OutputDirectory);
-            xAxisLotSteps = SimulationSnapshots.First().LotSteps;
-            xAxis = new CategoryAxis() { Angle = 60, ItemsSource = xAxisLotSteps };
+            SimulationSnapshots = new ObservableCollection<SimulationSnapshot>(WaferFabSim.MySimResults.SimulationSnapshots);
+            foreach (var step in waferFabSettings.LotSteps.OrderBy(x => x.Value.Id))
+            {
+                XAxisLotSteps.Add(new CheckBoxLotStep(settings.LotSteps.ContainsKey(step.Key), step.Key));
+            }
+            xAxis = new CategoryAxis() { Angle = 60, ItemsSource = XAxisLotSteps.Where(x => x.Selected).Select(x => x.Name) };
             WIPBarChart.Axes.Add(xAxis);
             yAxis = new LinearAxis() { Minimum = 0 };
             WIPBarChart.Axes.Add(yAxis);
         }
 
+        public ShellModel WaferFabSim { get; set; }
+
         private Stopwatch stopwatch = new Stopwatch();
         private LinearAxis yAxis;
         private CategoryAxis xAxis;
-        private string[] xAxisLotSteps;
         private Simulation sim;
         private ExperimentSettings experimentSettings;
         private WaferFabSettings waferFabSettings;
@@ -94,6 +114,8 @@ namespace WaferFabGUI.ViewModels
         private bool _isStartStateSelected;
         private int _selectedReplication;
         private int animationCounter;
+        private int waferThresholdQty;
+        private ObservableCollection<CheckBoxLotStep> _xAxisLotSteps;
         private ObservableCollection<WorkCenterData> _workCenters;
         private ObservableCollection<LotStartQty> _lotStartQtys;
         private ObservableCollection<SimulationSnapshot> _simulationSnapshots;
@@ -102,7 +124,7 @@ namespace WaferFabGUI.ViewModels
         private WIPSnapshotBase _snapshotSelected;
         private RealSnapshot _startState;
         private IDialogCoordinator dialogCoordinator;
-        private RealSnapshotReader realSnapshotReader;
+        private DataReaderBase waferFabReader;
 
         public bool AnimationPaused = false;
         public bool AnimationResumed = false;
@@ -114,41 +136,51 @@ namespace WaferFabGUI.ViewModels
             controller.SetIndeterminate();
 
             // Build simulation model
-            sim = new Simulation("WaferFab", experimentSettings.OutputDirectory);
-            experimentSettings.UpdateSettingsInSimulation(sim);
-
-            // Build model (and initialize waferfab with real snapshot)
             updateWaferFabSettings();
 
-            if (IsStartStateSelected)
-            {
-                sim = Program.AddModelAndObservers(sim, waferFabSettings, realSnapshotReader.AllRealLots.Where(x => x.SnapshotTime == StartState.Time).ToList());
-            }
-            else
-            {
-                sim = Program.AddModelAndObservers(sim, waferFabSettings, new List<RealLot>());
-            }
+            WaferFabSim.MyWaferFabSettings = waferFabSettings;
 
+            WaferFabSim.MyExperimentSettings = experimentSettings;
 
             // Run simulation
-            await Task.Run(() => sim.Run());
+            await Task.Run(() => WaferFabSim.RunSimulation());
 
             // Update WIP data
-            ClearAllWIPData();
-            SimulationSnapshots.Clear();
-            SimulationSnapshots = readWIPSnapshots(experimentSettings.OutputDirectory);
+            ClearAllWIPPlots();
 
             // Close...
             await controller.CloseAsync();
         }
-        public void ClearLastWIPData()
+        public async void LoadRealSnapshotsAsync()
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Multiselect = true;
+            openFileDialog.InitialDirectory = @"C:\Users\nx008314\OneDrive - Nexperia\Work\WaferFab\Snapshots";
+            try
+            {
+                if (openFileDialog.ShowDialog() == true)
+                {
+                    ProgressDialogController controller = await dialogCoordinator.ShowProgressAsync(this, "Loading", "Reading snapshot data...");
+                    controller.SetIndeterminate();
+                    
+                    await Task.Run(() => WaferFabSim.ReadRealSnaphots(openFileDialog.FileName));
+
+                    await controller.CloseAsync();
+                }
+            }
+            catch
+            {
+                throw new Exception("Cannot read selected file");
+            }
+        }
+        public void ClearLastWIPPlot()
         {
             WIPBarChart.Series.RemoveAt(WIPBarChart.Series.Count - 1);
             WIPBarChart.InvalidatePlot(true);
             ClearAllWIPDataCommand.NotifyOfCanExecuteChange();
             ClearLastWIPDataCommand.NotifyOfCanExecuteChange();
         }
-        public void ClearAllWIPData()
+        public void ClearAllWIPPlots()
         {
             WIPBarChart.Series.Clear();
             WIPBarChart.InvalidatePlot(true);
@@ -251,35 +283,13 @@ namespace WaferFabGUI.ViewModels
             AnimationPaused = false;
             animationCounter = 0;
         }
-        public async void LoadRealSnapshotsAsync()
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Multiselect = true;
-            openFileDialog.InitialDirectory = @"C:\Users\nx008314\OneDrive - Nexperia\Work\WaferFab";
-            try
-            {
-                if (openFileDialog.ShowDialog() == true)
-                {
-                    ProgressDialogController controller = await dialogCoordinator.ShowProgressAsync(this, "Loading", "Reading snapshot data...");
-                    controller.SetIndeterminate();
 
-                    realSnapshotReader = new RealSnapshotReader();
-                    await Task.Run(() => RealSnapshots = new ObservableCollection<RealSnapshot>(realSnapshotReader.Read(openFileDialog.FileName, 25)));
-
-                    await controller.CloseAsync();
-                }
-            }
-            catch
-            {
-                throw new Exception("Cannot read selected file");
-            }
-        }
-        private void initializeWaferFabSettings(WaferFabSettings settings)
+        private void initializeGUIWaferFabSettings(WaferFabSettings settings)
         {
             // Initialize workcenters
-            foreach (var wc in settings.WorkCentersData)
+            foreach (var wc in settings.WorkCenters)
             {
-                WorkCenters.Add(new WorkCenterData(wc.Key, 1 / wc.Value));
+                WorkCenters.Add(new WorkCenterData(wc, settings.WorkCenterDistributions[wc].Mean));
             }
             // Initialize lotstarts
             foreach (var lotStart in settings.LotStartQtys)
@@ -291,11 +301,20 @@ namespace WaferFabGUI.ViewModels
         {
             foreach (var wc in WorkCenters)
             {
-                waferFabSettings.WorkCentersData[wc.Name] = wc.ExponentialRate;
+                waferFabSettings.WorkCenterDistributions[wc.Name] = new ExponentialDistribution(wc.ExponentialRate);
             }
             foreach (var lotStart in LotStartQtys)
             {
                 waferFabSettings.LotStartQtys[lotStart.LotType] = lotStart.Quantity;
+            }
+
+            if (IsStartStateSelected)
+            {
+                waferFabSettings.InitialLots = WaferFabSim.RealSnapshotReader.RealLots.Where(x => x.SnapshotTime == StartState.Time && x.Qty >= waferThresholdQty).ToList();
+            }
+            else
+            {
+                waferFabSettings.InitialLots = new List<RealLot>();
             }
         }
         private void plotSelectedWIPData()
@@ -307,20 +326,18 @@ namespace WaferFabGUI.ViewModels
 
             var series = new ColumnSeries();
 
-            foreach (var lotStep in xAxisLotSteps)
+            foreach (var lotStep in XAxisLotSteps.Where(x => x.Selected))
             {
-                if (SnapshotSelected.WIPlevels.ContainsKey(lotStep))                        // Remark: plots 0 if lotStep is unknown in data.
+
+                if (SnapshotSelected.WIPlevels.ContainsKey(lotStep.Name))                        // Remark: plots 0 if lotStep is unknown in data.
                 {
-                    series.Items.Add(new ColumnItem(SnapshotSelected.WIPlevels[lotStep]));
+                    series.Items.Add(new ColumnItem(SnapshotSelected.WIPlevels[lotStep.Name]));
                 }
                 else
                 {
                     series.Items.Add(new ColumnItem(0));
                 }
             }
-
-            //WIPBarChart.Series.ElementAt(0);
-
 
             WIPBarChart.Series.Add(series);
             WIPBarChart.InvalidatePlot(true);
@@ -407,6 +424,18 @@ namespace WaferFabGUI.ViewModels
             set
             {
                 _lotStartQtys = value;
+                NotifyOfPropertyChange();
+            }
+        }
+        public ObservableCollection<CheckBoxLotStep> XAxisLotSteps
+        {
+            get
+            {
+                return _xAxisLotSteps;
+            }
+            set
+            {
+                _xAxisLotSteps = value;
                 NotifyOfPropertyChange();
             }
         }
@@ -640,41 +669,22 @@ namespace WaferFabGUI.ViewModels
         public RelayCommand StopAnimationCommand { get; }
         public RelayCommand LoadRealSnapshotsCommand { get; }
 
-        private ObservableCollection<SimulationSnapshot> readWIPSnapshots(string outputDir)
-        {
-            ObservableCollection<SimulationSnapshot> wipSnapshots = new ObservableCollection<SimulationSnapshot>();
-
-            // Get to experiment directory
-            string experimentDir = Directory.GetDirectories(outputDir).OrderBy(x => Directory.GetCreationTime(x)).Last();
-
-            // Get to replication directories
-            foreach (string replicationDir in Directory.GetDirectories(experimentDir))
-            {
-                var test = replicationDir.ToCharArray();
-
-                int replicationNumber = Convert.ToInt32(replicationDir.Substring(replicationDir.Length - 1));
-
-                // Get to waferFabObserver
-                var waferFabObserverDir = Directory.GetFiles(replicationDir).Where(x => x.Contains("WaferFabObserver")).First();
-
-                // Read data
-                using (var reader = new StreamReader(waferFabObserverDir))
-                {
-                    string header = reader.ReadLine();
-                    while (!reader.EndOfStream)
-                    {
-                        string data = reader.ReadLine();
-
-                        wipSnapshots.Add(new SimulationSnapshot(replicationNumber, header, data));
-                    }
-                }
-            }
-            return wipSnapshots;
-        }
-
         private void NotifyOfPropertyChange([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void ShellModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "MyResults")
+            {
+                SimulationSnapshots = new ObservableCollection<SimulationSnapshot>(WaferFabSim.MySimResults.SimulationSnapshots);
+            }
+
+            if (e.PropertyName == "RealSnapshotReader")
+            {
+                RealSnapshots = new ObservableCollection<RealSnapshot>(WaferFabSim.RealSnapshotReader.RealSnapshots);
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -710,6 +720,17 @@ namespace WaferFabGUI.ViewModels
             {
                 CanExecuteChanged?.Invoke(this, new EventArgs());
             }
+        }
+
+        public class CheckBoxLotStep
+        {
+            public CheckBoxLotStep(bool selected, string name)
+            {
+                Selected = selected;
+                Name = name;
+            }
+            public bool Selected { get; set; }
+            public string Name { get; set; }
         }
     }
 }

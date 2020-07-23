@@ -11,25 +11,33 @@ namespace WaferFabSim.SnapshotData
     {
         public RealSnapshotReader()
         {
-            AllRealLots = new List<RealLot>();
+            RealLots = new List<RealLot>();
         }
         public string fileDirectory { get; set; }
 
         public int WaferQtyThreshold { get; set; }
 
-        public List<RealLot> AllRealLots { get; set; }
+        public List<RealLot> RealLots { get; set; }
 
-        public List<RealSnapshot> Read(string fileToRead, int waferQtyuThreshold)
+        public List<RealSnapshot> RealSnapshots { get; set; }
+
+        public List<RealSnapshot> Read(string fileToRead, int waferQtyThreshold)
         {
-            WaferQtyThreshold = waferQtyuThreshold;
+            WaferQtyThreshold = waferQtyThreshold;
             fileDirectory = fileToRead;
-            AllRealLots = fillAllLots();
+            RealLots = fillAllLots();
+            RealSnapshots = constructRealSnapshots();
 
+            return RealSnapshots;
+        }
+
+        private List<RealSnapshot> constructRealSnapshots()
+        {
             List<RealSnapshot> allSnapshots = new List<RealSnapshot>();
 
-            foreach (var snapshotTime in AllRealLots.Select(x => x.SnapshotTime).Distinct())
+            foreach (var snapshotTime in RealLots.Select(x => x.SnapshotTime).Distinct())
             {
-                allSnapshots.Add(new RealSnapshot(AllRealLots.Where(x => x.SnapshotTime == snapshotTime).ToList(), WaferQtyThreshold));
+                allSnapshots.Add(new RealSnapshot(RealLots.Where(x => x.SnapshotTime == snapshotTime).ToList(), WaferQtyThreshold));
             }
 
             return allSnapshots.OrderBy(x => x.Time).ToList();

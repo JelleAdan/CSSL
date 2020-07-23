@@ -9,8 +9,4 @@
     <ProjectReference Include="..\CSSL\CSSL.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="OutputDataConversion\" />
-  </ItemGroup>
-
 </Project>
