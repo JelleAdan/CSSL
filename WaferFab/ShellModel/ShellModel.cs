@@ -1,6 +1,7 @@
 ﻿using CSSL.Examples.WaferFab;
 using CSSL.Examples.WaferFab.Dispatchers;
 using CSSL.Examples.WaferFab.Observers;
+using CSSL.Examples.WaferFab.Utilities;
 using CSSL.Modeling;
 using CSSL.Utilities.Distributions;
 using System;
@@ -23,14 +24,18 @@ namespace WaferFabSim
         {
             this.inputDir = inputDir;
             this.outputDir = outputDir;
+
+            DataImporter = new DataImporter();
         }
 
         private string inputDir { get; set; }
-        private string outputDir{ get; set; }
+        private string outputDir { get; set; }
 
         public Simulation MySimulation { get; private set; }
 
-        public DataReaderBase DataImporter { get; set; }
+        public DataReaderBase DataReader { get; set; }
+
+        public DataImporter DataImporter { get; set; }
 
         public WaferFabSettings MyWaferFabSettings { get; set; }
 
@@ -53,16 +58,16 @@ namespace WaferFabSim
             ReadSimulationResults();
         }
 
-        public void ReadRealSnaphots(string fileDirectory)
+        public void ReadRealSnaphots(string filename)
         {
             try
             {
                 RealSnapshotReader = new RealSnapshotReader();
-                RealSnapshotReader.Read(fileDirectory, 25);
+                RealSnapshotReader.Read(filename, 1);
             }
-            catch
+            catch (Exception e)
             {
-                throw new Exception("Cannot read selected file");
+                throw new Exception(e.Message);
             }
 
             NotifyOfPropertyChange(nameof(RealSnapshotReader));
@@ -71,20 +76,42 @@ namespace WaferFabSim
         private void buildWaferFab()
         {
             // Build the model
-            WaferFab waferFab = new WaferFab(MySimulation.MyModel, "WaferFab", new ConstantDistribution(MyWaferFabSettings.SampleInterval));
+            WaferFab waferFab = new WaferFab(MySimulation.MyModel, "WaferFab", new ConstantDistribution(MyWaferFabSettings.SampleInterval), MyWaferFabSettings.InitialTime);
 
             //// LotStarts
-            waferFab.LotStarts = MyWaferFabSettings.LotStartQtys;
+            waferFab.ManualLotStarts = MyWaferFabSettings.ManualLotStartQtys;
 
             //// LotSteps
             waferFab.LotSteps = MyWaferFabSettings.LotSteps;
 
             //// WorkCenters
-            foreach (var wc in MyWaferFabSettings.WorkCenters)
+            foreach (string wc in MyWaferFabSettings.WorkCenters)
             {
-                WorkCenter workCenter = new WorkCenter(waferFab, $"WorkCenter_{wc}", MyWaferFabSettings.WorkCenterDistributions[wc], MyWaferFabSettings.LotStepsPerWorkStation[wc]);
+                WorkCenter workCenter = new WorkCenter(waferFab, $"WorkCenter_{wc}", MyWaferFabSettings.WCServiceTimeDistributions[wc], MyWaferFabSettings.LotStepsPerWorkStation[wc]);
 
-                workCenter.SetDispatcher(new BQFDispatcher(workCenter, workCenter.Name + "_BQFDispatcher"));
+                // Connect workcenter to WIPDependentDistribution
+                if (MyWaferFabSettings.WCServiceTimeDistributions[wc] is EPTDistribution)
+                {
+                    var distr = (EPTDistribution)MyWaferFabSettings.WCServiceTimeDistributions[wc];
+
+                    distr.WorkCenter = workCenter;
+                }
+
+                if (MyWaferFabSettings.WCDispatchers[wc] == "BQF")
+                {
+                    workCenter.SetDispatcher(new BQFDispatcher(workCenter, workCenter.Name + "_BQFDispatcher"));
+                }
+                else if (MyWaferFabSettings.WCDispatchers[wc] == "EPTOvertaking")
+                {
+                    workCenter.SetDispatcher(new EPTOvertakingDispatcher(workCenter, workCenter.Name + "_EPTOvertakingDispatcher", MyWaferFabSettings.WCOvertakingDistributions[wc]));
+
+                    // Connect workcenter to OvertakingDistribution
+                    MyWaferFabSettings.WCOvertakingDistributions[wc].WorkCenter = workCenter;
+                }
+                else if (MyWaferFabSettings.WCDispatchers[wc] == "Random")
+                {
+                    workCenter.SetDispatcher(new RandomDispatcher(workCenter, workCenter.Name + "_RandomDispatcher"));
+                }
 
                 waferFab.AddWorkCenter(workCenter.Name, workCenter);
             }
@@ -96,12 +123,18 @@ namespace WaferFabSim
             }
 
             //// LotGenerator
-            waferFab.SetLotGenerator(new LotGenerator(waferFab, "LotGenerator", new ConstantDistribution(MyWaferFabSettings.LotStartsFrequency * 60 * 60)));
+            waferFab.SetLotGenerator(new LotGenerator(waferFab, "LotGenerator", new ConstantDistribution(MyWaferFabSettings.LotStartsFrequency * 60 * 60), MyWaferFabSettings.UseRealLotStartsFlag));
 
-            // Add intial lots
-            if (MyWaferFabSettings.InitialLots.Any() != default)
+            // Add real LotStarts, copied from fab data
+            if (MyWaferFabSettings.UseRealLotStartsFlag)
             {
-                waferFab.InitialLots = MyWaferFabSettings.InitialLots.Select(x => x.ConvertToLot(0, waferFab.Sequences)).Where(x => x != null).ToList();
+                waferFab.LotStarts = MyWaferFabSettings.GetLotStarts();
+            }
+
+            // Add intial lots by translating RealLots (from RealSnapshot) to Lots
+            if (MyWaferFabSettings.InitialRealLots.Any() != default)
+            {
+                waferFab.InitialLots = MyWaferFabSettings.InitialRealLots.Select(x => x.ConvertToLot(0, waferFab.Sequences, false)).Where(x => x != null).ToList();
             }
 
             // Add observers

@@ -6,22 +6,23 @@ using System.Text;
 
 namespace WaferFabSim.SnapshotData
 {
+    [Serializable]
     public class RealSnapshot : WIPSnapshotBase
     {
         public DateTime Time { get; private set; }
 
-        public List<RealLot> realLots { get; set; }
+        public List<RealLot> RealLots { get; set; }
 
         public List<RealLot> GetRealLots(int waferQtyThreshold)
         {
-            return realLots.Where(x => x.Qty >= waferQtyThreshold).ToList();
+            return RealLots.Where(x => x.Qty >= waferQtyThreshold).ToList();
         }
 
         public RealSnapshot(List<RealLot> lots, int waferQtyThreshold)
         {
-            realLots = lots;
+            RealLots = lots;
 
-            LotSteps = lots.Select(x => x.IRDGroup).Distinct().ToArray();
+            LotSteps = lots.Where(x => x.IRDGroup != null).Select(x => x.IRDGroup).Distinct().ToArray();
 
             Time = lots.First().SnapshotTime;
 

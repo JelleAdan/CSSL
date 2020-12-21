@@ -1,13 +1,19 @@
-﻿using CSSL.Modeling.Elements;
+﻿using CSSL.Examples.WaferFab.Utilities;
+using CSSL.Modeling.Elements;
+using CSSL.Utilities;
 using CSSL.Utilities.Distributions;
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace CSSL.Examples.WaferFab
 {
-    public class WaferFab : EventGeneratorBase
+    [Serializable]
+    public class WaferFab : EventGeneratorBase, IGetDateTime
     {
+        public DateTime InitialDateTime { get; }
+
         public LotGenerator LotGenerator { get; private set; }
 
         public Dictionary<string, WorkCenter> WorkCenters { get; private set; }
@@ -16,18 +22,26 @@ namespace CSSL.Examples.WaferFab
 
         public Dictionary<string, LotStep> LotSteps { get; set; }
 
-        public Dictionary<string, int> LotStarts { get; set; }
+        public Dictionary<string, int> ManualLotStarts { get; set; }
 
+        public List<Tuple<DateTime, Lot>> LotStarts { get; set; }
+
+        /// <summary>
+        /// Note: the ordering of these lists is used by some dispatchers to determine initial queue
+        /// </summary>
         public List<Lot> InitialLots { get; set; }
 
-        public WaferFab(ModelElementBase parent, string name, ConstantDistribution samplingDistribution) : base(parent, name, samplingDistribution)
+        public WaferFab(ModelElementBase parent, string name, ConstantDistribution samplingDistribution, DateTime? initialTime = null) : base(parent, name, samplingDistribution)
         {
             WorkCenters = new Dictionary<string, WorkCenter>();
             Sequences = new Dictionary<string, Sequence>();
             LotSteps = new Dictionary<string, LotStep>();
-            LotStarts = new Dictionary<string, int>();
+            ManualLotStarts = new Dictionary<string, int>();
             InitialLots = new List<Lot>();
+            InitialDateTime = initialTime == null ? DateTime.Now : (DateTime)initialTime;
         }
+
+        public DateTime GetDateTime => InitialDateTime + new TimeSpan (0,0,(int)GetTime);
 
         public void SetLotGenerator(LotGenerator lotGenerator)
         {
@@ -46,7 +60,7 @@ namespace CSSL.Examples.WaferFab
 
         public void AddLotStart(string lotType, int quantity)
         {
-            LotStarts.Add(lotType, quantity);
+            ManualLotStarts.Add(lotType, quantity);
         }
 
         /// <summary>
@@ -55,6 +69,8 @@ namespace CSSL.Examples.WaferFab
         /// <param name="e"></param>
         protected override void HandleGeneration(CSSLEvent e)
         {
+            Console.WriteLine($"Date: {GetDateTime}");
+
             NotifyObservers(this);
 
             ScheduleEvent(NextEventTime(), HandleGeneration);

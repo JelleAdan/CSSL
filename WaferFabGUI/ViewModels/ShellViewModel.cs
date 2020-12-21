@@ -45,11 +45,9 @@ namespace WaferFabGUI.ViewModels
             string inputDir = @"C:\Users\nx008314\OneDrive - Nexperia\Work\WaferFab\";
             string outputDir = @"C:\CSSLWaferFab\";
 
-
-            WaferFabSim = new ShellModel(inputDir, outputDir);
+            WaferFabSim = new ShellModel(inputDir + @"\SerializedFiles", outputDir);
             WaferFabSim.ReadSimulationResults();
             WaferFabSim.PropertyChanged += ShellModel_PropertyChanged;
-
 
             // Link relay commands
             RunSimulationCommand = new RelayCommand(RunSimulationAsync, () => true);
@@ -66,7 +64,7 @@ namespace WaferFabGUI.ViewModels
             XAxisLotSteps = new ObservableCollection<CheckBoxLotStep>();
             WIPBarChart = new PlotModel { Title = "WIP balance" };
             dialogCoordinator = DialogCoordinator.Instance;
-            inputDirectory = @"C:\Users\nx008314\OneDrive - Nexperia\Work\WaferFab\";
+            inputDirectory = inputDir;
             FPSAnimation = 5;
             FPSMax = 5;
             waferThresholdQty = 25;
@@ -155,14 +153,14 @@ namespace WaferFabGUI.ViewModels
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Multiselect = true;
-            openFileDialog.InitialDirectory = @"C:\Users\nx008314\OneDrive - Nexperia\Work\WaferFab\Snapshots";
+            openFileDialog.InitialDirectory = @"C:\Users\nx008314\OneDrive - Nexperia\Work\WaferFab\SerializedFiles";
             try
             {
                 if (openFileDialog.ShowDialog() == true)
                 {
                     ProgressDialogController controller = await dialogCoordinator.ShowProgressAsync(this, "Loading", "Reading snapshot data...");
                     controller.SetIndeterminate();
-                    
+
                     await Task.Run(() => WaferFabSim.ReadRealSnaphots(openFileDialog.FileName));
 
                     await controller.CloseAsync();
@@ -289,32 +287,35 @@ namespace WaferFabGUI.ViewModels
             // Initialize workcenters
             foreach (var wc in settings.WorkCenters)
             {
-                WorkCenters.Add(new WorkCenterData(wc, settings.WorkCenterDistributions[wc].Mean));
+                WorkCenters.Add(new WorkCenterData(wc, settings.WCServiceTimeDistributions[wc].Mean));
             }
             // Initialize lotstarts
-            foreach (var lotStart in settings.LotStartQtys)
+            foreach (var lotStart in settings.ManualLotStartQtys)
             {
-                LotStartQtys.Add(new LotStartQty(lotStart.Key, lotStart.Value));
+                LotStartQty newLotStart = new LotStartQty(lotStart.Key, lotStart.Value);
+                newLotStart.PropertyChanged += LotStartQtys_PropertyChanged;
+
+                LotStartQtys.Add(newLotStart);
             }
         }
         private void updateWaferFabSettings()
         {
-            foreach (var wc in WorkCenters)
-            {
-                waferFabSettings.WorkCenterDistributions[wc.Name] = new ExponentialDistribution(wc.ExponentialRate);
-            }
+            //foreach (var wc in WorkCenters)
+            //{
+            //    waferFabSettings.WorkCenterDistributions[wc.Name] = new ExponentialDistribution(wc.ExponentialRate);
+            //}
             foreach (var lotStart in LotStartQtys)
             {
-                waferFabSettings.LotStartQtys[lotStart.LotType] = lotStart.Quantity;
+                waferFabSettings.ManualLotStartQtys[lotStart.LotType] = lotStart.Quantity;
             }
 
             if (IsStartStateSelected)
             {
-                waferFabSettings.InitialLots = WaferFabSim.RealSnapshotReader.RealLots.Where(x => x.SnapshotTime == StartState.Time && x.Qty >= waferThresholdQty).ToList();
+                waferFabSettings.InitialRealLots = WaferFabSim.RealSnapshotReader.RealLots.Where(x => x.SnapshotTime == StartState.Time && x.Qty >= waferThresholdQty).ToList();
             }
             else
             {
-                waferFabSettings.InitialLots = new List<RealLot>();
+                waferFabSettings.InitialRealLots = new List<RealLot>();
             }
         }
         private void plotSelectedWIPData()
@@ -471,6 +472,15 @@ namespace WaferFabGUI.ViewModels
 
             }
         }
+
+        public double TotalDailyLotStarts
+        {
+            get
+            {
+                return LotStartQtys.Select(x => x.Quantity).Sum() / (LotStartFrequency / 24.0);
+            }
+        }
+        public double TotalMonthlyLotStarts => TotalDailyLotStarts * 30;
         public int FPSMax { get; set; } = 10;
         public int NumberOfReplications
         {
@@ -492,6 +502,8 @@ namespace WaferFabGUI.ViewModels
             {
                 waferFabSettings.LotStartsFrequency = value;
                 NotifyOfPropertyChange();
+                NotifyOfPropertyChange(nameof(TotalDailyLotStarts));
+                NotifyOfPropertyChange(nameof(TotalMonthlyLotStarts));
             }
         }
         public int SelectedReplication
@@ -661,6 +673,16 @@ namespace WaferFabGUI.ViewModels
                 NotifyOfPropertyChange();
             }
         }
+
+        public bool IsRealLotStartsSelected
+        {
+            get { return waferFabSettings.UseRealLotStartsFlag; }
+            set
+            {
+                waferFabSettings.UseRealLotStartsFlag = value;
+                NotifyOfPropertyChange();
+            }
+        }
         public RelayCommand RunSimulationCommand { get; }
         public RelayCommand ClearLastWIPDataCommand { get; }
         public RelayCommand ClearAllWIPDataCommand { get; }
@@ -676,7 +698,7 @@ namespace WaferFabGUI.ViewModels
 
         private void ShellModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "MyResults")
+            if (e.PropertyName == "MySimResults")
             {
                 SimulationSnapshots = new ObservableCollection<SimulationSnapshot>(WaferFabSim.MySimResults.SimulationSnapshots);
             }
@@ -684,6 +706,15 @@ namespace WaferFabGUI.ViewModels
             if (e.PropertyName == "RealSnapshotReader")
             {
                 RealSnapshots = new ObservableCollection<RealSnapshot>(WaferFabSim.RealSnapshotReader.RealSnapshots);
+            }
+        }
+
+        private void LotStartQtys_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "Quantity")
+            {
+                NotifyOfPropertyChange(nameof(TotalDailyLotStarts));
+                NotifyOfPropertyChange(nameof(TotalMonthlyLotStarts));
             }
         }
 

@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,6 +13,7 @@ namespace CSSL.Modeling.CSSLQueue
     /// 
     /// </summary>
     /// <typeparam name="T">The class of the items which will be in the queue.</typeparam>
+    [Serializable]
     public class CSSLQueue<T> : ModelElementBase where T : CSSLQueueObject<T>
     {
         public CSSLQueue(ModelElementBase parent, string name) : base(parent, name)
@@ -36,6 +38,16 @@ namespace CSSL.Modeling.CSSLQueue
         public void EnqueueLast(T item)
         {
             items.Add(item);
+            item.MyQueue = this;
+        }
+
+        /// <summary>
+        /// Insert an item at a specified index in the queue.
+        /// </summary>
+        /// <param name="item">The item to be added.</param>
+        public void EnqueueAt(T item, int index)
+        {
+            items.Insert(index, item);
             item.MyQueue = this;
         }
 

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace CSSL.Modeling.CSSLQueue
 {
+    [Serializable]
     /// <summary>
     /// The CSSLQueueObject serves as a class for objects that need to be placed in a CSSLQueue. A CSSLQueueObject can be in one and only one CSSLQueue at the time. 
     /// </summary>

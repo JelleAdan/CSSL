@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CSSL.Utilities.Distributions
 {
-    [Serializable]
+    [Serializable()]
     public abstract class Distribution
     {
         protected ExtendedRandom rnd;

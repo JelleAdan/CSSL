@@ -21,6 +21,14 @@ namespace CSSL.Examples.WaferFab
             this.lotSteps = new List<LotStep>();
         }
 
+        public Sequence (LotStep lotStep)
+        {
+            ProductGroup = "SingleStep_" + lotStep.Name;
+            ProductType = "SingleStep_" + lotStep.Name;
+            this.lotSteps = new List<LotStep>();
+            lotSteps.Add(lotStep);
+        }
+
         public string ProductGroup { get; }
 
         public string ProductType { get; 

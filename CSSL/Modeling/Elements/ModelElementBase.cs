@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace CSSL.Modeling.Elements
 {
+    [Serializable]
     public abstract class ModelElementBase : IIdentity, IName, IObservable<object>, IGetTime
     {
         /// <summary>

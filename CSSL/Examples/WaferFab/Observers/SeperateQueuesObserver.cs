@@ -28,22 +28,22 @@ namespace CSSL.Examples.WaferFab.Observers
 
         private void writeToFile(WorkCenter workCenter)
         {
-            Writer.Write(workCenter.GetTime + "\t" + workCenter.GetWallClockTime + "\t");
+            Writer.Write(workCenter.GetTime + "," + workCenter.GetWallClockTime + ",");
 
             foreach (LotStep step in workCenter.LotSteps)
             {
-                Writer.Write(queueLengths[step].Value + "\t");
+                Writer.Write(queueLengths[step].Value + ",");
             }
             Writer.Write("\n");
         }
 
         private void writeToConsole(WorkCenter workCenter)
         {
-            Console.Write(workCenter.GetTime + "\t" + workCenter.GetWallClockTime + "\t");
+            Console.Write(workCenter.GetTime + "," + workCenter.GetWallClockTime + ",");
 
             foreach (LotStep step in workCenter.LotSteps)
             {
-                Console.Write(queueLengths[step].Value + "\t");
+                Console.Write(queueLengths[step].Value + ",");
             }
             Console.Write("\n");
         }
@@ -77,9 +77,17 @@ namespace CSSL.Examples.WaferFab.Observers
             }
             catch
             {
-                Lot lot = workCenter.LastArrivedLot;
+                if (workCenter.IsArrivalFlag)
+                {
+                    Lot lot = workCenter.LastArrivedLot;
 
-                throw new Exception($"{workCenter.Name} has lot {lot.ProductType.ToString()} in {lot.GetCurrentStep.Name}, should be in {lot.GetCurrentWorkCenter.Name}");
+                    throw new Exception($"{workCenter.Name} has lot {lot.ProductType} in {lot.GetCurrentStep.Name}, should be in {lot.GetCurrentWorkCenter.Name}");
+                }
+                else
+                {
+                    LotStep step = workCenter.LotStepInService;
+                    throw new Exception($"{workCenter.Name} has step {step.Name} in service, but this step belongs to workcenter {step.WorkCenter.Name}");
+                }
             }
         }
 
@@ -89,26 +97,26 @@ namespace CSSL.Examples.WaferFab.Observers
 
         private void headerToFile(WorkCenter workCenter)
         {
-            Writer.Write("Simulation Time\tComputational Time\t");
+            Writer.Write("Simulation Time,Computational Time,");
 
             foreach (LotStep step in workCenter.LotSteps)
             {
                 queueLengths[step].UpdateValue(workCenter.Queues[step].Length);
 
-                Writer.Write(step.Name + "\t");
+                Writer.Write(step.Name + ",");
             }
             Writer.Write("\n");
         }
 
         private void headerToConsole(WorkCenter workCenter)
         {
-            Console.Write("Simulation Time\tComputational Time\t");
+            Console.Write("Simulation Time,Computational Time,");
 
             foreach (LotStep step in workCenter.LotSteps)
             {
                 queueLengths[step].UpdateValue(workCenter.Queues[step].Length);
 
-                Console.Write(step.Name + "\t");
+                Console.Write(step.Name + ",");
             }
             Console.Write("\n");
         }

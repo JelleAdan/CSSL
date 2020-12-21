@@ -7,6 +7,7 @@ using static CSSL.Modeling.Elements.CSSLEvent;
 
 namespace CSSL.Modeling.Elements
 {
+    [Serializable]
     public abstract class SchedulingElementBase : ModelElementBase
     {
         public SchedulingElementBase(ModelElementBase parent, string name) : base(parent, name)

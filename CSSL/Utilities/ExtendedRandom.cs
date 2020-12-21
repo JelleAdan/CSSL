@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace CSSL.Utilities
 {
+    [Serializable()]
     public class ExtendedRandom : Random
     {
         public ExtendedRandom()

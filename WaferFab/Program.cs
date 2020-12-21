@@ -25,23 +25,32 @@ namespace WaferFabSim
 
             string outputDir = @"C:\CSSLWaferFab\";
 
+            Settings.Output = true;
+            Settings.FixSeed = true;
+
             ShellModel WaferFabSim = new ShellModel(inputDir, outputDir);
 
             // Load WaferFab settings
-            ManualDataReader reader = new ManualDataReader(inputDir + "CSVs");
+            //ManualDataReader reader = new ManualDataReader(inputDir + "CSVs");
+            AutoDataReader reader = new AutoDataReader(inputDir + "Auto");
 
             WaferFabSettings waferFabSettings = reader.ReadWaferFabSettings();
 
-            waferFabSettings.SampleInterval = 12 * 60 * 60; // 12 hours
+            waferFabSettings.SampleInterval = 1 * 60 * 60; // seconds
+            waferFabSettings.LotStartsFrequency = 1; // hours
+            waferFabSettings.UseRealLotStartsFlag = true;
+
+            // Read Initial Lots
+            WaferFabSim.ReadRealSnaphots(inputDir + @"SerializedFiles\RealSnapshots_2019-12-1_2020-1-1_1h.dat");
+
+            waferFabSettings.InitialRealLots = WaferFabSim.RealSnapshotReader.RealSnapshots.First().RealLots;
 
             // Experiment settings
             ExperimentSettings experimentSettings = new ExperimentSettings();
 
-            experimentSettings.NumberOfReplications = 3;
-            experimentSettings.LengthOfReplication = 20 * 24 * 60 * 60; // 2 = number of days
-            experimentSettings.LengthOfWarmUp = 8 * 60 * 60;
-
-            Settings.Output = true;
+            experimentSettings.NumberOfReplications = 1;
+            experimentSettings.LengthOfReplication = 1 * 24 * 60 * 60; // seconds
+            experimentSettings.LengthOfWarmUp = 0 * 60 * 60;  // seconds
 
             // Connect settings
             WaferFabSim.MyWaferFabSettings = waferFabSettings;

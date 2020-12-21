@@ -7,6 +7,7 @@ using System.Text;
 
 namespace WaferFabSim.SnapshotData
 {
+    [Serializable]
     public abstract class WIPSnapshotBase
     {
         public string[] LotSteps { get; protected set; }

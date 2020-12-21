@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using WaferFabSim.InputDataConversion;
 
 namespace WaferFabSim.SnapshotData
 {
@@ -12,8 +13,9 @@ namespace WaferFabSim.SnapshotData
         public RealSnapshotReader()
         {
             RealLots = new List<RealLot>();
+            RealSnapshots = new List<RealSnapshot>();
         }
-        public string fileDirectory { get; set; }
+        public string Filename { get; set; }
 
         public int WaferQtyThreshold { get; set; }
 
@@ -21,14 +23,42 @@ namespace WaferFabSim.SnapshotData
 
         public List<RealSnapshot> RealSnapshots { get; set; }
 
-        public List<RealSnapshot> Read(string fileToRead, int waferQtyThreshold)
+        public List<RealSnapshot> Read(string filename, int waferQtyThreshold)
         {
+            RealLots.Clear();
+            RealSnapshots.Clear();
+
             WaferQtyThreshold = waferQtyThreshold;
-            fileDirectory = fileToRead;
-            RealLots = fillAllLots();
-            RealSnapshots = constructRealSnapshots();
+            Filename = filename;
+
+            string type = Path.GetExtension(filename).ToLower();
+
+            if (type == ".csv")
+            {
+                readCSV();
+            }
+            else if (type == ".dat")
+            {
+                ReadDAT();
+            }
+            else
+            {
+                throw new Exception($"Cannot read file type {type}");
+            }
 
             return RealSnapshots;
+        }
+
+        private void readCSV()
+        {
+            RealLots = fillAllLots();
+            RealSnapshots = constructRealSnapshots();
+        }
+
+        private void ReadDAT()
+        {
+            RealSnapshots = Tools.ReadFromBinaryFile<List<RealSnapshot>>(Filename);
+            RealLots = RealSnapshots.SelectMany(x => x.RealLots).ToList();
         }
 
         private List<RealSnapshot> constructRealSnapshots()
@@ -47,7 +77,7 @@ namespace WaferFabSim.SnapshotData
         {
             List<RealLot> allLots = new List<RealLot>();
 
-            using (StreamReader reader = new StreamReader(fileDirectory))
+            using (StreamReader reader = new StreamReader(Filename))
             {
                 string headerLine = reader.ReadLine();
 

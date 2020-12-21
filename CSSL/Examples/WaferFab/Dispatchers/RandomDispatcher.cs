@@ -1,22 +1,23 @@
-﻿using System;
+﻿using CSSL.Modeling.Elements;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
-using CSSL.Modeling.Elements;
 
 namespace CSSL.Examples.WaferFab.Dispatchers
 {
-    // Biggest Queue First Dispatcher
-    public class BQFDispatcher : DispatcherBase
+    public class RandomDispatcher : DispatcherBase
     {
-        public BQFDispatcher(ModelElementBase workCenter, string name) : base(workCenter, name)
+        public RandomDispatcher(ModelElementBase workCenter, string name) : base(workCenter, name)
         {
+            rnd = new Random();
         }
+
+        public Random rnd;
 
         public override void HandleArrival(Lot lot)
         {
-            //Console.WriteLine($"{GetTime} Arrival \tlot {lot.Id} \t{lot.GetCurrentStep.Name} \t{wc.Name}");
-
             wc.Queues[lot.GetCurrentStep].EnqueueLast(lot);
 
             // Queue was empty upon arrival, lot gets taken into service and departure event is scheduled immediately
@@ -32,13 +33,13 @@ namespace CSSL.Examples.WaferFab.Dispatchers
         {
             Lot lot = wc.Queues[wc.LotStepInService].DequeueFirst();
 
-            //Console.WriteLine($"{GetTime} Departure \tlot {lot.Id} \t{lot.GetCurrentStep.Name} \t{wc.Name}");
-
             // Schedule next departure event, if queue is nonempty
             if (wc.TotalQueueLength > 0)
             {
-                // Choose biggest queue to service
-                wc.LotStepInService = wc.Queues.OrderByDescending(x => x.Value.Length).First().Key;
+                // Choose random queue to service
+                List<LotStep> possibleQueues = wc.Queues.Where(x => x.Value.Length > 0).Select(x => x.Key).ToList();
+
+                wc.LotStepInService = possibleQueues[rnd.Next(0, possibleQueues.Count)];
 
                 ScheduleEvent(GetTime + wc.ServiceTimeDistribution.Next(), wc.HandleDeparture);
             }
@@ -62,8 +63,7 @@ namespace CSSL.Examples.WaferFab.Dispatchers
 
         public override void HandleInitialization(List<Lot> lots)
         {
-            // null values will appear at beginning of the lists with this ordering
-            foreach (Lot lot in lots.OrderBy(x => x.ArrivalReal))
+            foreach(Lot lot in lots)
             {
                 HandleArrival(lot);
             }

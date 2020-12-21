@@ -67,7 +67,7 @@ namespace WaferFabSim.InputDataConversion
                     }
                     else
                     {
-                        WaferFabSettings.LotStartQtys.Add(values[0], Convert.ToInt32(values[1]));
+                        WaferFabSettings.ManualLotStartQtys.Add(values[0], Convert.ToInt32(values[1]));
                     }
 
                     row++;
@@ -88,8 +88,8 @@ namespace WaferFabSim.InputDataConversion
                     if (row != 1)
                     {
                         WaferFabSettings.WorkCenters.Add(values[0]);
-                        WaferFabSettings.WorkCenterDistributions.Add(values[0], new ExponentialDistribution(Convert.ToDouble(values[1])));
-                        WaferFabSettings.WorkCenterDispatchers.Add(values[0], "BQF");
+                        WaferFabSettings.WCServiceTimeDistributions.Add(values[0], new ExponentialDistribution(Convert.ToDouble(values[1])));
+                        WaferFabSettings.WCDispatchers.Add(values[0], "BQF");
                     }
                     row++;
                 }

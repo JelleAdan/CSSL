@@ -1,12 +1,21 @@
 ﻿using CSSL.Examples.WaferFab;
+using CSSL.Examples.WaferFab.Utilities;
 using CSSL.Utilities.Distributions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
+using System.Drawing;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Security.Cryptography.X509Certificates;
+using System.Transactions;
 using WaferFabSim.Import;
+using WaferFabSim.SnapshotData;
+using static CSSL.Examples.WaferFab.Utilities.EPTDistribution;
+using static CSSL.Examples.WaferFab.Utilities.OvertakingDistributionBase;
+using static WaferFabSim.Import.LotTraces;
 
 namespace WaferFabSim.InputDataConversion
 {
@@ -28,10 +37,11 @@ namespace WaferFabSim.InputDataConversion
             lotActivitiesRaw = new List<LotActivityRaw>();
         }
 
-
         public override WaferFabSettings ReadWaferFabSettings()
         {
-            readWaferFabSettingsData();
+            Console.Write("Reading waferfabsettings -");
+
+            readWaferFabSettingsDataFromCSVs();
             lotSteps = fillStepsWithIRDs();
 
             WaferFabSettings = new WaferFabSettings();
@@ -40,29 +50,66 @@ namespace WaferFabSim.InputDataConversion
 
             WaferFabSettings.LotTypes = getProductTypes();
 
-            WaferFabSettings.LotStartQtys = WaferFabSettings.LotTypes.ToDictionary(x => x, x => 0);
+            WaferFabSettings.ManualLotStartQtys = WaferFabSettings.LotTypes.ToDictionary(x => x, x => 0);
 
             WaferFabSettings.LotSteps = lotSteps;
 
+            //WaferFabSettings.RealLotStarts = ReadRealLotStartsDAT("LotStarts_2019_2020.dat");
+
             WaferFabSettings.WorkCenters = irdMappings.Select(x => x.WorkStation).Distinct().ToList();
 
-            WaferFabSettings.WorkCenterDistributions = getDistributions();
-
-            WaferFabSettings.WorkCenterDispatchers = getDispatchers();
-
             WaferFabSettings.LotStepsPerWorkStation = getLotStepsPerWorkstation();
+
+            WaferFabSettings.WCDispatchers = getDispatchers();
 
             WaferFabSettings.Sequences = getSequencesPerIRDGroup();
 
             processPlans = getProcessPlans();
 
+            //WaferFabSettings.LotStarts = GetLotStartsOneWorkCenter("PHOTOLITH");
+
+            //SaveWaferFabSettings("PHOTOLITH_WithLotStarts");
+
+            //WaferFabSettings.WorkCenterDistributions = getDistributions();
+            WaferFabSettings.WCServiceTimeDistributions = getWIPDependentEPTDistributions();
+
+            WaferFabSettings.WCOvertakingDistributions = getOvertakingDistributions();
+
+            Console.Write(" done.\n");
+
             return WaferFabSettings;
         }
 
-        public override List<LotActivityHistory> ReadLotActivityHistories(string fileName, bool onlyProductionLots)
+        public override WaferFabSettings ReadWaferFabSettings(string serializedFileName)
         {
-            LotActivityHistories = new List<LotActivityHistory>();
+            Console.Write("Reading waferfabsettings -");
 
+            WaferFabSettings = ReadWaferFabSettingsDAT(serializedFileName);
+
+            WaferFabSettings.WCServiceTimeDistributions = getWIPDependentEPTDistributions();
+
+            WaferFabSettings.WCOvertakingDistributions = getOvertakingDistributions();
+
+            Console.Write(" done.\n");
+
+            return WaferFabSettings;
+        }
+
+        public void ReadEPTDistributions()
+        {
+            //WaferFabSettings.WorkCenterDistributions = getDistributions();
+            WaferFabSettings.WCServiceTimeDistributions = getWIPDependentEPTDistributions();
+
+            WaferFabSettings.WCOvertakingDistributions = getOvertakingDistributions();
+        }
+
+        public override List<WorkCenterLotActivities> ReadLotActivityHistoriesCSV(string fileName, bool onlyProductionLots)
+        {
+            Console.Write("Reading lot activities raw - ");
+
+            WorkCenterLotActivities = new List<WorkCenterLotActivities>();
+
+            // Fill lot activites raw
             using (StreamReader reader = new StreamReader(Path.Combine(InputDirectory, fileName)))
             {
                 string headerLine = reader.ReadLine();
@@ -73,39 +120,48 @@ namespace WaferFabSim.InputDataConversion
 
                     lotActivitiesRaw.Add(new LotActivityRaw(headerLine, dataLine));
                 }
+            }
 
-                // Filter only production lots, order by track-in time and group activities from same lot
-                if (onlyProductionLots)
+            Console.Write("done. \n");
+
+            // Filter only production lots, order by track-in time and group activities from same lot
+            if (onlyProductionLots)
+            {
+                lotActivitiesRaw = lotActivitiesRaw.Where(x => x.LotId.StartsWith("M1")).OrderBy(x => x.TrackIn).OrderBy(x => x.LotId).ToList();
+            }
+
+            // Map IRD groups on LotActivitiesRaw
+            Dictionary<string, IRDMapping> irdDict = irdMappings.ToDictionary(x => $"{x.Techstage} {x.Subplan}", x => x);
+
+            List<string> lotids = lotActivitiesRaw.Select(x => x.LotId).ToList();
+
+            foreach (LotActivityRaw lotActivity in lotActivitiesRaw)
+            {
+                if (irdDict.ContainsKey($"{lotActivity.Techstage} {lotActivity.Subplan}"))
                 {
-                    lotActivitiesRaw = lotActivitiesRaw.Where(x => x.LotId.StartsWith("M1")).OrderBy(x => x.TrackIn).OrderBy(x => x.LotId).ToList();
-                }
-
-                // Map IRD groups on LotActivities
-                Dictionary<string, IRDMapping> irdDict = irdMappings.ToDictionary(x => $"{x.Techstage} {x.Subplan}", x => x);
-
-                List<string> lotids = lotActivitiesRaw.Select(x => x.LotId).ToList();
-
-                foreach (var lotActivity in lotActivitiesRaw)
-                {
-                    if (irdDict.ContainsKey($"{lotActivity.Techstage} {lotActivity.Subplan}"))
-                    {
-                        lotActivity.IRDGroup = irdDict[$"{lotActivity.Techstage} {lotActivity.Subplan}"].IRDGroup;
-                    }
+                    lotActivity.IRDGroup = irdDict[$"{lotActivity.Techstage} {lotActivity.Subplan}"].IRDGroup;
+                    lotActivity.WorkStation = irdDict[$"{lotActivity.Techstage} {lotActivity.Subplan}"].WorkStation;
                 }
             }
 
-            // Group lotactivities per Lot into LotTraces
-            List<LotTrace> lotTraces = new List<LotTrace>();
+            Console.Write("Grouping lot activities per lot into lotraces - ");
 
+            // Group lotactivities per Lot into LotTraces and map StepSequences on the LotActitiesRaw
+            List<LotTrace> lotTraces = new List<LotTrace>();
             string currentId = "";
             LotTrace trace = new LotTrace("");
 
             foreach (LotActivityRaw activity in lotActivitiesRaw)
             {
-                if (activity.LotId != currentId)
+                if (activity.LotId != currentId) // Start new lot trace
                 {
                     if (currentId != "")
+                    {
                         lotTraces.Add(trace);
+                        trace.MapPPStepSequencesOnActivites(processPlans);
+                        trace.CheckCompleteness();
+                        trace.CalculateTimeInSteps();
+                    }
 
                     currentId = activity.LotId;
 
@@ -113,63 +169,118 @@ namespace WaferFabSim.InputDataConversion
                     trace.ProductType = activity.ProductType;
                 }
 
-                trace.LotActivities.Add(activity);
-
-                trace.AddProcessPlan(processPlans);
-                trace.CheckCompleteness();
-
-                lotTraces.Add(trace);
+                trace.LotActivitiesRaw.Add(activity);
             }
 
-            int complete = lotTraces.Where(x => x.IsComplete).Count();
-            int noprocessplan = lotTraces.Where(x => !x.HasProcessPlan).Count();
-            int nostart = lotTraces.Where(x => x.HasProcessPlan && !x.HasStart).Count();
-            int noend = lotTraces.Where(x => x.HasProcessPlan && !x.HasEnd).Count();
+            Console.Write("done. \n");
 
-            int stop = 0;
+            DateTime begin = lotActivitiesRaw.Select(x => x.TrackIn).Min();
+            DateTime end = lotActivitiesRaw.Select(x => x.TrackIn).Max();
 
-            var noendlist = lotTraces.Where(x => x.HasProcessPlan && !x.HasEnd).ToList();
-            var noprocessplanlist = lotTraces.Where(x => !x.HasProcessPlan).Select(x => x.ProductType).Distinct().ToList();
+            LotTraces = new LotTraces(lotTraces, begin, end);
 
-            int stop2 = 0;
+            int count = 1;
 
-            var noprocessplanlis2t = lotTraces.Where(x => !x.HasProcessPlan && x.ProductType == "CVCheck1").ToList();
+            Console.WriteLine($"Calculating EPTs for {irdMappings.Select(x => x.WorkStation).Distinct().Count()} workstations. Done for workstations:");
 
-            int asokd = 0;
+            // Make LotActivitiesPerWorkCenter and calculate EPTs
+            foreach (string workCenter in irdMappings.Select(x => x.WorkStation).Distinct())
+            {
+                WorkCenterLotActivities.Add(new WorkCenterLotActivities(LotTraces, workCenter));
 
-            var terminated = lotTraces.Where(x => x.HasProcessPlan && !x.HasEnd && x.LotActivities.Last().Status == "Terminated").ToList();
-            var onhold = lotTraces.Where(x => x.HasProcessPlan && !x.HasEnd && x.LotActivities.Last().Status == "Hold").ToList();
-            var active = lotTraces.Where(x => x.HasProcessPlan && !x.HasEnd && x.LotActivities.Last().Status == "Active").ToList();
-            var Finished = lotTraces.Where(x => x.HasProcessPlan && !x.HasEnd && x.LotActivities.Last().Status == "Finished").ToList();
+                Console.Write($"{count++} ");
+            }
 
-            int asd = 0;
+            Console.Write("- done. \n");
 
-            var None = lotTraces.Where(x => x.HasProcessPlan && !x.HasEnd && x.LotActivities.Last().Status != "Terminated" && x.LotActivities.Last().Status != "Active" && x.LotActivities.Last().Status != "Hold").ToList();
-
-            int stoppp = 0;
-
-
-            //List<LotActivityRaw> temp = lotActivitiesRaw.Where(x => x.IRDGroup == null).ToList();
-            //List<LotActivityRaw> temp2 = lotActivitiesRaw.Where(x => x.IRDGroup != null).ToList();
-
-            //List<string> IDs = temp.Select(x => x.Id).OrderBy(x => x).ToList();
-            //List<string> IDs2 = temp2.Select(x => x.Id).OrderBy(x => x).ToList();
-
-
-            return LotActivityHistories;
+            return WorkCenterLotActivities;
         }
 
-        // To read LotActivityHistories
-        private List<LotActivityRaw> lotActivitiesRaw { get; set; }
+        public override List<RealSnapshot> ReadRealSnapshots(DateTime from, DateTime until, TimeSpan interval, int waferQtyThreshold)
+        {
+            Console.Write("Reading RealSnaphots -");
 
-        // To read WaferFabSettings
+            if (LotTraces == null)
+            {
+                throw new Exception("LotTraces is still empty, first use ReadLotactivityHistories");
+            }
+
+            RealSnapshots = new List<RealSnapshot>();
+
+            DateTime current = from;
+
+            while (current <= until)
+            {
+                if (current >= LotTraces.StartDate && current <= LotTraces.EndDate)
+                {
+                    RealSnapshots.Add(LotTraces.GetWIPSnapshot(current, waferQtyThreshold));
+                }
+
+                current += interval;
+            }
+
+            Console.Write(" done.\n");
+
+            return RealSnapshots;
+        }
+
+        public List<Tuple<DateTime, RealLot>> GetRealLotStarts()
+        {
+            RealLotStarts = LotTraces.GetRealLotStarts();
+
+            return RealLotStarts;
+        }
+
+        public List<Tuple<DateTime, Lot>> GetLotStartsOneWorkCenter(string workcenter)
+        {
+            List<Tuple<DateTime, Lot>> starts = new List<Tuple<DateTime, Lot>>();
+
+            if (WorkCenterLotActivities == null || !WorkCenterLotActivities.Any())
+            {
+                ReadWorkCenterLotActivitiesDAT("WorkCenterLotActivities_2019_2020.dat");
+            }
+
+            // Make sequences per lotstep. Each sequence contains just 1 lotstep.
+            Dictionary<string, Sequence> sequences = new Dictionary<string, Sequence>();
+
+            foreach (var step in lotSteps)
+            {
+                sequences.Add(step.Key, new Sequence(step.Value));
+            }
+
+            WorkCenterLotActivities selected = WorkCenterLotActivities.Where(x => x.WorkCenter == workcenter).First();
+
+            foreach (LotActivity activity in selected.LotActivities.Where(x => x.Arrival != null && x.IRDGroup != null))
+            {
+                starts.Add(new Tuple<DateTime,Lot>((DateTime)activity.Arrival, activity.ConvertToLot(0, sequences[activity.IRDGroup])));
+            }
+
+            WaferFabSettings.Sequences = sequences;
+
+            WaferFabSettings.LotStarts = starts;
+
+            return starts;
+        }
+
+        public void SaveLotActivitiesToCSV(string directory)
+        {
+            LotTraces.WriteLotActivitiesToCSV(directory);
+        }
+
+        /// <summary>
+        /// Used to read LotActivityHistories
+        /// </summary>
+        private List<LotActivityRaw> lotActivitiesRaw { get; set; }
+        /// <summary>
+        /// Used to read waferfabsettings
+        /// </summary>
         private List<SingleStep> lotStepsRaw { get; set; }
         private Dictionary<string, LotStep> lotSteps { get; set; }
         private List<IRDMapping> irdMappings { get; set; }
         private Dictionary<string, int> irdNumbering { get; set; }
         private Dictionary<string, ProcessPlan> processPlans { get; set; }
 
-        private void readWaferFabSettingsData()
+        private void readWaferFabSettingsDataFromCSVs()
         {
             lotStepsRaw.Clear();
             irdMappings.Clear();
@@ -203,8 +314,6 @@ namespace WaferFabSim.InputDataConversion
 
 
             // Map IRDs on Steps
-            //List<string> missingLines = new List<string>();
-
             foreach (var step in lotStepsRaw)
             {
                 for (int i = 0; i < irdMappings.Count; i++)
@@ -224,14 +333,6 @@ namespace WaferFabSim.InputDataConversion
                     }
                 }
             }
-
-            //using (StreamWriter writer = new StreamWriter(@"C:\Users\nx008314\OneDrive - Nexperia\Work\WaferFab\MissingIRDs.csv", false))
-            //{
-            //    foreach (var line in missingLines.Distinct())
-            //    {
-            //        writer.WriteLine(line);
-            //    }
-            //}
 
             // Read IRD Numbering
             using (StreamReader reader = new StreamReader(Path.Combine(InputDirectory, "IRDNumbering.csv")))
@@ -330,6 +431,54 @@ namespace WaferFabSim.InputDataConversion
             return ProcessPlans;
         }
 
+        public Dictionary<string, Distribution> getWIPDependentEPTDistributions()
+        {
+            Dictionary<string, Distribution> dict = new Dictionary<string, Distribution>();
+
+            Dictionary<string, WIPDepDistParameters> parameters = new Dictionary<string, WIPDepDistParameters>();
+
+            // Read fitted WIP dependent EPT parameters from csv
+            using (StreamReader reader = new StreamReader(Path.Combine(InputDirectory, "FittedEPTParameters.csv")))
+            {
+                string[] headers = reader.ReadLine().Trim(',').Split(',');
+
+                while (!reader.EndOfStream)
+                {
+                    WIPDepDistParameters par = new WIPDepDistParameters();
+
+                    string[] data = reader.ReadLine().Trim(',').Split(',');
+
+                    for (int i = 0; i < data.Length; i++)
+                    {
+                        if (headers[i] == "WorkStation")
+                        {
+                            if (!WaferFabSettings.WorkCenters.Contains(data[i]))
+                            {
+                                throw new Exception($"Waferfab does not contain workcenter {data[i]}");
+                            }
+                            par.WorkCenter = data[i];
+                        }
+                        if (headers[i] == "wipmin") { par.LBWIP = (int)double.Parse(data[i]); }
+                        if (headers[i] == "wipmax") { par.UBWIP = (int)double.Parse(data[i]); }
+                        if (headers[i] == "t_wipmin") { par.Twipmin = double.Parse(data[i]); }
+                        if (headers[i] == "t_wipmax") { par.Twipmax = double.Parse(data[i]); }
+                        if (headers[i] == "t_decay") { par.Tdecay = double.Parse(data[i]); }
+                        if (headers[i] == "c_wipmin") { par.Cwipmin = double.Parse(data[i]); }
+                        if (headers[i] == "c_wipmax") { par.Cwipmax = double.Parse(data[i]); }
+                        if (headers[i] == "c_decay") { par.Cdecay = double.Parse(data[i]); }
+                    }
+
+                    parameters.Add(par.WorkCenter, par);
+                }
+            }
+
+            foreach (string wc in WaferFabSettings.WorkCenters)
+            {
+                dict.Add(wc, new EPTDistribution(parameters[wc]));
+            }
+
+            return dict;
+        }
 
         private Dictionary<string, Distribution> getDistributions()
         {
@@ -348,10 +497,62 @@ namespace WaferFabSim.InputDataConversion
 
             foreach (string wc in WaferFabSettings.WorkCenters)
             {
-                dict.Add(wc, "BQF");
+                dict.Add(wc, "EPTOvertaking");
             }
 
             return dict;
+        }
+
+        /// <summary>
+        /// Gets the LotStep-dependent and WIP-dependent empirical overtaking distributions. Key = workcenter, value = distribution
+        /// </summary>
+        /// <param name="sections">Number of discrete WIP intervals</param>
+        /// <returns></returns>
+        public Dictionary<string, OvertakingDistributionBase> getOvertakingDistributions()
+        {
+            Dictionary<string, OvertakingDistributionBase> distributions = new Dictionary<string, OvertakingDistributionBase>();
+
+            // Read all overtaking records
+            List<OvertakingRecord> records = new List<OvertakingRecord>();
+
+            using (StreamReader reader = new StreamReader(Path.Combine(InputDirectory, "OvertakingRecords.csv")))
+            {
+                string headerline = reader.ReadLine();
+
+                while (!reader.EndOfStream)
+                {
+                    string dataline = reader.ReadLine();
+
+                    OvertakingRecord rec = new OvertakingRecord();
+
+                    string[] headers = headerline.Trim(',').Split(',');
+                    string[] data = dataline.Trim(',').Split(',');
+
+                    for (int i = 0; i < data.Length; i++)
+                    {
+                        if (headers[i] == "WorkStation") { rec.WorkCenter = data[i]; }
+                        else if (headers[i] == "IRDGroup") { rec.LotStep = data[i]; }
+                        else if (headers[i] == "WIPIn") { rec.WIPIn = Convert.ToInt32(data[i]); }
+                        else if (headers[i] == "OvertakenLots") { rec.OvertakenLots = Convert.ToInt32(data[i]); }
+                        else { throw new Exception($"{headers[i]} is unknown"); }
+                    }
+
+                    records.Add(rec);
+                }
+            }
+
+            // Read overtaking distribution parameters
+            OvertakingDistributionParameters parameters = new OvertakingDistributionParameters(10, 100, 1);
+
+            // Select records per workcenter per lotstep
+            foreach (string wc in WaferFabSettings.WorkCenters)
+            {
+                List<OvertakingRecord> recordsWC = records.Where(x => x.WorkCenter == wc).ToList();
+
+                distributions.Add(wc, new LotStepOvertakingDistribution(recordsWC, parameters,  WaferFabSettings.LotStepsPerWorkStation[wc]));
+            }
+
+            return distributions;
         }
         private List<string> getProductTypes()
         {
@@ -362,148 +563,23 @@ namespace WaferFabSim.InputDataConversion
             return lotStepsRaw.Select(x => x.Plangroup).Distinct().ToList();
         }
 
-        private class LotTrace
-        {
-            public string ProductType { get; set; }
-            public string LotId { get; private set; }
-            public bool IsComplete => HasProcessPlan && HasEnd && HasStart;
-            public bool HasStart { get; set; }
-            public bool HasEnd { get; set; }
-            public bool HasProcessPlan { get; set; }
-
-            public string Status => LotActivities.Any() ? LotActivities.Last().Status : "NoLotActivities";
-
-
-            public List<LotActivityRaw> LotActivities { get; set; }
-
-            public ProcessPlan ProcessPlan { get; set; }
-
-            public void AddProcessPlan(Dictionary<string, ProcessPlan> processPlans)
-            {
-                if (processPlans.ContainsKey(ProductType))
-                    ProcessPlan = processPlans[ProductType];
-            }
-
-            public void CheckCompleteness()
-            {
-                HasStart = true;
-                HasEnd = true;
-                HasProcessPlan = true;
-
-
-                // Check whether trace has process plan
-                if (ProcessPlan == null)
-                {
-                    HasProcessPlan = false;
-                    return;
-                }
-
-
-                // Check whether trace contains first step
-                SingleStep firstStep = ProcessPlan.Steps.First();
-
-                if (!LotActivities.Where(x => x.Stepname == firstStep.Stepname).Any())
-                {
-                    HasStart = false;
-                    return;
-                }
-
-                // Check whether trace contains last step
-                SingleStep lastStep = ProcessPlan.Steps.Last();
-
-                if (!LotActivities.Where(x => x.Stepname == lastStep.Stepname).Any())
-                {
-                    HasEnd = false;
-
-                    return;
-                }
-
-                // Passed all checks, so trace is complete
-                return;
-            }
-
-            public LotTrace(string lotid)
-            {
-                LotActivities = new List<LotActivityRaw>();
-                LotId = lotid;
-            }
-        }
-
-        private class LotActivityRaw
-        {
-            public string LotId { get; set; }
-            public string SplitId { get; set; }        // If null no split, if some string is split
-            public string PlanName { get; set; }
-            public string ProductType { get; set; }
-            public string Techstage { get; set; }
-            public string Subplan { get; set; }
-            public string Stepname { get; set; }
-            public string Location { get; set; }
-            public string Recipe { get; set; }
-            public DateTime TrackIn { get; set; }
-            public DateTime TrackOut { get; set; }
-            public int QtyIn { get; set; }
-            public int QtyOut { get; set; }
-            public string Status { get; set; }
-            public string IRDGroup { get; set; }
-
-            public LotActivityRaw(string headerLine, string dataLine)
-            {
-                string[] headers = headerLine.Trim(',').Split(',');
-                string[] data = dataLine.Trim(',').Split(',');
-
-                for (int i = 0; i < data.Length; i++)
-                {
-                    if (headers[i] == "FW_LOTID")
-                    {
-                        if (data[i].Length > 7)
-                        {
-                            LotId = data[i].Substring(0, 7);
-                            SplitId = data[i].Substring(7);
-                        }
-                        else
-                        {
-                            LotId = data[i];
-                        }
-                    }
-                    if (headers[i] == "FW_CURRENTPLANNAME") { PlanName = data[i]; }
-                    if (headers[i] == "FW_CURRENTPRODUCTNAME") { ProductType = data[i]; }
-                    if (headers[i] == "TECHSTAGE") { Techstage = data[i]; }
-                    if (headers[i] == "SUBPLAN") { Subplan = data[i]; }
-                    if (headers[i] == "FW_STEPNAME") { Stepname = data[i]; }
-                    if (headers[i] == "FW_LOCATION") { Location = data[i]; }
-                    if (headers[i] == "FW_TRACKINTIME") { TrackIn = Convert.ToDateTime(data[i]); }
-                    if (headers[i] == "FW_TRACKOUTTIME")
-                    {
-                        if (data[i] != "1/0/1900 0:00")
-                        {
-                            TrackOut = Convert.ToDateTime(data[i]);
-                        }
-                        else
-                        {
-                            TrackOut = Convert.ToDateTime("1/1/1900 0:00");
-                        }
-                    }
-                    if (headers[i] == "FW_STEPQTYIN") { QtyIn = Convert.ToInt32(data[i]); }
-                    if (headers[i] == "FW_STEPQTYOUT") { QtyOut = Convert.ToInt32(data[i]); }
-                    if (headers[i] == "FW_CURRENTSTATUS") { Status = data[i]; }
-                }
-            }
-        }
-
-        private class ProcessPlan
+        [Serializable]
+        public class ProcessPlan
         {
             public string Productname { get; private set; }
-            public List<SingleStep> Steps { get; set; }
+            public List<SingleStep> Steps { get; private set; }
+
+            public Dictionary<int, SingleStep> StepsDict { get; set; }
 
             public ProcessPlan(string productName, List<SingleStep> steps)
             {
                 Productname = productName;
                 Steps = steps;
+                StepsDict = steps.ToDictionary(x => x.StepSequence, x => x);
             }
         }
-
-        private class SingleStep
+        [Serializable]
+        public class SingleStep
         {
             public string Productname { get; private set; }
             public string Plangroup { get; private set; }
@@ -537,8 +613,8 @@ namespace WaferFabSim.InputDataConversion
                 }
             }
         }
-
-        public class IRDMapping
+        [Serializable]
+        private class IRDMapping
         {
             public string Techstage { get; set; }
             public string Subplan { get; set; }
