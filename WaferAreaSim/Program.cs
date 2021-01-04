@@ -95,6 +95,7 @@ namespace WaferAreaSim
             workCenter.Subscribe(seperateQueueObs);
             #endregion
 
+
             simulation.Run();
 
             #region Reporting
