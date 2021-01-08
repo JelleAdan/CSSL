@@ -7,15 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSSL", "CSSL\CSSL.csproj", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataCenter", "DataCenter\DataCenter.csproj", "{460EFFC3-CE86-4294-BF06-B55AF1977BCB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WaferFabSim", "WaferFab\WaferFabSim.csproj", "{B58AF6A8-E98C-41C8-98DC-C59C0CE420ED}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LineSim", "LineSim\LineSim.csproj", "{267CB093-5289-43C4-88F3-8F47761094F3}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WaferFabGUI", "WaferFabGUI\WaferFabGUI.csproj", "{84C80EFF-73E0-4387-AD82-5FF6E82FEF08}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WaferFabDataReader", "WaferFabDataReader\WaferFabDataReader.csproj", "{A2EB5D10-32E4-4489-8648-AA56889DEED8}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WaferAreaSim", "WaferAreaSim\WaferAreaSim.csproj", "{2C516D86-7285-474F-9F2E-388FB3BD0630}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,26 +23,10 @@ Global
 		{460EFFC3-CE86-4294-BF06-B55AF1977BCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{460EFFC3-CE86-4294-BF06-B55AF1977BCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{460EFFC3-CE86-4294-BF06-B55AF1977BCB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B58AF6A8-E98C-41C8-98DC-C59C0CE420ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B58AF6A8-E98C-41C8-98DC-C59C0CE420ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B58AF6A8-E98C-41C8-98DC-C59C0CE420ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B58AF6A8-E98C-41C8-98DC-C59C0CE420ED}.Release|Any CPU.Build.0 = Release|Any CPU
 		{267CB093-5289-43C4-88F3-8F47761094F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{267CB093-5289-43C4-88F3-8F47761094F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{267CB093-5289-43C4-88F3-8F47761094F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{267CB093-5289-43C4-88F3-8F47761094F3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{84C80EFF-73E0-4387-AD82-5FF6E82FEF08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{84C80EFF-73E0-4387-AD82-5FF6E82FEF08}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{84C80EFF-73E0-4387-AD82-5FF6E82FEF08}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{84C80EFF-73E0-4387-AD82-5FF6E82FEF08}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A2EB5D10-32E4-4489-8648-AA56889DEED8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A2EB5D10-32E4-4489-8648-AA56889DEED8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A2EB5D10-32E4-4489-8648-AA56889DEED8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A2EB5D10-32E4-4489-8648-AA56889DEED8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2C516D86-7285-474F-9F2E-388FB3BD0630}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2C516D86-7285-474F-9F2E-388FB3BD0630}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2C516D86-7285-474F-9F2E-388FB3BD0630}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2C516D86-7285-474F-9F2E-388FB3BD0630}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
