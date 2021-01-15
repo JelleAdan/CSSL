@@ -22,7 +22,7 @@ namespace CSSL.Modeling
 
         private DateTime endWallClockTime;
 
-        public bool IsComputationalTimeExceeded => DateTime.Now.Subtract(beginWallClockTime).TotalSeconds > maxWallClockTime; 
+        public bool IsComputationalTimeExceeded => DateTime.Now.Subtract(beginWallClockTime).TotalSeconds > maxWallClockTime;
 
         /// <summary>
         /// Get elapsed wall clock time in seconds.
@@ -46,6 +46,8 @@ namespace CSSL.Modeling
 
         public bool IsRunning => CurrentState.GetType().Name == "RunningState";
 
+        public bool IsPaused => CurrentState.GetType().Name == "PausedState";
+
         public bool IsEnded => CurrentState.GetType().Name == "EndedState";
 
         private CreatedState createdState;
@@ -54,12 +56,15 @@ namespace CSSL.Modeling
 
         private RunningState runningState;
 
+        private PausedState pausedState;
+
         private EndedState endedState;
 
         internal protected bool StopFlag { get; protected set; }
 
+        internal protected bool IsPausedFlag { get; protected set; }
+
         internal protected bool IsDoneFlag { get; protected set; }
-        internal protected bool IsReplicationLimit { get; protected set; }
 
         private void SetState(ProcessState processState)
         {
@@ -71,6 +76,7 @@ namespace CSSL.Modeling
             createdState = new CreatedState(this);
             initializedState = new InitializedState(this);
             runningState = new RunningState(this);
+            pausedState = new PausedState(this);
             endedState = new EndedState(this);
             CurrentState = createdState;
         }
@@ -111,6 +117,14 @@ namespace CSSL.Modeling
             }
         }
 
+        public void TryPause()
+        {
+            if (CurrentState.TryPause())
+            {
+                DoPause();
+            }
+        }
+
         public void TryEnd()
         {
             if (CurrentState.TryEnd())
@@ -123,18 +137,18 @@ namespace CSSL.Modeling
         {
             SetState(initializedState);
             beginWallClockTime = DateTime.Now;
-            endWallClockTime = default(DateTime);
+            endWallClockTime = default;
             IsDoneFlag = false;
             StopFlag = false;
         }
 
         protected void DoRunAll()
         {
-            //SetState(runningState); // TODO
+            IsPausedFlag = false;
 
             if (HasNext)
             {
-                while (!IsDoneFlag)
+                while (!IsDoneFlag && !IsPausedFlag)
                 {
                     TryRunNext();
                 }
@@ -144,7 +158,15 @@ namespace CSSL.Modeling
                 throw new Exception($"Can not run {Name} because there are no iterations.");
             }
 
-            TryEnd();
+            if (IsDoneFlag)
+            {
+                TryEnd();
+            }
+
+            if (IsPausedFlag)
+            {
+                TryPause();
+            }
         }
 
         protected void DoRunNext()
@@ -180,6 +202,11 @@ namespace CSSL.Modeling
             }
         }
 
+        protected virtual void DoPause()
+        {
+            SetState(pausedState);
+        }
+
         protected virtual void DoEnd()
         {
             SetState(endedState);
@@ -193,6 +220,11 @@ namespace CSSL.Modeling
         internal void Stop()
         {
             StopFlag = true;
+        }
+
+        internal void Pause()
+        {
+            IsPausedFlag = true;
         }
     }
 }

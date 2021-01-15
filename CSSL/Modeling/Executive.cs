@@ -45,6 +45,11 @@ namespace CSSL.Modeling
             eventExecutionProcess.TryRunAll();
         }
 
+        internal void TryEnd()
+        {
+            eventExecutionProcess.TryEnd();
+        }
+
         internal void Execute(CSSLEvent e)
         {
             if (e.Time < Time)
@@ -61,6 +66,11 @@ namespace CSSL.Modeling
             eventExecutionProcess.Stop();
         }
 
+        internal void HandlePauseEvent(CSSLEvent csslevent)
+        {
+            eventExecutionProcess.Pause();
+        }
+
         internal void ScheduleEvent(double time, CSSLEventAction action)
         {
             if (time < Time)
@@ -75,6 +85,21 @@ namespace CSSL.Modeling
         {
             ScheduleEvent(time, HandleEndEvent);
         }
+
+        internal void SchedulePauseEvent(double time)
+        {
+            ScheduleEvent(time, HandlePauseEvent);
+        }
+
+        public bool IsCreated => eventExecutionProcess.IsCreated;
+
+        public bool IsInitialized => eventExecutionProcess.IsInitialized;
+
+        public bool IsRunning => eventExecutionProcess.IsRunning;
+
+        public bool IsPaused => eventExecutionProcess.IsPaused;
+
+        public bool IsEnded => eventExecutionProcess.IsEnded;
 
         private class EventExecutionProcess : IterativeProcess<CSSLEvent>
         {

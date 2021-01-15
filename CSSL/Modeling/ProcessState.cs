@@ -31,6 +31,11 @@ namespace CSSL.Modeling
             throw new Exception($"\nTried to run next step in {process.GetType().Name} from an illegal state: {process.CurrentState.GetType().Name}");
         }
 
+        public virtual bool TryPause()
+        {
+            throw new Exception($"\nTried to run next step in {process.GetType().Name} from an illegal state: {process.CurrentState.GetType().Name}");
+        }
+
         public virtual bool TryEnd()
         {
             throw new Exception($"\nTried to end {process.GetType().Name} from an illegal state: {process.CurrentState.GetType().Name}");
@@ -64,6 +69,21 @@ namespace CSSL.Modeling
     public sealed class RunningState : ProcessState
     {
         public RunningState(IProcess process) : base(process)
+        {
+        }
+
+        public override bool TryRunAll() { return true; }
+
+        public override bool TryRunNext() { return true; }
+
+        public override bool TryPause() { return true; }
+
+        public override bool TryEnd() { return true; }
+    }
+
+    public sealed class PausedState : ProcessState
+    {
+        public PausedState(IProcess process) : base(process)
         {
         }
 
