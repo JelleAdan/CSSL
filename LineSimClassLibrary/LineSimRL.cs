@@ -1,21 +1,18 @@
-﻿//using CSSL.Examples.AssemblyLineOld;
-//using CSSL.Examples.AssemblyLineOld.AssemblyLineObservers;
-using CSSL.Calendar;
-using CSSL.Examples.AssemblyLine;
+﻿using CSSL.Examples.AssemblyLine;
 using CSSL.Examples.AssemblyLine.Observers;
 using CSSL.Modeling;
-using CSSL.Modeling.CSSLQueue;
+using CSSL.RL;
 using CSSL.Utilities.Distributions;
 using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace LineSim
+namespace LineSimClassLibrary
 {
-    class Program
+    class LineSimRL : RLLayerBase
     {
-        static void Main(string[] args)
+        public override Simulation BuildTrainingEnvironment()
         {
-            Settings.FixSeed = true;
-
             Simulation sim = new Simulation("AssemblyLineSimulation", @"C:\CSSLtest");
 
             AssemblyLine assemblyLine = new AssemblyLine(sim.MyModel, "AssemblyLine", 3);
@@ -41,7 +38,9 @@ namespace LineSim
             sim.MyExperiment.LengthOfReplication = 1E6;
             sim.MyExperiment.NumberOfReplications = 2;
 
-            sim.Run();
+            return sim;
         }
+
+
     }
 }

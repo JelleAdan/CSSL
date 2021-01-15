@@ -15,7 +15,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WaferFabGUI", "WaferFabGUI\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WaferFabDataReader", "WaferFabDataReader\WaferFabDataReader.csproj", "{A2EB5D10-32E4-4489-8648-AA56889DEED8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WaferAreaSim", "WaferAreaSim\WaferAreaSim.csproj", "{2C516D86-7285-474F-9F2E-388FB3BD0630}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WaferAreaSim", "WaferAreaSim\WaferAreaSim.csproj", "{2C516D86-7285-474F-9F2E-388FB3BD0630}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSSL_WebAPI", "CSSL_WebAPI\CSSL_WebAPI.csproj", "{4A119D69-38D2-4A72-9491-27A623158779}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessControllerExample", "AccessControllerExample\AccessControllerExample.csproj", "{BD7695C9-0905-4481-BDAC-F422356354A5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +55,14 @@ Global
 		{2C516D86-7285-474F-9F2E-388FB3BD0630}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2C516D86-7285-474F-9F2E-388FB3BD0630}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2C516D86-7285-474F-9F2E-388FB3BD0630}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A119D69-38D2-4A72-9491-27A623158779}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A119D69-38D2-4A72-9491-27A623158779}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A119D69-38D2-4A72-9491-27A623158779}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A119D69-38D2-4A72-9491-27A623158779}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD7695C9-0905-4481-BDAC-F422356354A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD7695C9-0905-4481-BDAC-F422356354A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD7695C9-0905-4481-BDAC-F422356354A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD7695C9-0905-4481-BDAC-F422356354A5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -14,14 +14,12 @@ namespace CSSL.Modeling
 {
     public class Simulation : IDisposable, IName, IGetTime
     {
-        public Simulation(string name, string outputDirectory)
+        public Simulation(string name, string outputDirectory = null)
         {
             Name = name;
             MyExecutive = new Executive(this);
             MyModel = new Model(name + "_Model", this);
             MyExperiment = new Experiment(name + "_Experiment", outputDirectory);
-            replicationExecutionProcess = new ReplicationExecutionProcess(this);
-            OutputDirectory = outputDirectory;
         }
 
         public Executive MyExecutive { get; }
@@ -30,9 +28,7 @@ namespace CSSL.Modeling
 
         public Experiment MyExperiment { get; }
 
-        private ReplicationExecutionProcess replicationExecutionProcess { get; }
-
-        internal string OutputDirectory { get; }
+        private ReplicationExecutionProcess replicationExecutionProcess { get; set; }
 
         public string Name { get; }
 
@@ -50,17 +46,13 @@ namespace CSSL.Modeling
         {
             try
             {
+                replicationExecutionProcess = new ReplicationExecutionProcess(this);
                 replicationExecutionProcess.TryRunAll();
             }
             finally
             {
                 Dispose();
             }
-        }
-
-        public void End()
-        {
-            replicationExecutionProcess.TryEnd();
         }
 
         public void Dispose()
@@ -71,44 +63,44 @@ namespace CSSL.Modeling
         {
             return new SimulationReporter(this);
         }
-    }
 
-    internal class ReplicationExecutionProcess : IterativeProcess<int>
-    {
-        private Simulation simulation;
-
-        public ReplicationExecutionProcess(Simulation simulation)
+        private class ReplicationExecutionProcess : IterativeProcess<int>
         {
-            this.simulation = simulation;
-        }
+            private Simulation simulation;
 
-        protected override bool HasNext => simulation.MyExperiment.HasMoreReplications;
+            public ReplicationExecutionProcess(Simulation simulation)
+            {
+                this.simulation = simulation;
+            }
 
-        protected sealed override void DoInitialize()
-        {
-            base.DoInitialize();
-            simulation.MyExperiment.StrictlyOnExperimentStart();
-            simulation.MyModel.StrictlyOnExperimentStart();
-        }
+            protected override bool HasNext => simulation.MyExperiment.HasMoreReplications;
 
-        protected sealed override int NextIteration()
-        {
-            return simulation.MyExperiment.IncrementCurrentReplicationNumber();
-        }
+            protected sealed override void DoInitialize()
+            {
+                base.DoInitialize();
+                simulation.MyExperiment.StrictlyOnExperimentStart();
+                simulation.MyModel.StrictlyOnExperimentStart();
+            }
 
-        protected sealed override void RunIteration()
-        {
-            NextIteration();
-            simulation.MyExecutive.TryInitialize();
-            simulation.MyModel.StrictlyOnReplicationStart();
-            simulation.MyExecutive.TryRunAll();
-            simulation.MyModel.StrictlyOnReplicatioEnd();
-        }
+            protected sealed override int NextIteration()
+            {
+                return simulation.MyExperiment.IncrementCurrentReplicationNumber();
+            }
 
-        protected sealed override void DoEnd()
-        {
-            base.DoEnd();
-            simulation.MyModel.StrictlyOnExperimentEnd();
+            protected sealed override void RunIteration()
+            {
+                NextIteration();
+                simulation.MyExecutive.TryInitialize();
+                simulation.MyModel.StrictlyOnReplicationStart();
+                simulation.MyExecutive.TryRunAll();
+                simulation.MyModel.StrictlyOnReplicatioEnd();
+            }
+
+            protected sealed override void DoEnd()
+            {
+                base.DoEnd();
+                simulation.MyModel.StrictlyOnExperimentEnd();
+            }
         }
     }
 }
