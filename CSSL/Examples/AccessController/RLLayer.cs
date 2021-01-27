@@ -8,11 +8,6 @@ namespace CSSL.Examples.AccessController
 {
     public class RLLayer : RLLayerBase
     {
-        public RLLayer()
-        {
-            BuildTrainingEnvironment();
-        }
-
         public AccessController ac { get; set; }
 
         public override void BuildTrainingEnvironment()

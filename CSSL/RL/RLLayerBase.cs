@@ -1,9 +1,9 @@
 ﻿using CSSL.Modeling;
 using CSSL.Modeling.Elements;
-using CSSL_WebAPI.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 
 namespace CSSL.RL
 {
@@ -18,6 +18,11 @@ namespace CSSL.RL
         private double reward;
 
         private Dictionary<string, string> info;
+
+        public RLLayerBase()
+        {
+            BuildTrainingEnvironment();
+        }
 
         public Response Reset()
         {
