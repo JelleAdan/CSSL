@@ -71,10 +71,7 @@ namespace CSSL.RL
                         break;
                 }
 
-                if(flag != Flag.CANCEL)
-                {
-                    mutex.ReleaseMutex();
-                }
+                //mutex.ReleaseMutex(); // TODO MUTEX
             }
 
             Dispose(); 
@@ -123,7 +120,7 @@ namespace CSSL.RL
 
             while (!cancellationToken.IsCancellationRequested)
             {
-                mutex.WaitOne();
+                mutex.WaitOne(); // TODO MUTEX
 
                 flag = ReadFlag();
 
@@ -133,11 +130,11 @@ namespace CSSL.RL
                 }
                 else
                 {
-                    overtakeCount++;
-                    Console.WriteLine(overtakeCount);
+                    //overtakeCount++;
+                    //Console.WriteLine(overtakeCount);
                 }
 
-                mutex.ReleaseMutex();
+                mutex.ReleaseMutex(); // TODO MUTEX
             }
 
             return Flag.CANCEL;
