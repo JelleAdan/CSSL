@@ -11,6 +11,7 @@ namespace CSSL.Utilities.Distributions
             LowerLimit = lowerLimit;
             UpperLimit = upperLimit;
             Mode = mode;
+            c = (Mode - lowerLimit) / (upperLimit - lowerLimit);
         }
 
         public double LowerLimit { get; }
@@ -18,6 +19,8 @@ namespace CSSL.Utilities.Distributions
         public double UpperLimit { get; }
 
         public double Mode { get; }
+
+        private double c;
 
         public override double Next()
         {
@@ -29,7 +32,7 @@ namespace CSSL.Utilities.Distributions
                 v = u;
                 u = tmp;
             }
-            return (1 - Mode) * u + Mode * v;
+            return LowerLimit + (UpperLimit - LowerLimit) * ((1 - c) * u + c * v);
         }
     }
 }
