@@ -15,6 +15,10 @@ namespace DataCenterSimulation
         {
             Simulation sim = new Simulation("SomeSimulation", @"C:\CSSL");
 
+            Settings.WriteOutput = false;
+
+            Settings.NotifyObservers = true;
+
             // Parameters...
 
             double dispatchTime = 1E-3;

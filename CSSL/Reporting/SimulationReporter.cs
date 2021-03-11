@@ -46,13 +46,16 @@ namespace CSSL.Reporting
 
         public void PrintSummaryToFile()
         {
-            if (!summary.Any()) { BuildSummary(); }
-
-            using (StreamWriter writer = new StreamWriter(experiment.ExperimentOutputDirectory + @"\Summary.txt"))
+            if (Settings.WriteOutput)
             {
-                foreach(string line in summary)
+                if (!summary.Any()) { BuildSummary(); }
+            
+                using (StreamWriter writer = new StreamWriter(experiment.ExperimentOutputDirectory + @"\Summary.txt"))
                 {
-                    writer.WriteLine(line);
+                    foreach (string line in summary)
+                    {
+                        writer.WriteLine(line);
+                    }
                 }
             }
         }
@@ -61,7 +64,7 @@ namespace CSSL.Reporting
         {
             if (!summary.Any()) { BuildSummary(); }
 
-            foreach(string line in summary)
+            foreach (string line in summary)
             {
                 Console.WriteLine(line);
             }

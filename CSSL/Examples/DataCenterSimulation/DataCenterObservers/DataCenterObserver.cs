@@ -20,7 +20,7 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
             DataCenter dataCenter = (DataCenter)modelElement;
             totalJobCount = dataCenter.Dispatcher.TotalNrJobsInSystem;
 
-            Writer.WriteLine($"Simulation Time,Wall Clock Time,Job Count");
+            Writer?.WriteLine($"Simulation Time,Wall Clock Time,Job Count");
         }
 
         protected override void OnWarmUp(ModelElementBase modelElement)
@@ -32,7 +32,7 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
             DataCenter dataCenter = (DataCenter)modelElement;
             totalJobCount = dataCenter.Dispatcher.TotalNrJobsInSystem;
 
-            Writer.WriteLine($"{dataCenter.GetTime},{dataCenter.GetWallClockTime},{totalJobCount}");
+            Writer?.WriteLine($"{dataCenter.GetTime},{dataCenter.GetWallClockTime},{totalJobCount}");
             //Console.WriteLine($"{simulationTime}\t{computationalTime}\t{totalJobCount}");
         }
 

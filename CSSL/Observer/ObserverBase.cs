@@ -22,22 +22,22 @@ namespace CSSL.Observer
 
         protected void StrictlyOnExperimentStart()
         {
-            ExperimentWriter = new StreamWriter(Path.Combine(MySimulation.MyExperiment.ExperimentOutputDirectory, Name + ".txt"));
         }
 
         protected void StrictlyOnReplicationStart()
         {
-            Writer = new StreamWriter(Path.Combine(MySimulation.MyExperiment.ReplicationOutputDirectory, Name + ".txt"));
         }
 
         protected void StrictlyOnReplicationEnd()
         {
-            Writer.Dispose();
+            writer?.Dispose();
+            writer = null;
         }
 
         protected void StrictlyOnExperimentEnd()
         {
-            ExperimentWriter.Dispose();
+            experimentWriter?.Dispose();
+            experimentWriter = null;
         }
 
         public ObserverBase(Simulation mySimulation)
@@ -68,10 +68,33 @@ namespace CSSL.Observer
 
         protected readonly Simulation MySimulation;
 
-        protected StreamWriter Writer { get; private set; }
+        private StreamWriter writer { get; set; }
 
-        protected StreamWriter ExperimentWriter { get; private set; }
+        protected StreamWriter Writer
+        {
+            get
+            {
+                return Settings.WriteOutput ? writer ??= new StreamWriter(Path.Combine(MySimulation.MyExperiment.ReplicationOutputDirectory, Name + ".txt")) : null;
+            }
+            private set
+            {
+                writer = value;
+            }
+        }
 
+        private StreamWriter experimentWriter;
+
+        protected StreamWriter ExperimentWriter
+        {
+            get
+            {
+                return Settings.WriteOutput ? experimentWriter ??= new StreamWriter(Path.Combine(MySimulation.MyExperiment.ExperimentOutputDirectory, Name + ".txt")) : null;
+            }
+            private set
+            {
+                experimentWriter = value;
+            }
+        }
         protected List<Unsubscriber> cancellations;
 
         /// <summary>

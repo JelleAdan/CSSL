@@ -39,7 +39,7 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
             ServerPool serverPool = (ServerPool)modelElement;
             nrOfJobs.UpdateValue(serverPool.JobCount);
 
-            Writer.WriteLine($"Current Simulation Time,Average number of jobs, StDev on average number of jobs");
+            Writer?.WriteLine($"Current Simulation Time,Average number of jobs, StDev on average number of jobs");
         }
 
         protected override void OnUpdate(ModelElementBase modelElement)
@@ -50,7 +50,7 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
 
             
 
-            Writer.WriteLine($"{serverPool.GetTime}',{nrOfJobsStatistic.Average()},{nrOfJobsStatistic.StandardDeviation()}");
+            Writer?.WriteLine($"{serverPool.GetTime}',{nrOfJobsStatistic.Average()},{nrOfJobsStatistic.StandardDeviation()}");
         }
 
         protected override void OnReplicationEnd(ModelElementBase modelElement)

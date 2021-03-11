@@ -12,7 +12,7 @@ namespace CSSL.Examples.AccessController
 
         public override void BuildTrainingEnvironment()
         {
-            Settings.Output = false;
+            Settings.WriteOutput = false;
 
             Simulation = new RLSimulation("Access_controller_simulation");
 

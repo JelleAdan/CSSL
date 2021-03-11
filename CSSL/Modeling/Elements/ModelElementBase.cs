@@ -302,7 +302,7 @@ namespace CSSL.Modeling.Elements
 
         protected void NotifyObservers(object info)
         {
-            if (Settings.Output)
+            if (Settings.NotifyObservers)
             {
                 foreach (ObserverBase observer in observers)
                 {

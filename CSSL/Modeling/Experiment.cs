@@ -130,7 +130,7 @@ namespace CSSL.Modeling
 
         private void CreateExperimentOutputDirectory()
         {
-            if (Settings.Output)
+            if (Settings.WriteOutput)
             {
                 ExperimentOutputDirectory = Path.Combine(outputDirectory, Name);
                 if (Directory.Exists(ExperimentOutputDirectory))
@@ -150,7 +150,7 @@ namespace CSSL.Modeling
 
         private void CreateReplicationOutputDirectory()
         {
-            if (Settings.Output)
+            if (Settings.WriteOutput)
             {
                 ReplicationOutputDirectory = Path.Combine(ExperimentOutputDirectory, $"rep_{currentReplicationNumber}");
 
