@@ -1,6 +1,7 @@
 ﻿using CSSL.Examples.AccessController;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Text;
@@ -14,9 +15,7 @@ namespace CSSL.RL
     {
         public RLLayer RLLayer { get; }
 
-        //private CancellationToken cancellationToken { get; }
-
-        private Mutex mutex { get; }
+        private CancellationTokenSource cts { get; }
 
         private MemoryMappedFile mmfResponse { get; }
 
@@ -24,40 +23,71 @@ namespace CSSL.RL
 
         private MemoryMappedFile mmfFlag { get; }
 
-        private int overtakeCount = 0; // TODO Remove this
+        private MemoryMappedViewStream viewStreamResponse { get; }
+
+        private MemoryMappedViewStream viewStreamAction { get; }
+
+        private MemoryMappedViewStream viewStreamFlag { get; }
+
+        private BinaryWriter writerResponse { get; }
+
+        private BinaryReader readerAction { get; }
+
+        private BinaryReader readerFlag { get; }
+
+        private BinaryWriter writerFlag { get; }
 
         private enum Flag : byte
         {
             WAIT, RESET, ACT, CANCEL
         }
 
-        public RLController(RLLayer RLLayer)
+        public RLController(RLLayer RLLayer, CancellationTokenSource cts)
         {
             this.RLLayer = RLLayer;
-            //cancellationToken = new CancellationToken();
-            bool mutexCreated;
-            mutex = new Mutex(true, "cssl_rl_mutex", out mutexCreated);
-            mmfResponse = MemoryMappedFile.CreateNew("response", 100);
-            mmfAction = MemoryMappedFile.CreateNew("action", 4);
-            mmfFlag = MemoryMappedFile.CreateNew("flag", 1);
-            SetFlag(Flag.WAIT);
-            mutex.ReleaseMutex();
+            this.cts = cts;
 
+            using (FileStream fs = new FileStream("response", FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite))
+            {
+                mmfResponse = MemoryMappedFile.CreateFromFile(fs, null, 4096, MemoryMappedFileAccess.ReadWrite, HandleInheritability.None, true);
+                viewStreamResponse = mmfResponse.CreateViewStream();
+                writerResponse = new BinaryWriter(viewStreamResponse);
+            }
+
+            mmfAction = MemoryMappedFile.CreateNew("action", 4);
+            viewStreamAction = mmfAction.CreateViewStream();
+            readerAction = new BinaryReader(viewStreamAction);
+
+            mmfFlag = MemoryMappedFile.CreateNew("flag", 1);
+            viewStreamFlag = mmfFlag.CreateViewStream();
+            readerFlag = new BinaryReader(viewStreamFlag);
+            writerFlag = new BinaryWriter(viewStreamFlag);
+
+            SetFlag(Flag.WAIT);
         }
 
         public void Dispose()
         {
-            mutex.Dispose();
             mmfResponse.Dispose();
+            viewStreamResponse.Dispose();
+            writerResponse.Dispose();
+
             mmfAction.Dispose();
+            viewStreamAction.Dispose();
+            readerAction.Dispose();
+
             mmfFlag.Dispose();
+            viewStreamFlag.Dispose();
+            readerFlag.Dispose();
+            writerFlag.Dispose();
+
         }
 
-        public async Task Run(CancellationToken cancellationToken)
+        public void Run()
         {
-            while (!cancellationToken.IsCancellationRequested)
+            while (!cts.IsCancellationRequested)
             {
-                Flag flag = Wait(cancellationToken);
+                Flag flag = Wait();
 
                 switch (flag)
                 {
@@ -70,71 +100,47 @@ namespace CSSL.RL
                     case Flag.CANCEL:
                         break;
                 }
-
-                //mutex.ReleaseMutex(); // TODO MUTEX
             }
 
-            Dispose(); 
+            Dispose();
         }
 
         private void SetFlag(Flag flag)
         {
-            using (MemoryMappedViewStream stream = mmfFlag.CreateViewStream())
-            {
-                BinaryWriter writer = new BinaryWriter(stream);
-                writer.BaseStream.Position = 0;
-                writer.Write((byte)flag);
-            }
+            viewStreamFlag.Seek(0, SeekOrigin.Begin);
+            writerFlag.Write((byte)flag);
         }
 
         private Flag ReadFlag()
         {
-            using (MemoryMappedViewStream stream = mmfFlag.CreateViewStream())
-            {
-                BinaryReader reader = new BinaryReader(stream);
-                return (Flag)reader.ReadByte();
-            }
+            viewStreamFlag.Seek(0, SeekOrigin.Begin);
+            return (Flag)readerFlag.ReadByte();
         }
 
         private int ReadAction()
         {
-            using (MemoryMappedViewStream stream = mmfAction.CreateViewStream())
-            {
-                BinaryReader reader = new BinaryReader(stream);
-                return reader.ReadInt32();
-            }
+            viewStreamAction.Seek(0, SeekOrigin.Begin);
+            return readerAction.ReadInt32();
         }
 
         private void WriteResponse(Response response)
         {
-            using (MemoryMappedViewStream stream = mmfResponse.CreateViewStream())
-            {
-                BinaryWriter writer = new BinaryWriter(stream);
-                writer.Write(JsonSerializer.Serialize(response));
-            }
+            viewStreamResponse.Seek(0, SeekOrigin.Begin);
+            writerResponse.Write(JsonSerializer.Serialize(response));
         }
 
-        private Flag Wait(CancellationToken cancellationToken)
+        private Flag Wait()
         {
             Flag flag;
 
-            while (!cancellationToken.IsCancellationRequested)
+            while (!cts.IsCancellationRequested)
             {
-                mutex.WaitOne(); // TODO MUTEX
-
                 flag = ReadFlag();
 
                 if (flag != Flag.WAIT)
                 {
                     return flag;
                 }
-                else
-                {
-                    //overtakeCount++;
-                    //Console.WriteLine(overtakeCount);
-                }
-
-                mutex.ReleaseMutex(); // TODO MUTEX
             }
 
             return Flag.CANCEL;

@@ -15,52 +15,65 @@ namespace AccessControllerExample
 {
     class Program
     {
-        static async Task Main(string[] args)
+        static void Main(string[] args)
         {
-            RLLayer layer = new RLLayer();
+            Console.WriteLine("Press spacebar to cancel CSSL.");
 
-            //CancellationTokenSource cts = new CancellationTokenSource();
+            var cts = new CancellationTokenSource();
+            var token = cts.Token;
 
-            //Console.CancelKeyPress += (s, e) =>
-            //{
-            //    Console.WriteLine("Canceling...");
-            //    cts.Cancel();
-            //    e.Cancel = true;
-            //};
-
-            //RLController controller = new RLController(layer);
-            //await controller.Run(cts.Token);
-
-            //
-
-            Stopwatch stopwatch = new Stopwatch();
-            int reps = 100;
-            double totalDuration = 0;
-
-            Random rnd = new Random();
-            ServerPool sp = layer.ac.ServerPool;
-
-            for (int i = 0; i < reps; i++)
+            Task.Run(() =>
             {
-                stopwatch.Restart();
+                RLLayer layer = new RLLayer();
 
-                layer.Reset();
-                for (int customers = 0; customers < 6000; customers++)
+                RLController controller = new RLController(layer, cts);
+
+                controller.Run();
+
+            });
+
+            while (true)
+            {
+                if (Console.ReadKey(true).Key == ConsoleKey.Spacebar)
                 {
-                    if (sp.FreeServers > 0)
-                    {
-                        layer.Act(rnd.Next(2));
-                    }
-                    else
-                    {
-                        layer.Act(0);
-                    }
+                    Console.WriteLine("CSSL canceled.");
+                    cts.Cancel();
+                    break;
                 }
-
-                totalDuration += stopwatch.Elapsed.TotalSeconds;
             }
 
-            Console.WriteLine($"Average duration: {totalDuration / reps} seconds.");
+            // 
+
+            //RLLayer layer = new RLLayer();
+
+            //Stopwatch stopwatch = new Stopwatch();
+            //int reps = 100;
+            //double totalDuration = 0;
+
+            //Random rnd = new Random();
+            //ServerPool sp = layer.ac.ServerPool;
+
+            //for (int i = 0; i < reps; i++)
+            //{
+            //    stopwatch.Restart();
+
+            //    layer.Reset();
+            //    for (int customers = 0; customers < 6000; customers++)
+            //    {
+            //        if (sp.FreeServers > 0)
+            //        {
+            //            layer.Act(rnd.Next(2));
+            //        }
+            //        else
+            //        {
+            //            layer.Act(0);
+            //        }
+            //    }
+
+            //    totalDuration += stopwatch.Elapsed.TotalSeconds;
+            //}
+
+            //Console.WriteLine($"Average duration: {totalDuration / reps} seconds.");
         }
     }
 }
