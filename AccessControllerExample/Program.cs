@@ -17,30 +17,11 @@ namespace AccessControllerExample
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Press spacebar to cancel CSSL.");
+            RLLayer layer = new RLLayer();
 
-            var cts = new CancellationTokenSource();
-            var token = cts.Token;
+            RLController controller = new RLController(layer);
 
-            Task.Run(() =>
-            {
-                RLLayer layer = new RLLayer();
-
-                RLController controller = new RLController(layer, cts);
-
-                controller.Run();
-
-            });
-
-            while (true)
-            {
-                if (Console.ReadKey(true).Key == ConsoleKey.Spacebar)
-                {
-                    Console.WriteLine("CSSL canceled.");
-                    cts.Cancel();
-                    break;
-                }
-            }
+            controller.Run();
 
             // 
 

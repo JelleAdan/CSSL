@@ -13,9 +13,9 @@ namespace CSSL.RL
 {
     public class RLController : IDisposable
     {
-        public RLLayer RLLayer { get; }
+        public RLLayerBase RLLayer { get; }
 
-        private CancellationTokenSource cts { get; }
+        private CancellationTokenSource cts { get; set; }
 
         private MemoryMappedFile mmfResponse { get; }
 
@@ -42,26 +42,31 @@ namespace CSSL.RL
             WAIT, RESET, ACT, CANCEL
         }
 
-        public RLController(RLLayer RLLayer, CancellationTokenSource cts)
+        public RLController(RLLayerBase RLLayer)
         {
             this.RLLayer = RLLayer;
-            this.cts = cts;
 
             using (FileStream fs = new FileStream("response", FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite))
             {
-                mmfResponse = MemoryMappedFile.CreateFromFile(fs, null, 4096, MemoryMappedFileAccess.ReadWrite, HandleInheritability.None, true);
+                mmfResponse = MemoryMappedFile.CreateFromFile(fs, null, 1096, MemoryMappedFileAccess.ReadWrite, HandleInheritability.None, false);
                 viewStreamResponse = mmfResponse.CreateViewStream();
                 writerResponse = new BinaryWriter(viewStreamResponse);
             }
 
-            mmfAction = MemoryMappedFile.CreateNew("action", 4);
-            viewStreamAction = mmfAction.CreateViewStream();
-            readerAction = new BinaryReader(viewStreamAction);
+            using (FileStream fs = new FileStream("action", FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite))
+            {
+                mmfAction = MemoryMappedFile.CreateFromFile(fs, null, 4, MemoryMappedFileAccess.ReadWrite, HandleInheritability.None, false);
+                viewStreamAction= mmfAction.CreateViewStream();
+                readerAction = new BinaryReader(viewStreamAction);
+            }
 
-            mmfFlag = MemoryMappedFile.CreateNew("flag", 1);
-            viewStreamFlag = mmfFlag.CreateViewStream();
-            readerFlag = new BinaryReader(viewStreamFlag);
-            writerFlag = new BinaryWriter(viewStreamFlag);
+            using (FileStream fs = new FileStream("flag", FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite))
+            {
+                mmfFlag = MemoryMappedFile.CreateFromFile(fs, null, 1, MemoryMappedFileAccess.ReadWrite, HandleInheritability.None, false);
+                viewStreamFlag = mmfFlag.CreateViewStream();
+                readerFlag = new BinaryReader(viewStreamFlag);
+                writerFlag = new BinaryWriter(viewStreamFlag);
+            }
 
             SetFlag(Flag.WAIT);
         }
@@ -85,24 +90,41 @@ namespace CSSL.RL
 
         public void Run()
         {
-            while (!cts.IsCancellationRequested)
-            {
-                Flag flag = Wait();
+            Console.WriteLine("Ready to run. Press spacebar to cancel.");
 
-                switch (flag)
+            cts = new CancellationTokenSource();
+
+            Task.Run(() =>
+            {
+                while (!cts.IsCancellationRequested)
                 {
-                    case Flag.ACT:
-                        Act();
-                        break;
-                    case Flag.RESET:
-                        Reset();
-                        break;
-                    case Flag.CANCEL:
-                        break;
+                    Flag flag = Wait();
+
+                    switch (flag)
+                    {
+                        case Flag.ACT:
+                            Act();
+                            break;
+                        case Flag.RESET:
+                            Reset();
+                            break;
+                        case Flag.CANCEL:
+                            break;
+                    }
+                }
+
+                Dispose();
+            });
+
+            while (true)
+            {
+                if (Console.ReadKey(true).Key == ConsoleKey.Spacebar)
+                {
+                    Console.WriteLine("Successfully canceled.");
+                    cts.Cancel();
+                    break;
                 }
             }
-
-            Dispose();
         }
 
         private void SetFlag(Flag flag)
