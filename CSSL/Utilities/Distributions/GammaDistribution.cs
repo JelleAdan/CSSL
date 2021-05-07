@@ -40,19 +40,22 @@ namespace CSSL.Utilities.Distributions
 
         public override double Next()
         {
-            // special case when alpha is less than 1.0
             if (Alpha < 1.0)
             {
-                double oldAlpha = Alpha;
-                Alpha = +1;
-                return Next() * Math.Pow(uniform.Next(), 1.0 / oldAlpha);
+                return next(Alpha + 1.0, Beta) * Math.Pow(uniform.Next(), 1.0 / Alpha);
             }
+            else
+            {
+                return next(Alpha, Beta);
+            }
+        }
 
-            double d = Alpha - 1.0 / 3.0;
+        private double next(double a, double b)
+        {
+            double d = a - 1.0 / 3.0;
             double c = 1.0 / Math.Sqrt(9.0 * d);
             double z, v, p;
 
-            // iteratively find the random number
             do
             {
                 z = normal.Next();
@@ -60,7 +63,7 @@ namespace CSSL.Utilities.Distributions
                 p = 0.5 * Math.Pow(z, 2.0) + d - d * v + d * Math.Log(v);
             } while ((z < -1.0 / c) || (Math.Log(uniform.Next()) > p));
 
-            return (d * v) / Beta;
+            return d * v / b;
         }
 
         //public override double Next()

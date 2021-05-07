@@ -12,6 +12,8 @@ namespace CSSL.Utilities.Distributions
     {
         protected ExtendedRandom rnd;
 
+        public static Random rndStatic = null;
+
         public double Mean { get; }
 
         public double Variance { get; }
@@ -20,15 +22,7 @@ namespace CSSL.Utilities.Distributions
         {
             Mean = mean;
             Variance = variance;
-            
-            if (Settings.FixSeed)
-            {
-                rnd = new ExtendedRandom(200844210);
-            }
-            else
-            {
-                rnd = new ExtendedRandom();
-            }
+            rnd = new ExtendedRandom(Settings.SeedGenerator.Next());
         }
 
         public abstract double Next();
