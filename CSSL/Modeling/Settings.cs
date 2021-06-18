@@ -13,5 +13,7 @@ namespace CSSL.Modeling
         public static bool WriteOutput { get; set; } = true;
 
         public static bool NotifyObservers { get; set; } = true;
+
+        public static Random SeedGenerator { get; set; } = FixSeed ? new Random(200844210) : new Random();
     }
 }

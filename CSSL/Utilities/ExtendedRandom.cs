@@ -9,7 +9,7 @@ namespace CSSL.Utilities
     [Serializable()]
     public class ExtendedRandom : Random
     {
-        public ExtendedRandom()
+        public ExtendedRandom() : base()
         {
         }
 
