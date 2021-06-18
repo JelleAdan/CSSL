@@ -17,6 +17,8 @@ namespace CSSL.Modeling.Elements
 
         public abstract void Act(int action);
 
+        public abstract bool TryAct(int action);
+
         protected void GetAction(double[] state, double reward)
         {
             reinforcementLearningLayer.GetAction(this, state, reward);

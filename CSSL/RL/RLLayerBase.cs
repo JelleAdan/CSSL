@@ -50,8 +50,11 @@ namespace CSSL.RL
         {
             if (sender != null)
             {
-                sender.Act(action);
-                sender = null;
+                if (sender.TryAct(action))
+                {
+                    sender.Act(action);
+                    sender = null;
+                }
             }
             else
             {

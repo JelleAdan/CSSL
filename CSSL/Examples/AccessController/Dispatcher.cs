@@ -47,5 +47,19 @@ namespace CSSL.Examples.AccessController
             }
             throw new Exception();
         }
+
+        public override bool TryAct(int action)
+        {
+            if (action == 0 || (action == 1 && serverPool.FreeServers > 0))
+            {
+                return true;
+            }
+            else
+            {
+                reward = 100; // Some penalty?
+                ScheduleEndEvent(GetTime);
+                GetAction(state, reward);
+            }
+        }
     }
 }
