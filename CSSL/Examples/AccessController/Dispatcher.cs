@@ -59,6 +59,7 @@ namespace CSSL.Examples.AccessController
                 reward = 100; // Some penalty?
                 ScheduleEndEvent(GetTime);
                 GetAction(state, reward);
+                return false;
             }
         }
     }
