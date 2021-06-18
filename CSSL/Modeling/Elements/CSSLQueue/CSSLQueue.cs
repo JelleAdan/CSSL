@@ -35,7 +35,7 @@ namespace CSSL.Modeling.CSSLQueue
         /// Adds an item to the end of the queue.
         /// </summary>
         /// <param name="item">The item to be added.</param>
-        public void EnqueueLast(T item)
+        public virtual void EnqueueLast(T item)
         {
             items.Add(item);
             item.MyQueue = this;
@@ -45,7 +45,7 @@ namespace CSSL.Modeling.CSSLQueue
         /// Insert an item at a specified index in the queue.
         /// </summary>
         /// <param name="item">The item to be added.</param>
-        public void EnqueueAt(T item, int index)
+        public virtual void EnqueueAt(T item, int index)
         {
             items.Insert(index, item);
             item.MyQueue = this;
@@ -56,7 +56,7 @@ namespace CSSL.Modeling.CSSLQueue
         /// </summary>
         /// <param name="index">Position of the item in the queue.</param>
         /// <returns></returns>
-        public T DequeueAt(int index)
+        public virtual T DequeueAt(int index)
         {
             T item = items[index];
             items.RemoveAt(index);
@@ -68,7 +68,7 @@ namespace CSSL.Modeling.CSSLQueue
         /// Retrieves and removes the first item from the queue.
         /// </summary>
         /// <returns></returns>
-        public T DequeueFirst()
+        public virtual T DequeueFirst()
         {
             T item = items.First();
             items.RemoveAt(0);
@@ -81,7 +81,7 @@ namespace CSSL.Modeling.CSSLQueue
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public T Dequeue(T item)
+        public virtual T Dequeue(T item)
         {
             items.Remove(item);
             return item;
