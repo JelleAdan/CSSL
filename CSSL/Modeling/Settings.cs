@@ -6,13 +6,13 @@ namespace CSSL.Modeling
 {
     public static class Settings
     {
-
+        private static bool fixSeed;
 
         public static bool FixSeed
         {
             get
             {
-                return FixSeed;
+                return fixSeed;
             }
             set
             {
@@ -24,7 +24,7 @@ namespace CSSL.Modeling
                 {
                     SeedGenerator = new Random();
                 }
-                FixSeed = value;
+                fixSeed = value;
             }
         }
 
