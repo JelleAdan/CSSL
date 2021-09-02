@@ -43,7 +43,7 @@ namespace CSSL.Observer
         public ObserverBase(Simulation mySimulation)
         {
             Id = observerCounter++;
-            Name = $"{Id}_{GetType().Name}";
+            Name = $"{GetType().Name}";
             MySimulation = mySimulation;
             cancellations = new List<Unsubscriber>();
         }
@@ -51,7 +51,7 @@ namespace CSSL.Observer
         public ObserverBase(Simulation mySimulation, string name)
         {
             Id = observerCounter++;
-            Name = $"{Id}_{name}";
+            Name = $"{name}";
             MySimulation = mySimulation;
             cancellations = new List<Unsubscriber>();
         }
@@ -74,7 +74,28 @@ namespace CSSL.Observer
         {
             get
             {
-                return Settings.WriteOutput ? writer ??= new StreamWriter(Path.Combine(MySimulation.MyExperiment.ReplicationOutputDirectory, Name + ".txt")) : null;
+                if (Settings.WriteOutput)
+                {
+                    if (writer == null)
+                    {
+                        string path = Path.Combine(MySimulation.MyExperiment.ReplicationOutputDirectory, Name);
+                        if (File.Exists(path + ".txt"))
+                        {
+                            int counter = 1;
+                            while (File.Exists(path + $"_{counter}.txt"))
+                            {
+                                counter++;
+                            }
+                            writer = new StreamWriter(path + $"_{counter}.txt");
+                        }
+                        else
+                        {
+                            writer = new StreamWriter(path + ".txt");
+                        }
+                    }
+                    return writer;
+                }
+                else return null;
             }
             private set
             {
@@ -88,7 +109,28 @@ namespace CSSL.Observer
         {
             get
             {
-                return Settings.WriteOutput ? experimentWriter ??= new StreamWriter(Path.Combine(MySimulation.MyExperiment.ExperimentOutputDirectory, Name + ".txt")) : null;
+                if (Settings.WriteOutput)
+                {
+                    if (experimentWriter == null)
+                    {
+                        string path = Path.Combine(MySimulation.MyExperiment.ExperimentOutputDirectory, Name);
+                        if (File.Exists(path + ".txt"))
+                        {
+                            int counter = 1;
+                            while (File.Exists(path + $"_{counter}.txt"))
+                            {
+                                counter++;
+                            }
+                            experimentWriter = new StreamWriter(path + $"_{counter}.txt");
+                        }
+                        else
+                        {
+                            experimentWriter = new StreamWriter(path + ".txt");
+                        }
+                    }
+                    return experimentWriter;
+                }
+                else return null;
             }
             private set
             {
