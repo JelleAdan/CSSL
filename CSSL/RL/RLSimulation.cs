@@ -7,7 +7,7 @@ namespace CSSL.RL
 {
     public class RLSimulation : Simulation
     {
-        public RLSimulation(string name) : base(name)
+        public RLSimulation(string name, string outputDirectory = null) : base(name, outputDirectory)
         {
             MyExperiment.LengthOfReplication = double.PositiveInfinity;
         }

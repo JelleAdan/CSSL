@@ -28,6 +28,7 @@ namespace CSSL.Modeling.Elements
         protected void GetAction(double[][] state, double reward)
         {
             reinforcementLearningLayer.GetAction(this, state, reward);
+            SchedulePauseEvent(GetTime);
         }
 
         protected void SchedulePauseEvent(double time)
