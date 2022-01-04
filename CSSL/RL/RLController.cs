@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.MemoryMappedFiles;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -42,15 +43,20 @@ namespace CSSL.RL
             WAIT, RESET, ACT, CANCEL
         }
 
-        public RLController(RLLayerBase RLLayer)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="RLLayer">Reference to instance of RLLayerBase.</param>
+        /// <param name="responseLength">The allocated bytes for the response (state, reward, isDone and info combined).</param>
+        public RLController(RLLayerBase RLLayer, int responseLength = 1000)
         {
             this.RLLayer = RLLayer;
 
             using (FileStream fs = new FileStream("response", FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite))
             {
-                mmfResponse = MemoryMappedFile.CreateFromFile(fs, null, 1096, MemoryMappedFileAccess.ReadWrite, HandleInheritability.None, false);
+                mmfResponse = MemoryMappedFile.CreateFromFile(fs, null, responseLength, MemoryMappedFileAccess.ReadWrite, HandleInheritability.None, false);
                 viewStreamResponse = mmfResponse.CreateViewStream();
-                writerResponse = new BinaryWriter(viewStreamResponse);
+                writerResponse = new BinaryWriter(viewStreamResponse, Encoding.UTF7);
             }
 
             using (FileStream fs = new FileStream("action", FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite))
@@ -148,7 +154,11 @@ namespace CSSL.RL
         private void WriteResponse(Response response)
         {
             viewStreamResponse.Seek(0, SeekOrigin.Begin);
-            writerResponse.Write(JsonSerializer.Serialize(response));
+            var serializedResponse = JsonSerializer.Serialize(response);
+            byte[] bytesLength = BitConverter.GetBytes(serializedResponse.Length);
+            byte[] bytesJSON = Encoding.UTF8.GetBytes(serializedResponse);
+            writerResponse.Write(bytesLength);
+            writerResponse.Write(bytesJSON);
         }
 
         private Flag Wait()
