@@ -22,18 +22,18 @@ namespace CSSL.Modeling.Elements
         protected void GetAction(double[] state, double reward)
         {
             reinforcementLearningLayer.GetAction(this, state, reward);
-            SchedulePauseEvent(GetTime);
+            SchedulePauseEvent();
         }
 
         protected void GetAction(double[][] state, double reward)
         {
             reinforcementLearningLayer.GetAction(this, state, reward);
-            SchedulePauseEvent(GetTime);
+            SchedulePauseEvent();
         }
 
-        protected void SchedulePauseEvent(double time)
+        protected void SchedulePauseEvent()
         {
-            GetExecutive.SchedulePauseEvent(time);
+            GetExecutive.SchedulePauseEventNow();
         }
     }
 }

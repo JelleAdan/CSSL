@@ -18,6 +18,8 @@ namespace CSSL.Calendar
 
         void Add(CSSLEvent e);
 
+        void AddNow(CSSLEvent e);
+
         void Cancel(CSSLEvent e);
 
         void CancelAll();

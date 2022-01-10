@@ -182,6 +182,7 @@ namespace CSSL.RL
         {
             try
             {
+                Console.WriteLine("Reset");
                 Response response = RLLayer.Reset();
 
                 WriteResponse(response);
@@ -196,8 +197,8 @@ namespace CSSL.RL
 
         public void Act()
         {
-            try
-            {
+            //try
+            //{
                 int action = ReadAction();
 
                 Response response = RLLayer.Act(action);
@@ -205,11 +206,11 @@ namespace CSSL.RL
                 WriteResponse(response);
 
                 SetFlag(Flag.WAIT);
-            }
-            catch (Exception exception)
-            {
-                throw exception;
-            }
+            //}
+            //catch (Exception exception)
+            //{
+            //    throw exception;
+            //}
         }
     }
 }

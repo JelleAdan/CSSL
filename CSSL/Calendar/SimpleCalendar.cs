@@ -36,6 +36,15 @@ namespace CSSL.Calendar
             }
         }
 
+        public void AddNow(CSSLEvent e)
+        {
+            if (fes.First().Time < e.Time)
+            {
+                throw new Exception("Tried to violate chronological order of calendar.");
+            }
+            fes.Insert(0, e);
+        }
+
         public void Cancel(CSSLEvent e)
         {
             fes.Remove(e);

@@ -81,14 +81,20 @@ namespace CSSL.Modeling
             calendar.Add(e);
         }
 
+        internal void ScheduleEventNow(CSSLEventAction action)
+        {
+            CSSLEvent e = new CSSLEvent(Time, action);
+            calendar.AddNow(e);
+        }
+
         internal void ScheduleEndEvent(double time)
         {
             ScheduleEvent(time, HandleEndEvent);
         }
 
-        internal void SchedulePauseEvent(double time)
+        internal void SchedulePauseEventNow()
         {
-            ScheduleEvent(time, HandlePauseEvent);
+            ScheduleEventNow(HandlePauseEvent);
         }
 
         public bool IsCreated => eventExecutionProcess.IsCreated;
