@@ -99,8 +99,20 @@ namespace CSSL.RL
                     Info = info
                 };
             }
-
-            throw new InvalidOperationException("No sender to respond");
+            else if (Simulation.MyExecutive.IsEnded)
+            {
+                return new Response()
+                {
+                    State = null,
+                    Reward = 0,
+                    IsEnded = Simulation.MyExecutive.IsEnded,
+                    Info = null
+                };
+            }
+            else
+            {
+                throw new InvalidOperationException("Cannot get response");
+            }
         }
     }
 }

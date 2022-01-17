@@ -31,6 +31,18 @@ namespace CSSL.Modeling.Elements
             SchedulePauseEvent();
         }
 
+        protected void SendFinalResponse(double[] state, double reward)
+        {
+            reinforcementLearningLayer.GetAction(this, state, reward);
+            ScheduleEndEventNow();
+        }
+
+        protected void SendFinalResponse(double[][] state, double reward)
+        {
+            reinforcementLearningLayer.GetAction(this, state, reward);
+            ScheduleEndEventNow();
+        }
+
         protected void SchedulePauseEvent()
         {
             GetExecutive.SchedulePauseEventNow();

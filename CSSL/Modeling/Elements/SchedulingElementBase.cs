@@ -23,5 +23,10 @@ namespace CSSL.Modeling.Elements
         {
             GetExecutive.ScheduleEndEvent(time);
         }
+
+        protected void ScheduleEndEventNow()
+        {
+            GetExecutive.ScheduleEndEventNow();
+        }
     }
 }

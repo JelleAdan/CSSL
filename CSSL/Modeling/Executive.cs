@@ -92,6 +92,11 @@ namespace CSSL.Modeling
             ScheduleEvent(time, HandleEndEvent);
         }
 
+        internal void ScheduleEndEventNow()
+        {
+            ScheduleEventNow(HandleEndEvent);
+        }
+
         internal void SchedulePauseEventNow()
         {
             ScheduleEventNow(HandlePauseEvent);

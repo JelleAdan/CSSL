@@ -93,7 +93,6 @@ namespace CSSL.RL
             writerFlag.Dispose();
 
         }
-
         public void Run()
         {
             Console.WriteLine("Ready to run. Press spacebar to cancel.");
