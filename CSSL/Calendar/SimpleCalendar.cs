@@ -38,7 +38,7 @@ namespace CSSL.Calendar
 
         public void AddNow(CSSLEvent e)
         {
-            if (fes.First().Time < e.Time)
+            if (fes.Any() && fes.First().Time < e.Time)
             {
                 throw new Exception("Tried to violate chronological order of calendar.");
             }
