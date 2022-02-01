@@ -56,9 +56,8 @@ namespace CSSL.Examples.AccessController
             }
             else
             {
-                reward = 100; // Some penalty?
-                ScheduleEndEvent(GetTime);
-                GetAction(state, reward);
+                reward = -100; // Some penalty?
+                SendFinalResponse(state, reward);
                 return false;
             }
         }
