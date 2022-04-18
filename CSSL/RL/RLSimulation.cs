@@ -14,9 +14,13 @@ namespace CSSL.RL
 
         public void StartTrain()
         {
+            MyExperiment.StrictlyOnExperimentStart(true);
+
             MyModel.StrictlyOnExperimentStart();
 
             MyExecutive.TryInitialize();
+
+            MyExperiment.StrictlyOnReplicationStart();
 
             MyModel.StrictlyOnReplicationStart();
         }

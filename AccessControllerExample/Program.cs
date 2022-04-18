@@ -17,9 +17,11 @@ namespace AccessControllerExample
     {
         static void Main(string[] args)
         {
+            int responseLength = 1000;
+
             RLLayer layer = new RLLayer();
 
-            RLController controller = new RLController(layer);
+            RLController controller = new RLController(layer, responseLength);
 
             controller.Run();
 

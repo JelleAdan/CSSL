@@ -78,7 +78,7 @@ namespace CSSL.Modeling
             protected sealed override void DoInitialize()
             {
                 base.DoInitialize();
-                simulation.MyExperiment.StrictlyOnExperimentStart();
+                simulation.MyExperiment.StrictlyOnExperimentStart(false);
                 simulation.MyModel.StrictlyOnExperimentStart();
             }
 

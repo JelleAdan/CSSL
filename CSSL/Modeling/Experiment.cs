@@ -169,9 +169,9 @@ namespace CSSL.Modeling
             }
         }
 
-        internal void StrictlyOnExperimentStart()
+        internal void StrictlyOnExperimentStart(bool isRLSimulation)
         {
-            CheckReplicationLengths();
+            if (!isRLSimulation) CheckReplicationLengths();
             ResetCurrentReplicationNumber();
             CreateExperimentOutputDirectory();
         }
