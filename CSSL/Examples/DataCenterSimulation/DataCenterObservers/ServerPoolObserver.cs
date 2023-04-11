@@ -13,7 +13,6 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
         private Variable<int> nrOfJobs;
         private WeightedStatistic nrOfJobsStatistic;
 
-
         public ServerPoolObserver(Simulation sim) : base(sim)
         {
             nrOfJobs = new Variable<int>(this);
@@ -47,8 +46,6 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
             ServerPool serverPool = (ServerPool)modelElement;
 
             nrOfJobs.UpdateValue(serverPool.JobCount);
-
-            
 
             Writer?.WriteLine($"{serverPool.GetTime}',{nrOfJobsStatistic.Average()},{nrOfJobsStatistic.StandardDeviation()}");
         }

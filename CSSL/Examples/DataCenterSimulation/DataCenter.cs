@@ -48,6 +48,5 @@ namespace CSSL.Examples.DataCenterSimulation
         {
             NotifyObservers(this);
         }
-
     }
 }

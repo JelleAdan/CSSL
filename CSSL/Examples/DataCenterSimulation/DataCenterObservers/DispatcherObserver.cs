@@ -46,10 +46,7 @@ namespace CSSL.Examples.DataCenterSimulation.DataCenterObservers
             Dispatcher dispatcher = (Dispatcher)modelElement;
             queueLength.UpdateValue(dispatcher.QueueLength);
             queueLengthStatistic.Collect(queueLength.Value, queueLength.Weight);
-
             Writer?.WriteLine($"{dispatcher.GetTime},{queueLength.Value}");
-
-            
         }
 
         protected override void OnReplicationEnd(ModelElementBase modelElement)

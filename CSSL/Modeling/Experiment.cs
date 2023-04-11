@@ -14,7 +14,7 @@ namespace CSSL.Modeling
         /// Constructs an experiment.
         /// </summary>
         /// <param name="name">The name of the experiment.</param>
-        /// <param name="outputDirectory">The output directory the the results have to be written to.</param>
+        /// <param name="outputDirectory">The path where the results have to be written to.</param>
         /// <param name="numberOfReplications">The number of replications.</param>
         /// <param name="lengthOfWarmUp">The warm up time of a replication in simulation clock time.</param>
         /// <param name="lengthOfReplicationWallClock">The maximum wall clock time per replication in seconds.</param>
