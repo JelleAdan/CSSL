@@ -137,6 +137,7 @@ namespace CSSL.Observer
                 experimentWriter = value;
             }
         }
+
         protected List<Unsubscriber> cancellations;
 
         /// <summary>

@@ -19,15 +19,15 @@ namespace CSSL.Modeling.Elements
 
         public abstract bool TryAct(int action);
 
-        protected void GetAction(double[] state, double reward)
+        protected void GetAction(double[] state, double reward, Dictionary<string, string> info = null)
         {
-            reinforcementLearningLayer.GetAction(this, state, reward);
+            reinforcementLearningLayer.GetAction(this, state, reward, info);
             SchedulePauseEvent();
         }
 
-        protected void GetAction(double[][] state, double reward)
+        protected void GetAction(double[][] state, double reward, Dictionary<string, string> info = null)
         {
-            reinforcementLearningLayer.GetAction(this, state, reward);
+            reinforcementLearningLayer.GetAction(this, state, reward, info);
             SchedulePauseEvent();
         }
 

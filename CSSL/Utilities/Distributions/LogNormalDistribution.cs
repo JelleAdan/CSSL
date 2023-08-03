@@ -16,8 +16,7 @@ namespace CSSL.Utilities.Distributions
 
         public override double Next()
         {
-            return Math.Exp(rnd.NextDouble() * Sigma + Mu);
+            return Math.Exp(rnd.NextGaussian() * Sigma + Mu);
         }
-
     }
 }
